@@ -1,0 +1,8 @@
+ss:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: scheduling_system
+    username: root
+    password: xyk200406
