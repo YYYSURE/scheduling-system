@@ -284,4 +284,3 @@ create table user_position
 )
     comment 'user_position中间表' charset = utf8mb3
                                   row_format = DYNAMIC;
-

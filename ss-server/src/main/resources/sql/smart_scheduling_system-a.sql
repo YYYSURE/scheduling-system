@@ -405,9 +405,9 @@ CREATE TABLE `scheduling_date`  (
   `is_need_work` tinyint(0) NULL DEFAULT NULL COMMENT '是否需要工作 0：休假 1：工作',
   `start_work_time` varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '上班时间（8:00）',
   `end_work_time` varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '下班时间（21:00）',
-  `store_id` bigint(0) NULL DEFAULT NULL COMMENT '门店id'
+  `store_id` bigint(0) NULL DEFAULT NULL COMMENT '门店id',
   -- `task_id` bigint(0) NULL DEFAULT NULL COMMENT '任务id',
-  PRIMARY KEY (`id`) USING BTREE,
+  PRIMARY KEY (`id`) USING BTREE
   INDEX `taskId`(`task_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 34113 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '排班日期表' ROW_FORMAT = Dynamic;
 
