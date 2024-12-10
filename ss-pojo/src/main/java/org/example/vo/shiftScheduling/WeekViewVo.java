@@ -1,8 +1,8 @@
 package org.example.vo.shiftScheduling;
 
-import com.dam.model.entity.shiftScheduling.SchedulingDateEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.example.entity.SchedulingDate;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,5 +20,5 @@ public class WeekViewVo implements Serializable {
     /**
      * 每天的date，可以查看是否需要上班
      */
-    private HashMap<Integer, SchedulingDateEntity> indexAndDateMap;
+    private HashMap<Integer, SchedulingDate> indexAndDateMap;
 }

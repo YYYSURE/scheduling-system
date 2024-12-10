@@ -1,23 +1,16 @@
-package org.example.entity;
+package org.example.vo.enterprise;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import org.example.entity.Base;
 
-/**
- * 通知表
- *
- * @author dam
- * @email 1782067308@qq.com
- * @date 2023-03-20 15:43:46
- */
 @Data
-@TableName("message")
-public class Message extends Base implements Serializable {
+public class MessageItemVo extends Base implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -35,7 +28,6 @@ public class Message extends Base implements Serializable {
     /**
      * 门店id
      */
-
     @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
     /**
@@ -51,15 +43,40 @@ public class Message extends Base implements Serializable {
      * 发布时间
      */
     private Date publishTime;
+
     /**
      * 创建人id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long createUserId;
     /**
-     * 创建人id
+     * 发送人用户名
+     */
+    private String createUsername;
+    /**
+     * 发送人真实姓名
+     */
+    private String createName;
+    /**
+     * 发起人头像
+     */
+    private String createAvatar;
+    /**
+     * 发布人id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long publishUserId;
+    /**
+     * 发布人用户名
+     */
+    private String publishUsername;
+    /**
+     * 发布人真实姓名
+     */
+    private String publishName;
+    /**
+     * 发布人头像
+     */
+    private String publishAvatar;
 
 }

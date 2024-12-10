@@ -1,50 +1,50 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
 
 /**
- * 班次_用户中间表，记录用户与班次的关联信息
+ * 班次_用户中间表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-04 14:30:17
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ShiftUser {
+@TableName("shift_user")
+public class ShiftUser implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    private Date createTime;
 
+    @TableField(value = "update_time", fill = FieldFill.UPDATE)
+    private Date updateTime;
     /**
-     * 更新时间
+     * 班次id
      */
-    private LocalDateTime updateTime;
-
-    /**
-     * 是否删除：0-未删除，1-已删除
-     */
-    private Integer isDeleted;
-
-    /**
-     * 班次ID
-     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long shiftId;
-
     /**
-     * 用户ID
+     * 用户id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
-
     /**
-     * 职位ID（记录用户当时的职位）
+     * 记录用户当时的职位，可能后面升职了
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long positionId;
+
 }

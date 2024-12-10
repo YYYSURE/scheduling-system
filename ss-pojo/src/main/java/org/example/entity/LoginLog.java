@@ -1,44 +1,32 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.util.Date;
 
-/**
- * 登录日志表，记录用户登录的相关日志信息
- */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoginLog {
-    /**
-     * 主键ID
-     */
-    private Long id;
-
-    /**
-     * 删除标识：0-未删除，1-已删除
-     */
-    private Byte isDeleted;
-
-    /**
-     * 用户名
-     */
+@TableName("login_log")
+public class LoginLog extends Base{
+    private static final long serialVersionUID = 1L;
     private String username;
-
-    /**
-     * 登录IP地址
-     */
     private String ipaddr;
-
+    private Integer status;
+    private String msg;
+    private String browser;
+    private String os;
+    private Date access_time;
     /**
-     * 登录状态：0-失败，1-成功
+     * 企业id
      */
-    private String status;
-
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long enterpriseId;
     /**
-     * 访问时间
+     * 门店名称
      */
-    private Date accessTime;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long storeId;
 }

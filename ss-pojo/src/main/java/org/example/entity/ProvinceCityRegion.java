@@ -1,44 +1,36 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.Date;
+
+import java.io.Serializable;
 
 /**
- * 省-市-区表，记录省市区的地理层级信息
+ * 省-市-区表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-02-09 11:17:26
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProvinceCityRegion {
-    /**
-     * 主键ID
-     */
-    private Long id;
+@TableName("province_city_region")
+public class ProvinceCityRegion extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 地区名称（省/市/区）
+     * 名称
      */
     private String name;
-
     /**
-     * 地区类型：1-省，2-市，3-区
+     * 类型 0：省 1：市 2：区
      */
-    private Byte type;
-
+    private Integer type;
     /**
-     * 父级ID（省的parentId为0，市的parentId为省ID，区的parentId为市ID）
+     * 没有父元素设置为-1
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long parentId;
+
 }

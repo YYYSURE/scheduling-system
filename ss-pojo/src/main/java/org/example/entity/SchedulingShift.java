@@ -1,75 +1,71 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
+import lombok.ToString;
 
 /**
- * 排班班次表，记录系统的班次安排
+ * 排班班次表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-04 14:30:17
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SchedulingShift {
+@TableName("scheduling_shift")
+@ToString
+public class SchedulingShift implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    private Date createTime;
+
+    @TableField(value = "update_time", fill = FieldFill.UPDATE)
+    private Date updateTime;
 
     /**
-     * 更新时间
+     * 班次开始时间 2023-02-27 07:00:00
      */
-    private LocalDateTime updateTime;
-
+    private Date startDate;
     /**
-     * 删除标识：0-未删除，1-已删除
+     * 班次结束时间 2023-02-27 10:30:00
      */
-    private Integer isDeleted;
-
+    private Date endDate;
     /**
-     * 班次开始时间
+     * 对应排班工作日的id
      */
-    private LocalDateTime startDate;
-
-    /**
-     * 班次结束时间
-     */
-    private LocalDateTime endDate;
-
-    /**
-     * 对应排班工作日的ID
-     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long schedulingDateId;
-
     /**
      * 吃饭开始时间
      */
-    private LocalDateTime mealStartDate;
-
+    private Date mealStartDate;
     /**
      * 吃饭结束时间
      */
-    private LocalDateTime mealEndDate;
-
+    private Date mealEndDate;
     /**
-     * 午餐、晚餐或不安排用餐：0-午餐，1-晚餐，2-不安排用餐
+     * 0：午餐 1：晚餐 2：不安排用餐
      */
     private Integer mealType;
-
     /**
-     * 班次总时间（分钟）
+     * 班次时间（分钟）
      */
     private Integer totalMinute;
-
     /**
-     * 班次类型：0-正常班，1-开店，2-收尾
+     * 班次类型 0：正常班 1：开店 2：收尾
      */
     private Integer shiftType;
+
 }
