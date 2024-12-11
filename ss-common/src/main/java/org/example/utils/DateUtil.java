@@ -96,7 +96,7 @@ public class DateUtil {
      * @param date
      * @return
      */
-    public static DateUtil.DateEntity parseDate(Date date) {
+    public static DateEntity parseDate(Date date) {
         // 创建一个Calendar对象
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
         calendar.setTime(date);
@@ -109,7 +109,7 @@ public class DateUtil {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
-        DateUtil.DateEntity dateEntity = new DateUtil.DateEntity(year, month, day, hour, minute, second);
+        DateEntity dateEntity = new DateEntity(year, month, day, hour, minute, second);
         return dateEntity;
     }
 
