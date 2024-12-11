@@ -1,16 +1,17 @@
 package org.example.intelligent_scheduling_server.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
-import com.baomidou.mybatisplus.core.conditions.query.Query;
 import org.example.entity.SchedulingShift;
 import org.example.entity.ShiftUser;
 import org.example.enums.ResultCodeEnum;
 import org.example.exception.SSSException;
+import org.example.feign.EnterpriseFeignService;
 import org.example.intelligent_scheduling_server.dao.ShiftUserDao;
 import org.example.intelligent_scheduling_server.service.SchedulingShiftService;
 import org.example.intelligent_scheduling_server.service.ShiftUserService;
 import org.example.result.Result;
 import org.example.utils.PageUtils;
+import org.example.utils.Query;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -114,7 +114,8 @@ public class SchedulingTaskController {
         schedulingTask.setStoreId(storeId);
 
         //默认复制门店的排班规则
-        Result r = enterpriseFeignService.copySchedulingRule(storeId);
+        //TODO
+/*        Result r = enterpriseFeignService.copySchedulingRule(storeId);
         if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
             Long ruleId = r.getData("ruleId", new TypeReference<Long>() {
             });
@@ -122,7 +123,7 @@ public class SchedulingTaskController {
                 throw new SSSException(ResultCodeEnum.FAIL.getCode(), "门店规则还没有设置，请先设置规则再添加任务");
             }
             schedulingTask.setSchedulingRuleId(ruleId);
-        }
+        }*/
 
         schedulingTaskService.save(schedulingTask);
 

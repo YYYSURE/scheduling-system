@@ -47,8 +47,8 @@ public class ShiftSchedulingStatisticsController {
     public Result getStoreAverageStaffWorkTime(@RequestParam("year") Integer year, @RequestParam("month") Integer month, HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
         Long enterpriseId = Long.parseLong(JwtUtil.getEnterpriseId(httpServletRequest.getHeader("token")));
-
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+/*        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC + "getStoreAverageStaffWorkTime:" + enterpriseId + "_" + year + "_" + month,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -66,11 +66,12 @@ public class ShiftSchedulingStatisticsController {
                     return resultMap1;
                 },
                 1,
-                TimeUnit.DAYS);
+                TimeUnit.DAYS);*/
 
         System.out.println("getStoreAverageStaffWorkTime耗时：" + (System.currentTimeMillis() - start) + "ms");
-        return Result.ok().addData("storeNameList", resultMap.get("storeNameList"))
-                .addData("averageStaffWorkTimeList", resultMap.get("averageStaffWorkTimeList"));
+        /*return Result.ok().addData("storeNameList", resultMap.get("storeNameList"))
+                .addData("averageStaffWorkTimeList", resultMap.get("averageStaffWorkTimeList"));*/
+        return Result.ok();
     }
 
     /**
@@ -85,8 +86,8 @@ public class ShiftSchedulingStatisticsController {
     public Result getStoreShiftNumAndAllocationRate(@RequestParam("year") Integer year, @RequestParam("month") Integer month, HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
         Long enterpriseId = Long.parseLong(JwtUtil.getEnterpriseId(httpServletRequest.getHeader("token")));
-
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+/*        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC + "getStoreShiftNumAndAllocationRate:" + enterpriseId + "_" + year + "_" + month,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -112,7 +113,8 @@ public class ShiftSchedulingStatisticsController {
         System.out.println("getStoreShiftNumAndAllocationRate耗时：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("storeNameList", resultMap.get("storeNameList"))
                 .addData("averageShiftNumList", resultMap.get("averageShiftNumList"))
-                .addData("averageShiftAllocationRateList", resultMap.get("averageShiftAllocationRateList"));
+                .addData("averageShiftAllocationRateList", resultMap.get("averageShiftAllocationRateList"));*/
+        return Result.ok();
     }
 
     /**
@@ -127,8 +129,8 @@ public class ShiftSchedulingStatisticsController {
     public Result getAveragePassengerFlow(@RequestParam("year") Integer year, @RequestParam("month") Integer month, HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
         Long enterpriseId = Long.parseLong(JwtUtil.getEnterpriseId(httpServletRequest.getHeader("token")));
-
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+/*        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC + "getAveragePassengerFlow:" + enterpriseId + "_" + year + "_" + month,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -150,7 +152,8 @@ public class ShiftSchedulingStatisticsController {
 
         System.out.println("getAveragePassengerFlow耗时：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("storeNameList", resultMap.get("storeNameList"))
-                .addData("averagePassengerFlowList", resultMap.get("averagePassengerFlowList"));
+                .addData("averagePassengerFlowList", resultMap.get("averagePassengerFlowList"));*/
+        return Result.ok();
     }
 
     /**
@@ -166,7 +169,8 @@ public class ShiftSchedulingStatisticsController {
         long start = System.currentTimeMillis();
         Long enterpriseId = Long.parseLong(JwtUtil.getEnterpriseId(httpServletRequest.getHeader("token")));
 
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+        /*Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC + "getTotalLunchNumAndDinnerNum:" + enterpriseId + "_" + year + "_" + month,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -192,7 +196,8 @@ public class ShiftSchedulingStatisticsController {
         System.out.println("getTotalLunchNumAndDinnerNum耗时：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("storeNameList", resultMap.get("storeNameList"))
                 .addData("totalLunchNumList", resultMap.get("totalLunchNumList"))
-                .addData("totalDinnerNumList", resultMap.get("totalDinnerNumList"));
+                .addData("totalDinnerNumList", resultMap.get("totalDinnerNumList"));*/
+        return Result.ok();
     }
 
     /**
@@ -205,7 +210,8 @@ public class ShiftSchedulingStatisticsController {
     public Result getStatisticsVoByEnterpriseId(HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
         Long enterpriseId = Long.parseLong(JwtUtil.getEnterpriseId(httpServletRequest.getHeader("token")));
-        StatisticsVo statisticsVo = (StatisticsVo) distributedCache.safeGet(
+        //TODO
+/*        StatisticsVo statisticsVo = (StatisticsVo) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC + "getStatisticsVoByEnterpriseId:" + enterpriseId,
                 new TypeReference<StatisticsVo>() {
                 },
@@ -213,7 +219,8 @@ public class ShiftSchedulingStatisticsController {
                 1,
                 TimeUnit.DAYS);
         System.out.println("getStatisticsVoByEnterpriseId耗时：" + (System.currentTimeMillis() - start) + "ms");
-        return Result.ok().addData("statisticsVo", statisticsVo);
+        return Result.ok().addData("statisticsVo", statisticsVo);*/
+        return Result.ok();
     }
 
     /**
@@ -227,7 +234,8 @@ public class ShiftSchedulingStatisticsController {
         long start = System.currentTimeMillis();
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
 
-        StatisticsVo statisticsVo = (StatisticsVo) distributedCache.safeGet(
+        //TODO
+        /*StatisticsVo statisticsVo = (StatisticsVo) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getStatisticsVoByStoreId:" + storeId,
                 new TypeReference<StatisticsVo>() {
                 },
@@ -236,7 +244,8 @@ public class ShiftSchedulingStatisticsController {
                 TimeUnit.DAYS);
 
         System.out.println("getStatisticsVoByStoreId耗时：" + (System.currentTimeMillis() - start) + "ms");
-        return Result.ok().addData("statisticsVo", statisticsVo);
+        return Result.ok().addData("statisticsVo", statisticsVo);*/
+        return Result.ok();
     }
 
     /**
@@ -250,7 +259,8 @@ public class ShiftSchedulingStatisticsController {
         long start = System.currentTimeMillis();
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
 
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+        /*Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getMonthAverageStaffWorkTime:" + storeId + "_" + year,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -272,7 +282,8 @@ public class ShiftSchedulingStatisticsController {
 
         System.out.println("getMonthAverageStaffWorkTime耗时：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("monthNameList", resultMap.get("monthNameList"))
-                .addData("averageStaffWorkTimeList", resultMap.get("averageStaffWorkTimeList"));
+                .addData("averageStaffWorkTimeList", resultMap.get("averageStaffWorkTimeList"));*/
+        return Result.ok();
     }
 
     /**
@@ -287,7 +298,9 @@ public class ShiftSchedulingStatisticsController {
         long start = System.currentTimeMillis();
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
 
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+
+        //TODO
+        /*Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getMonthTotalLunchNumAndDinnerNum:" + storeId + "_" + year,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -313,7 +326,8 @@ public class ShiftSchedulingStatisticsController {
         System.out.println("getMonthTotalLunchNumAndDinnerNum耗时：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("monthNameList", resultMap.get("monthNameList"))
                 .addData("totalLunchNumList", resultMap.get("totalLunchNumList"))
-                .addData("totalDinnerNumList", resultMap.get("totalDinnerNumList"));
+                .addData("totalDinnerNumList", resultMap.get("totalDinnerNumList"));*/
+        return Result.ok();
     }
 
     /**
@@ -327,8 +341,8 @@ public class ShiftSchedulingStatisticsController {
     public Result getMonthShiftNumAndAllocationRate(@RequestParam("year") Integer year, HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
-
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+        /*Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getMonthShiftNumAndAllocationRate:" + storeId + "_" + year,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -354,7 +368,8 @@ public class ShiftSchedulingStatisticsController {
         System.out.println("getMonthShiftNumAndAllocationRate耗时：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("monthNameList", resultMap.get("monthNameList"))
                 .addData("averageShiftNumList", resultMap.get("averageShiftNumList"))
-                .addData("averageShiftAllocationRateList", resultMap.get("averageShiftAllocationRateList"));
+                .addData("averageShiftAllocationRateList", resultMap.get("averageShiftAllocationRateList"));*/
+        return Result.ok();
     }
 
     /**
@@ -370,8 +385,8 @@ public class ShiftSchedulingStatisticsController {
     public Result getUserWorkTime(@RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam("type") Integer type, @RequestParam("num") Integer num, HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
-
-        Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
+        //TODO
+        /*Map<String, Object> resultMap = (Map<String, Object>) distributedCache.safeGet(
                 MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getUserWorkTime:" + storeId + "_" + year,
                 new TypeReference<Map<String, Object>>() {
                 },
@@ -392,7 +407,8 @@ public class ShiftSchedulingStatisticsController {
                 TimeUnit.DAYS);
 
         System.out.println("getUserWorkTime耗时：" + (System.currentTimeMillis() - start) + "ms");
-        return Result.ok().addData("staffNameList", resultMap.get("staffNameList")).addData("averageWorkTimeList", resultMap.get("averageWorkTimeList"));
+        return Result.ok().addData("staffNameList", resultMap.get("staffNameList")).addData("averageWorkTimeList", resultMap.get("averageWorkTimeList"));*/
+        return Result.ok();
     }
 
 }

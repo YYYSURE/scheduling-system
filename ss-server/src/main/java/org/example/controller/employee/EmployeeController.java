@@ -65,7 +65,7 @@ public class EmployeeController {
         // User user = employeeService.getScheduling(username);
 
         // return Result.ok().addData("data", user);
-
+        return Result.ok();
     }
     /**
      * 提交调整排班申请
@@ -75,7 +75,7 @@ public class EmployeeController {
     @PostMapping("/adjustScheduling")
     public Result adjustScheduling() {
         //
-        employeeService.adjustScheduling();
+        //employeeService.adjustScheduling();
         return Result.ok();
     }
 

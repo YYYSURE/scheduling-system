@@ -8,6 +8,7 @@ import org.example.entity.SchedulingTask;
 import org.example.entity.Store;
 import org.example.enums.ResultCodeEnum;
 import org.example.exception.SSSException;
+import org.example.feign.EnterpriseFeignService;
 import org.example.intelligent_scheduling_server.constant.AlgoEnumConstant;
 import org.example.intelligent_scheduling_server.dao.SchedulingTaskDao;
 import org.example.intelligent_scheduling_server.service.SchedulingTaskService;
@@ -43,8 +44,6 @@ public class SchedulingTaskServiceImpl extends ServiceImpl<SchedulingTaskDao, Sc
     private ShiftSchedulingAlgorithmService shiftSchedulingAlgorithmService;
     @Autowired
     private ShiftUserService shiftUserService;
-    @Autowired
-    private SystemFeignService systemFeignService;
     @Autowired
     private EnterpriseFeignService enterpriseFeignService;
 
@@ -235,7 +234,8 @@ public class SchedulingTaskServiceImpl extends ServiceImpl<SchedulingTaskDao, Sc
 
     @Override
     public Long getTotalTaskByEnterpriseId(Long enterpriseId, Date firstDate, Date endDate) throws SSSException {
-        Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
+
+        /*Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
         if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
             List<Store> storeEntityList = r.getData("list", new TypeReference<List<Store>>() {
             });
@@ -246,7 +246,8 @@ public class SchedulingTaskServiceImpl extends ServiceImpl<SchedulingTaskDao, Sc
             return num;
         } else {
             throw new SSSException(ResultCodeEnum.Feign_ERROR);
-        }
+        }*/
+        return 0L;
     }
 
     @Override

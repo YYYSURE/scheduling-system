@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.constant.RedisConstant;
 import org.example.entity.*;
 import org.example.enums.ResultCodeEnum;
+import org.example.feign.EnterpriseFeignService;
+import org.example.feign.SystemFeignService;
 import org.example.intelligent_scheduling_server.service.*;
 import org.example.result.Result;
 import org.example.utils.DateUtil;
@@ -462,14 +464,14 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
             frontNUserIdList.add(averageWorkTimeVoList.get(i).getUserId());
         }
         //查询前n名员工的真实姓名
-        Result userMapByIdList = systemFeignService.getUserMapByIdList(frontNUserIdList);
+        /*Result userMapByIdList = systemFeignService.getUserMapByIdList(frontNUserIdList);
         if (userMapByIdList.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
             Map<Long, User> idAndUserEntityMap = userMapByIdList.getData("idAndUserEntityMap", new TypeReference<Map<Long, UserEntity>>() {
             });
             for (AverageWorkTimeVo averageWorkTimeVo : frontNAverageWorkTimeVoList) {
                 averageWorkTimeVo.setStaffName(idAndUserEntityMap.get(averageWorkTimeVo.getUserId()).getName());
             }
-        }
+        }*/
 
         //反转一下前端显示才正确
         Collections.reverse(frontNAverageWorkTimeVoList);

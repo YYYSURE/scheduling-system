@@ -43,10 +43,6 @@ import java.util.stream.Collectors;
 @Service
 public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgorithmService {
     @Autowired
-    private EnterpriseFeignService enterpriseFeignService;
-    @Autowired
-    private SystemFeignService systemFeignService;
-    @Autowired
     private SchedulingTaskService schedulingTaskService;
     @Autowired
     private SchedulingShiftService schedulingShiftService;
@@ -782,7 +778,8 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
         //// 设置门店员工信息
-        CompletableFuture<Void> searchEmployeeFuture = CompletableFuture.runAsync(() -> {
+        //TODO
+        /*CompletableFuture<Void> searchEmployeeFuture = CompletableFuture.runAsync(() -> {
             // 2.每一个线程都共享之前的请求数据
             RequestContextHolder.setRequestAttributes(requestAttributes);
             /// 调用远程服务查询门店的员工
@@ -818,10 +815,10 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             }
             instance.setEmployees(employees);
             System.out.println("员工数据构建完成----");
-        }, executor);
+        }, executor);*/
 
         //// 调用远程服务查询门店的排班规则
-        CompletableFuture<Void> searchRuleFuture = CompletableFuture.runAsync(() -> {
+/*        CompletableFuture<Void> searchRuleFuture = CompletableFuture.runAsync(() -> {
             // 2.每一个线程都共享之前的请求数据
             RequestContextHolder.setRequestAttributes(requestAttributes);
             Result ruleR = enterpriseFeignService.getSchedulingRuleVoById(schedulingCalculateVo.getSchedulingRuleId());
@@ -860,8 +857,8 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
-        }
-
+        }*/
+        return new Instance();
     }
 
     /**

@@ -1,3 +1,4 @@
+/*
 package org.example.feign.config;
 
 import feign.RequestInterceptor;
@@ -8,9 +9,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+*/
 /**
  * 调用远程服务的时候传递token过去
- */
+ *//*
+
 @Configuration
 public class FeignConfig implements RequestInterceptor {
 
@@ -24,3 +27,4 @@ public class FeignConfig implements RequestInterceptor {
     }
 
 }
+*/

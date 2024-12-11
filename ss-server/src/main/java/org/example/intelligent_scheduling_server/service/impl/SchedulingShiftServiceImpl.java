@@ -200,7 +200,8 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
 
     @Override
     public Long getTotalShiftNumByEnterpriseId(Long enterpriseId, Date startDate, Date endDate) throws SSSException {
-        Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
+        //TODO
+        /*Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
         if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
             List<Store> storeEntityList = r.getData("list", new TypeReference<List<Store>>() {
             });
@@ -216,7 +217,8 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             return totalShiftNum;
         } else {
             throw new SSSException(ResultCodeEnum.Feign_ERROR);
-        }
+        }*/
+        return 0L;
     }
 
     @Override
@@ -480,7 +482,8 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             ///调用远程服务查询员工的姓名
             System.out.println("totalUserIdList数量：" + totalUserIdList.size());
             if (totalUserIdList.size() > 0) {
-                Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(totalUserIdList));
+                //TODO
+                /*Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(totalUserIdList));
                 if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                     List<UserInfoVo> userInfoVoList = r.getData("userInfoVoList", new TypeReference<List<UserInfoVo>>() {
                     });
@@ -490,20 +493,21 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
                         }
                     }
 
-                }
+                }*/
 //                System.out.println("listSchedulingShiftVoByDateId 3：" + (System.currentTimeMillis() - start) + "ms");
             }
 
             ///调用远程服务查询员工的职位名称
             System.out.println("totalPositionIdSet数量：" + totalPositionIdSet.size());
             if (totalPositionIdSet.size() > 0) {
-                Result r1 = enterpriseFeignService.listPositionListByPositionIdList(new ArrayList<>(totalPositionIdSet));
+                //TODO
+                /*Result r1 = enterpriseFeignService.listPositionListByPositionIdList(new ArrayList<>(totalPositionIdSet));
                 if (r1.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                     for (Position position : r1.getData("positionEntityList", new TypeReference<List<Position>>() {
                     })) {
                         positionIdAndPositionMap.put(position.getId(), position);
                     }
-                }
+                }*/
 //                System.out.println("listSchedulingShiftVoByDateId 4：" + (System.currentTimeMillis() - start) + "ms");
             }
 
@@ -608,14 +612,15 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             }
 //        System.out.println("listWeekViewShiftVoBetweenStartDateAndEndDate查询时间2："+(System.currentTimeMillis()-start)+"ms");
             // 调用远程服务，根据id查询用户的具体信息
-            Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(userIdSet));
+            //TODO
+/*            Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(userIdSet));
 //        System.out.println("listWeekViewShiftVoBetweenStartDateAndEndDate查询时间3："+(System.currentTimeMillis()-start)+"ms");
             if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                 for (UserInfoVo userInfoVo : r.getData("userInfoVoList", new TypeReference<List<UserInfoVo>>() {
                 })) {
                     userIdAndUserInfoVoMap.put(userInfoVo.getId(), userInfoVo);
                 }
-            }
+            }*/
 //        System.out.println("listWeekViewShiftVoBetweenStartDateAndEndDate查询时间4："+(System.currentTimeMillis()-start)+"ms");
         }
 

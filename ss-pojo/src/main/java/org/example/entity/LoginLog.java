@@ -13,7 +13,6 @@ import java.util.Date;
 public class LoginLog extends Base{
     private static final long serialVersionUID = 1L;
     private String username;
-    private Long storeId;
     private String ipaddr;
     private Integer status;
     private String msg;
