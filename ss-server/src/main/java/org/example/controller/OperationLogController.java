@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import com.alibaba.fastjson.TypeReference;
-import org.example.feign.EnterpriseFeignService;
+
 //import org.example.entity.Enterprise;
 import org.example.entity.Store;
 import org.example.entity.OperationLog;
@@ -31,8 +31,8 @@ import java.util.*;
 public class OperationLogController {
     @Autowired
     private OperationLogService operationLogService;
-    @Autowired
-    private EnterpriseFeignService enterpriseFeignService;
+//    @Autowired
+//    private EnterpriseFeignService enterpriseFeignService;
     private static final String title = "操作日志管理";
 
     /**
@@ -73,19 +73,21 @@ public class OperationLogController {
 //            }
 //        }
         //设置门店名称
-        Result r2 = enterpriseFeignService.getStoreMapByIdList(new ArrayList<>(storeIdList));
-        if (r2.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-            Map<Long, Store> idAndStoreEntityMap = r2.getData("idAndStoreEntityMap",
-                    new TypeReference<Map<Long, Store>>() {
-                    });
-            for (OperationLogVo operationLogVo : operationLogVoList) {
-                Long storeId = operationLogVo.getStoreId();
-                operationLogVo.setStoreName(idAndStoreEntityMap.get(storeId).getName());
-            }
-        }
-        page.setList(operationLogVoList);
-
-        return Result.ok().addData("page", page);
+        // TODO:
+        return Result.ok();
+//        Result r2 = enterpriseFeignService.getStoreMapByIdList(new ArrayList<>(storeIdList));
+//        if (r2.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
+//            Map<Long, Store> idAndStoreEntityMap = r2.getData("idAndStoreEntityMap",
+//                    new TypeReference<Map<Long, Store>>() {
+//                    });
+//            for (OperationLogVo operationLogVo : operationLogVoList) {
+//                Long storeId = operationLogVo.getStoreId();
+//                operationLogVo.setStoreName(idAndStoreEntityMap.get(storeId).getName());
+//            }
+//        }
+//        page.setList(operationLogVoList);
+//
+//        return Result.ok().addData("page", page);
     }
 
 

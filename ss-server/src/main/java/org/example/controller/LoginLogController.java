@@ -3,7 +3,6 @@ package org.example.controller;
 import java.util.*;
 
 import com.alibaba.fastjson.TypeReference;
-import org.example.feign.EnterpriseFeignService;
 //import org.example.entity.Enterprise;
 import org.example.entity.Store;
 import org.example.entity.LoginLog;
@@ -36,8 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginLogController {
     @Autowired
     private LoginLogService loginLogService;
-    @Autowired
-    private EnterpriseFeignService enterpriseFeignService;
+//    @Autowired
+//    private EnterpriseFeignService enterpriseFeignService;
 
     /**
      * 列表
@@ -75,19 +74,21 @@ public class LoginLogController {
 //            }
 //        }
         //设置门店名称
-        Result r2 = enterpriseFeignService.getStoreMapByIdList(new ArrayList<>(storeIdList));
-        if (r2.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-            Map<Long, Store> idAndStoreEntityMap = r2.getData("idAndStoreEntityMap",
-                    new TypeReference<Map<Long, Store>>() {
-                    });
-            for (LoginLogVo loginLogVo : loginLogVoList) {
-                Long storeId = loginLogVo.getStoreId();
-                loginLogVo.setStoreName(idAndStoreEntityMap.get(storeId).getName());
-            }
-        }
-        page.setList(loginLogVoList);
-
-        return Result.ok().addData("page", page);
+        // TODO:
+//        Result r2 = enterpriseFeignService.getStoreMapByIdList(new ArrayList<>(storeIdList));
+//        if (r2.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
+//            Map<Long, Store> idAndStoreEntityMap = r2.getData("idAndStoreEntityMap",
+//                    new TypeReference<Map<Long, Store>>() {
+//                    });
+//            for (LoginLogVo loginLogVo : loginLogVoList) {
+//                Long storeId = loginLogVo.getStoreId();
+//                loginLogVo.setStoreName(idAndStoreEntityMap.get(storeId).getName());
+//            }
+//        }
+//        page.setList(loginLogVoList);
+//
+//        return Result.ok().addData("page", page);
+        return Result.ok();
     }
 
 

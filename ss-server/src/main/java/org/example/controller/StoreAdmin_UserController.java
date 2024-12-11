@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 //import org.example.enums.IdempotentSceneEnum;
 //import org.example.enums.IdempotentTypeEnum;
 import org.example.exception.SSSException;
-import org.example.feign.ShiftSchedulingCalculateFeignService;
 import org.example.entity.User;
 import org.example.entity.UserRole;
 import org.example.enums.ResultCodeEnum;
@@ -38,8 +37,8 @@ import java.util.*;
 public class StoreAdmin_UserController {
     @Autowired
     private StoreAdmin_UserService adminUserService;
-    @Autowired
-    private ShiftSchedulingCalculateFeignService shiftSchedulingCalculateFeignService;
+//    @Autowired
+//    private ShiftSchedulingCalculateFeignService shiftSchedulingCalculateFeignService;
     private static final String title = "用户管理";
 
     @PostMapping("/{page}/{limit}")
@@ -73,19 +72,21 @@ public class StoreAdmin_UserController {
                 param.put("shiftStartDate", shiftStartDate);
                 param.put("shiftEndDate", shiftEndDate);
                 param.put("storeId", storeId);
-                Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
-                if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-                    List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
-                    });
-                    for (UserInfoVo userInfoVo : userInfoVoList) {
-                        if (userIdListIsBusy.indexOf(userInfoVo.getId()) != -1) {
-                            //--if--用户繁忙
-                            userInfoVo.setIsBusy(true);
-                        } else {
-                            userInfoVo.setIsBusy(false);
-                        }
-                    }
-                }
+                // TODO:
+                return Result.ok();
+//                Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
+//                if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
+//                    List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
+//                    });
+//                    for (UserInfoVo userInfoVo : userInfoVoList) {
+//                        if (userIdListIsBusy.indexOf(userInfoVo.getId()) != -1) {
+//                            //--if--用户繁忙
+//                            userInfoVo.setIsBusy(true);
+//                        } else {
+//                            userInfoVo.setIsBusy(false);
+//                        }
+//                    }
+//                }
             }
         } else {
             if (userQueryVo.getBusyStatus() == 0) {

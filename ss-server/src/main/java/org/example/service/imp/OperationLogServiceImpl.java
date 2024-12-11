@@ -22,13 +22,15 @@ import java.util.Map;
 class OperationLogServiceImpl extends ServiceImpl<OperationLogDao, OperationLog> implements OperationLogService {
     @Autowired
     private OperationLogDao OperationLogDao;
-    @Autowired
-    private EnterpriseAdmin_UserService adminUserService;
+//    @Autowired
+//    private EnterpriseAdmin_UserService adminUserService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, String token) {
         Long userId = Long.parseLong(JwtUtil.getUserId(token));
-        User user = adminUserService.getById(userId);
+        // TODO:
+        User user = new User();
+        //User user = adminUserService.getById(userId);
         String enterpriseId = JwtUtil.getEnterpriseId(token);
         String storeId = JwtUtil.getStoreId(token);
         QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
