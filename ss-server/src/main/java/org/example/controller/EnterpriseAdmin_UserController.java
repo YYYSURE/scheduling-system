@@ -72,20 +72,21 @@ public class EnterpriseAdmin_UserController {
                 param.put("shiftStartDate", shiftStartDate);
                 param.put("shiftEndDate", shiftEndDate);
                 param.put("storeId", storeId);
-                //TODO
-                /*Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
-                if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-                    List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
-                    });
-                    for (UserInfoVo userInfoVo : userInfoVoList) {
-                        if (userIdListIsBusy.indexOf(userInfoVo.getId()) != -1) {
-                            //--if--用户繁忙
-                            userInfoVo.setIsBusy(true);
-                        } else {
-                            userInfoVo.setIsBusy(false);
-                        }
-                    }
-                }*/
+                // TODO:
+                return Result.ok();
+//                Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
+//                if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
+//                    List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
+//                    });
+//                    for (UserInfoVo userInfoVo : userInfoVoList) {
+//                        if (userIdListIsBusy.indexOf(userInfoVo.getId()) != -1) {
+//                            //--if--用户繁忙
+//                            userInfoVo.setIsBusy(true);
+//                        } else {
+//                            userInfoVo.setIsBusy(false);
+//                        }
+//                    }
+//                }
             }
         } else {
             if (userQueryVo.getBusyStatus() == 0) {
