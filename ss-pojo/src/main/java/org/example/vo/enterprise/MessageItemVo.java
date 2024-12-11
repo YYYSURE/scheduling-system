@@ -1,5 +1,7 @@
 package org.example.vo.enterprise;
 
+import org.example.entity.Base;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
@@ -7,7 +9,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import org.example.entity.Base;
 
 @Data
 public class MessageItemVo extends Base implements Serializable {

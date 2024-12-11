@@ -96,6 +96,10 @@ public class User extends Base implements Serializable {
      */
     private String workDayPreference;
     /**
+     * 所属企业id
+     */
+    private Integer enterpriseId;
+    /**
      * 工作时间偏好（1:00~3.00|5.00~8.00|17.00~21.00），缺省为全部）
      */
     private String workTimePreference;

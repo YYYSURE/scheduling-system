@@ -49,6 +49,10 @@ public class Store extends Base implements Serializable {
      */
     private String address;
     /**
+     * 所属企业id
+     */
+    private Integer enterpriseId;
+    /**
      * 工作场所面积
      */
     private BigDecimal size;
