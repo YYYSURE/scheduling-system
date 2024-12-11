@@ -1,60 +1,60 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.valid.annotations.TypeAnno;
+import org.example.valid.groups.AddGroup;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 节日表
+ * 门店节日表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-13 16:42:08
  */
 @Data
+@TableName("festival")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Festival {
-    /**
-     * 主键
-     */
-    private Long id;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 是否删除 0：未删除 1：已删除
-     */
-    private Byte isDeleted;
+public class Festival extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 节日名称
      */
+    @NotBlank(message = "节日名称不能为空")
     private String name;
 
     /**
      * 起始日期
      */
+    @NotNull(message = "起始日期不能为空", groups = {AddGroup.class})
     private Date startDate;
 
     /**
      * 截止日期
      */
+    @NotNull(message = "截止日期不能为空", groups = {AddGroup.class})
     private Date endDate;
-
-    /**
-     * 类型 0：农历 1：新历
-     */
-    private Byte type;
 
     /**
      * 门店id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
+
+    /**
+     * 0：农历 1：新历
+     */
+    @TypeAnno(values = {0, 1}, groups = {AddGroup.class}, message = "节日日期类型只能是农历（0）、新历（1）")
+    private int type;
 }

@@ -1,63 +1,87 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.Date;
+
+import java.io.Serializable;
 
 /**
- * 操作日志表，记录系统中所有的操作日志
+ * 操作日志表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-13 16:42:08
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class OperationLog {
+@TableName("operation_log")
+public class OperationLog extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
-     * 主键ID
+     * 模块标题
      */
-    private Long id;
-
+    private String title;
     /**
-     * 创建时间
+     * 业务类型 (0其它 1新增 2修改 3删除)
      */
-    private Date createTime;
-
+    private Integer businessType;
     /**
-     * 更新时间
+     * 方法名称
      */
-    private Date updateTime;
+    private String method;
     /**
-     * 所属门店ID
+     * 说明
      */
+    private String detail;
+    /**
+     * 请求方式
+     */
+    private String requestMethod;
+    /**
+     * 操作类别(0其它 1后台用户 2手机端用户)
+     */
+    private Integer operatorType;
+    /**
+     * 操作人员
+     */
+    private String operName;
+    /**
+     * 企业id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long enterpriseId;
+    /**
+     * 门店名称
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
-
     /**
-     * 删除标识：0-未删除，1-已删除
+     * 请求URL
      */
-    private Byte isDeleted;
-
+    private String operUrl;
     /**
-     * 业务类型：1-用户管理，2-权限管理，3-订单处理等
-     */
-    private Byte businessType;
-
-    /**
-     * 操作人ID
-     */
-    private Long userId;
-
-    /**
-     * 操作IP
+     * 主机地址
      */
     private String operIp;
-
     /**
-     * 操作状态：0-失败，1-成功
+     * 操作地点
      */
-    private Byte status;
-
+    private String operLocation;
     /**
-     * 错误信息（如果有）
+     * 请求参数
+     */
+    private String operParam;
+    /**
+     * 返回参数
+     */
+    private String jsonResult;
+    /**
+     * 操作状态 (0正常 1异常)
+     */
+    private Integer status;
+    /**
+     * 错误消息
      */
     private String errorMsg;
 }

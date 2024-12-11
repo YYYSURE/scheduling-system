@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 
-@Service("userService")
+@Service
 public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, User> implements StoreAdmin_UserService {
 
 

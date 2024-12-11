@@ -1,68 +1,60 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
- * 门店表，记录门店的基本信息
+ * 门店表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-02-09 11:17:26
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Store {
+@TableName("store")
+public class Store extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
-     */
-    private Long id;
-
-    /**
-     * 创建时间
-     */
-    private java.time.LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    private java.time.LocalDateTime updateTime;
-
-    /**
-     * 门店名称
+     * 名称
      */
     private String name;
-
     /**
-     * 省份ID
+     * 企业id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long enterpriseId;
+    /**
+     * 省
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long provinceId;
-
     /**
-     * 城市ID
+     * 市
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long cityId;
-
     /**
-     * 区域ID
+     * 区
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long regionId;
-
     /**
      * 详细地址
      */
     private String address;
     /**
-     * 所属企业id
+     * 工作场所面积
      */
-    private Integer enterpriseId;
-
+    private BigDecimal size;
     /**
-     * 门店工作场所面积
-     */
-    private java.math.BigDecimal size;
-
-    /**
-     * 门店状态：0-营业中，1-休息中
+     * 0：营业中 1：休息中（默认0）
      */
     private Integer status;
+
 }

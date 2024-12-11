@@ -1,119 +1,120 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.Date;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
- * 排班规则表，记录系统的排班规则设置
+ * 门店规则中间表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-02-23 21:34:22
  */
 @Data
-@NoArgsConstructor
+@TableName("scheduling_rule")
 @AllArgsConstructor
-public class SchedulingRule {
-    /**
-     * 主键ID
-     */
-    private Long id;
+@NoArgsConstructor
+public class SchedulingRule extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 创建时间
+     *
      */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 删除标识：0-未删除，1-已删除
-     */
-    private Byte isDeleted;
-
-    /**
-     * 门店ID
-     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
-
     /**
-     * 门店工作时间区间（如：09:00-18:00）
+     * 门店工作时间段
      */
     private String storeWorkTimeFrame;
-
     /**
-     * 一天最大工作小时数
+     * 员工一天最多工作几小时
      */
-    private Double mostWorkHourInOneDay;
-
+    private BigDecimal mostWorkHourInOneDay;
     /**
-     * 一周最大工作小时数
+     * 员工一周最多工作几小时
      */
-    private Double mostWorkHourInOneWeek;
-
+    private BigDecimal mostWorkHourInOneWeek;
     /**
-     * 最短排班时间（分钟）
+     * 一个班次的最少时间（分钟为单位）
      */
-    private Integer minShiftMinute;
-
+    private int minShiftMinute;
     /**
-     * 最长排班时间（分钟）
+     * 一个班次的最大时间（分钟为单位）
      */
-    private Integer maxShiftMinute;
-
+    private int maxShiftMinute;
     /**
-     * 休息时间（分钟）
+     * 休息时间长度（分钟为单位）
      */
-    private Integer restMinute;
-
+    private int restMinute;
     /**
-     * 最大连续工作时间（小时）
+     * 员工最长连续工作时间
      */
-    private Double maximumContinuousWorkTime;
-
+    private BigDecimal maximumContinuousWorkTime;
     /**
      * 开店规则
      */
     private String openStoreRule;
-
     /**
      * 关店规则
      */
     private String closeStoreRule;
-
     /**
-     * 正常排班规则
+     * 正常班规则
      */
     private String normalRule;
-
     /**
-     * 无顾客时排班规则
+     * 无客流量值班规则
      */
     private String noPassengerRule;
-
     /**
-     * 每天最小排班数量
+     * 每天最少班次
      */
     private Integer minimumShiftNumInOneDay;
-
     /**
-     * 正常班次排班规则
+     * 正常班次规则
      */
     private String normalShiftRule;
-
     /**
-     * 午餐时间规则
+     * 午餐时间
      */
     private String lunchTimeRule;
-
     /**
-     * 晚餐时间规则
+     * 晚餐时间
      */
     private String dinnerTimeRule;
-
     /**
-     * 排班规则类型：0-普通，1-特殊
+     * 规则类型 0：主规则 1：从规则（和任务绑定）
      */
-    private Byte ruleType;
+    private Integer ruleType;
+
+    public SchedulingRule(Long storeId, String storeWorkTimeFrame, BigDecimal mostWorkHourInOneDay, BigDecimal mostWorkHourInOneWeek, int minShiftMinute, int maxShiftMinute, int restMinute, BigDecimal maximumContinuousWorkTime, String openStoreRule, String closeStoreRule, String normalRule, String noPassengerRule, Integer minimumShiftNumInOneDay, String normalShiftRule, String lunchTimeRule, String dinnerTimeRule, int type) {
+        this.storeId = storeId;
+        this.storeWorkTimeFrame = storeWorkTimeFrame;
+        this.mostWorkHourInOneDay = mostWorkHourInOneDay;
+        this.mostWorkHourInOneWeek = mostWorkHourInOneWeek;
+        this.minShiftMinute = minShiftMinute;
+        this.maxShiftMinute = maxShiftMinute;
+        this.restMinute = restMinute;
+        this.maximumContinuousWorkTime = maximumContinuousWorkTime;
+        this.openStoreRule = openStoreRule;
+        this.closeStoreRule = closeStoreRule;
+        this.normalRule = normalRule;
+        this.noPassengerRule = noPassengerRule;
+        this.minimumShiftNumInOneDay = minimumShiftNumInOneDay;
+        this.normalShiftRule = normalShiftRule;
+        this.lunchTimeRule = lunchTimeRule;
+        this.dinnerTimeRule = dinnerTimeRule;
+        this.ruleType = type;
+    }
+
+    public SchedulingRule clone() {
+        return new SchedulingRule(storeId, storeWorkTimeFrame, mostWorkHourInOneDay, mostWorkHourInOneWeek, minShiftMinute, maxShiftMinute, restMinute, maximumContinuousWorkTime, openStoreRule, closeStoreRule, normalRule, noPassengerRule, minimumShiftNumInOneDay, normalShiftRule, lunchTimeRule, dinnerTimeRule, ruleType);
+    }
 }

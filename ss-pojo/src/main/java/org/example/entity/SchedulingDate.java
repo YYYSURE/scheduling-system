@@ -1,59 +1,65 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 排班日期表，记录每个排班日期的详细信息
+ * 排班日期表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-04 14:30:17
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SchedulingDate {
-    /**
-     * 主键ID
-     */
+@TableName("scheduling_date")
+public class SchedulingDate implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 创建时间
-     */
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private Date createTime;
 
-    /**
-     * 更新时间
-     */
+    @TableField(value = "update_time", fill = FieldFill.UPDATE)
     private Date updateTime;
 
     /**
-     * 删除标识：0-未删除，1-已删除
-     */
-    private Byte isDeleted;
-
-    /**
-     * 排班日期
+     * 日期
      */
     private Date date;
-
     /**
-     * 是否需要工作：0-否，1-是
+     * 是否需要工作 0：休假 1：工作
      */
-    private Byte isNeedWork;
-
+    private Integer isNeedWork;
     /**
-     * 开始工作时间（例如：09:00）
+     * 上班时间（8:00）
      */
     private String startWorkTime;
-
     /**
-     * 结束工作时间（例如：18:00）
+     * 下班时间（21:00）
      */
     private String endWorkTime;
-
     /**
-     * 所属门店ID
+     * 门店id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
+    /**
+     * 任务id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long taskId;
+    /**
+     * 当天是否含有班次
+     */
+    @TableField(exist = false)
+    private Integer isHaveShift = 0;
+
 }

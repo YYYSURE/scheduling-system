@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 字符集工具类
- *
- * @author ruoyi
  */
 public class CharsetKit
 {
@@ -26,7 +24,6 @@ public class CharsetKit
 
     /**
      * 转换为Charset对象
-     *
      * @param charset 字符集，为空则返回默认字符集
      * @return Charset
      */
@@ -37,7 +34,6 @@ public class CharsetKit
 
     /**
      * 转换字符串的字符集编码
-     *
      * @param source 字符串
      * @param srcCharset 源字符集，默认ISO-8859-1
      * @param destCharset 目标字符集，默认UTF-8
@@ -50,7 +46,6 @@ public class CharsetKit
 
     /**
      * 转换字符串的字符集编码
-     *
      * @param source 字符串
      * @param srcCharset 源字符集，默认ISO-8859-1
      * @param destCharset 目标字符集，默认UTF-8

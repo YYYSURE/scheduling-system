@@ -4,6 +4,7 @@ import org.example.vo.system.UserInfoVo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
+import org.example.vo.system.UserInfoVo;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1,55 +1,58 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 系统定时通知表，记录系统发送的定时通知信息
+ * 系统定时通知
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-21 20:45:41
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SystemScheduledNotice {
+@TableName("system_scheduled_notice")
+public class SystemScheduledNotice extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * 门店id
      */
-    private Long id;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
-
-    /**
-     * 门店ID
-     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
 
     /**
-     * 上班通知提醒时间
+     * 门店是否启用上班通知提醒
      */
-    private LocalDateTime workNoticeTime;
+    private Integer workNoticeUse;
 
     /**
-     * 上班通知方式：0-系统消息，1-邮件，2-系统消息及邮件
+     * 上班通知提醒时间，如每天晚上八点提醒相关人员第二天是否需要上班
+     */
+    private Date workNoticeTime;
+
+    /**
+     * 工作通知方式 0：系统发送消息 1：发送邮件 2：系统发送消息及发送邮件
      */
     private Integer workNoticeType;
 
     /**
-     * 休假通知提醒时间
+     * 门店是否启用休假通知提醒
      */
-    private LocalDateTime holidayNoticeTime;
+    private Integer holidayNoticeUse;
 
     /**
-     * 休假通知方式：0-系统消息，1-邮件，2-系统消息及邮件
+     * 休假通知提醒时间，如每天晚上八点提醒相关人员第二天是否需要上班
+     */
+    private Date holidayNoticeTime;
+
+    /**
+     * 休假通知方式 0：系统发送消息 1：发送邮件 2：系统发送消息及发送邮件
      */
     private Integer holidayNoticeType;
 }

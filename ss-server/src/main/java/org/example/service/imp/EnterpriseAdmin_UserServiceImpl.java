@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 
-@Service("userService")
+@Service
 public class EnterpriseAdmin_UserServiceImpl extends ServiceImpl<EnterpriseAdmin_UserDao, User> implements EnterpriseAdmin_UserService {
 
 

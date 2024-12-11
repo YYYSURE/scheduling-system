@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 //import org.example.enums.IdempotentSceneEnum;
 //import org.example.enums.IdempotentTypeEnum;
 import org.example.exception.SSSException;
-import org.example.feign.ShiftSchedulingCalculateFeignService;
 import org.example.entity.User;
 import org.example.entity.UserRole;
 import org.example.enums.ResultCodeEnum;
@@ -40,8 +39,6 @@ public class EnterpriseAdmin_UserController {
     private EnterpriseAdmin_UserService adminUserService;
     @Autowired
     private EnterpriseAdmin_UserRoleService adminUserRoleService;
-    @Autowired
-    private ShiftSchedulingCalculateFeignService shiftSchedulingCalculateFeignService;
     private static final String title = "用户管理";
 
     @PostMapping("/{page}/{limit}")

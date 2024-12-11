@@ -1,45 +1,33 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
+
+import java.io.Serializable;
 
 /**
- * 用户-消息中间表，记录用户与消息的关联信息
+ * 用户-消息中间表
+ *
+ * @author dam
+ * @email 1782067308@qq.com
+ * @date 2023-03-20 15:43:46
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserMessage {
+@TableName("user_message")
+public class UserMessage extends Base implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * 用户id
      */
-    private Long id;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
-
-    /**
-     * 是否删除：0-未删除，1-已删除
-     */
-    private Integer isDeleted;
-
-    /**
-     * 用户ID
-     */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
-
     /**
-     * 消息ID
+     * 消息id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long messageId;
+
 }
