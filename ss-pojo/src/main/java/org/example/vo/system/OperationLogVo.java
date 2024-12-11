@@ -1,10 +1,10 @@
 package org.example.vo.system;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.dam.model.entity.BaseEntity;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
+import org.example.entity.Base;
 
 import java.io.Serializable;
 
@@ -17,7 +17,7 @@ import java.io.Serializable;
  */
 @Data
 @TableName("operation_log")
-public class OperationLogVo extends BaseEntity implements Serializable {
+public class OperationLogVo extends Base implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
