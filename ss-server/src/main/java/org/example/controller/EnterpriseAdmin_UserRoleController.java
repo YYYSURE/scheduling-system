@@ -2,7 +2,7 @@ package org.example.controller;
 
 import org.example.entity.UserRole;
 import org.example.result.Result;
-import org.example.service.UserRoleService;
+import org.example.service.EnterpriseAdmin_UserRoleService;
 import org.example.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,17 +19,17 @@ import java.util.Map;
  * @date 2022-12-03 21:21:06
  */
 @RestController
-@RequestMapping("system/userrole")
-public class UserRoleController {
+@RequestMapping("system/Admin_userrole")
+public class EnterpriseAdmin_UserRoleController {
     @Autowired
-    private UserRoleService userRoleService;
+    private EnterpriseAdmin_UserRoleService adminUserRoleService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     public Result list(@RequestParam Map<String, Object> params){
-        PageUtils page = userRoleService.queryPage(params);
+        PageUtils page = adminUserRoleService.queryPage(params);
 
         return Result.ok().addData("page", page);
     }
@@ -40,7 +40,7 @@ public class UserRoleController {
      */
     @RequestMapping("/info/{id}")
     public Result info(@PathVariable("id") Long id){
-        UserRole userRole = userRoleService.getById(id);
+        UserRole userRole = adminUserRoleService.getById(id);
 
         return Result.ok().addData("userRole", userRole);
     }
@@ -50,7 +50,7 @@ public class UserRoleController {
      */
     @RequestMapping("/save")
     public Result save(@RequestBody UserRole userRole){
-        userRoleService.save(userRole);
+        adminUserRoleService.save(userRole);
 
         return Result.ok();
     }
@@ -60,9 +60,9 @@ public class UserRoleController {
      */
     @RequestMapping("/update")
     public Result update(@RequestBody UserRole userRole){
-        userRoleService.updateById(userRole);
+        adminUserRoleService.updateById(userRole);
 
-        return Result.ok().ok();
+        return Result.ok();
     }
 
     /**
@@ -70,7 +70,7 @@ public class UserRoleController {
      */
     @RequestMapping("/delete")
     public Result delete(@RequestBody Long[] ids){
-        userRoleService.removeByIds(Arrays.asList(ids));
+        adminUserRoleService.removeByIds(Arrays.asList(ids));
 
         return Result.ok();
     }

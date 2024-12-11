@@ -1,17 +1,18 @@
 package org.example.dao;
 
-import org.example.entity.Store;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.example.entity.Message;
 
 /**
- * 门店表
+ * 通知表
  *
  * @author dam
  * @email 1782067308@qq.com
- * @date 2023-02-09 11:17:26
+ * @date 2023-03-20 15:43:46
  */
 @Mapper
-public interface StoreDao extends BaseMapper<Store> {
+public interface StoreAdmin_MessageDao extends BaseMapper<Message> {
 
 }

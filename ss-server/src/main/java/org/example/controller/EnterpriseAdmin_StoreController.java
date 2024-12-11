@@ -8,12 +8,9 @@ import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.example.entity.OperationLog;
-import org.example.enums.BusinessTypeEnum;
 import org.example.result.Result;
 import org.example.vo.enterprise.StoreVo;
-import org.example.service.ProvinceCityRegionService;
-import org.example.utils.JwtUtil;
+import org.example.service.EnterpriseAdmin_ProvinceCityRegionService;
 import org.example.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.example.entity.Store;
-import org.example.service.StoreService;
-
-import javax.servlet.http.HttpServletRequest;
+import org.example.service.EnterpriseAdmin_StoreService;
 
 /**
  * 门店表
@@ -33,12 +28,12 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2023-02-09 11:17:26
  */
 @RestController
-@RequestMapping("store")
-public class StoreController {
+@RequestMapping("EnterpriseAdmin_store")
+public class EnterpriseAdmin_StoreController {
     @Autowired
-    private StoreService storeService;
+    private EnterpriseAdmin_StoreService enterpriseAdminStoreService;
     @Autowired
-    private ProvinceCityRegionService provinceCityRegionService;
+    private EnterpriseAdmin_ProvinceCityRegionService enterpriseAdminProvinceCityRegionService;
     private static final String title = "门店管理";
 
     /**
@@ -50,7 +45,7 @@ public class StoreController {
     @PreAuthorize("hasAuthority('bnt.store.list')")
     public Result listAllStores() {
         QueryWrapper<Store> wrapper = new QueryWrapper<>();
-        List<Store> list = storeService.list(wrapper); // 查询所有门店，不再过滤
+        List<Store> list = enterpriseAdminStoreService.list(wrapper); // 查询所有门店，不再过滤
 
         return Result.ok().addData("list", list);
     }
@@ -64,7 +59,7 @@ public class StoreController {
         //构建查询wrapper
         QueryWrapper<Store> wrapper = new QueryWrapper<>();
 
-        PageUtils page = storeService.queryPage(params, wrapper);
+        PageUtils page = enterpriseAdminStoreService.queryPage(params, wrapper);
 
         //封装vo数据
         List<?> list = page.getList();
@@ -74,9 +69,9 @@ public class StoreController {
             StoreVo storeVo = new StoreVo();
             BeanUtils.copyProperties(store, storeVo);
             //查询名字省市区的名字
-            storeVo.setProvinceName(provinceCityRegionService.getById(store.getProvinceId()).getName());
-            storeVo.setCityName(provinceCityRegionService.getById(store.getCityId()).getName());
-            storeVo.setRegionName(provinceCityRegionService.getById(store.getRegionId()).getName());
+            storeVo.setProvinceName(enterpriseAdminProvinceCityRegionService.getById(store.getProvinceId()).getName());
+            storeVo.setCityName(enterpriseAdminProvinceCityRegionService.getById(store.getCityId()).getName());
+            storeVo.setRegionName(enterpriseAdminProvinceCityRegionService.getById(store.getRegionId()).getName());
             return storeVo;
         }).collect(Collectors.toList());
         page.setList(storeVoList);
@@ -90,7 +85,7 @@ public class StoreController {
      */
     @RequestMapping("/getAllStoreNum")
     public Result getAllStoreNum() {
-        long count = storeService.count(new QueryWrapper<Store>()); // 查询所有门店数量
+        long count = enterpriseAdminStoreService.count(new QueryWrapper<Store>()); // 查询所有门店数量
         return Result.ok().addData("count", count);
     }
 
@@ -99,7 +94,7 @@ public class StoreController {
      */
     @RequestMapping("/info/{id}")
     public Result info(@PathVariable("id") Long id) {
-        Store store = storeService.getById(id);
+        Store store = enterpriseAdminStoreService.getById(id);
 
         return Result.ok().addData("store", store);
     }
@@ -113,7 +108,7 @@ public class StoreController {
     public Result getStoreMapByIdList(@RequestBody List<Long> storeIdList) {
         Map<Long, Store> idAndStoreMap = new HashMap<>();
         if (storeIdList.size() > 0) {
-            List<Store> storeList = storeService.list(new QueryWrapper<Store>().in("id", storeIdList));
+            List<Store> storeList = enterpriseAdminStoreService.list(new QueryWrapper<Store>().in("id", storeIdList));
             for (Store store : storeList) {
                 idAndStoreMap.put(store.getId(), store);
             }
@@ -128,7 +123,7 @@ public class StoreController {
     @PreAuthorize("hasAuthority('bnt.store.add')")
     //@OperationLog(title = StoreController.title, businessType = BusinessTypeEnum.INSERT, detail = "新增门店")
     public Result save(@RequestBody Store store) {
-        storeService.save(store);
+        enterpriseAdminStoreService.save(store);
 
         return Result.ok();
     }
@@ -140,7 +135,7 @@ public class StoreController {
     @PreAuthorize("hasAuthority('bnt.store.update')")
   //  @OperationLog(title = StoreController.title, businessType = BusinessTypeEnum.UPDATE, detail = "修改门店信息")
     public Result update(@RequestBody Store store) {
-        storeService.updateById(store);
+        enterpriseAdminStoreService.updateById(store);
 
         return Result.ok();
     }
@@ -152,7 +147,7 @@ public class StoreController {
     @PreAuthorize("hasAuthority('bnt.store.delete')")
  //   @OperationLog(title = StoreController.title, businessType = BusinessTypeEnum.UPDATE, detail = "删除门店")
     public Result delete(@RequestBody Long[] ids) {
-        storeService.removeByIds(Arrays.asList(ids));
+        enterpriseAdminStoreService.removeByIds(Arrays.asList(ids));
 
         return Result.ok();
     }

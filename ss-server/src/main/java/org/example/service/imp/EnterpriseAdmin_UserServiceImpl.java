@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.example.dao.UserDao;
+import org.example.dao.EnterpriseAdmin_UserDao;
 import org.example.entity.User;
 import org.example.exception.SSSException;
 
@@ -19,7 +19,7 @@ import org.example.enums.UserCodeEnum;
 import org.example.result.Result;
 import org.example.feign.EnterpriseFeignService;
 import org.example.vo.system.UserInfoVo;
-import org.example.service.UserService;
+import org.example.service.EnterpriseAdmin_UserService;
 import org.example.utils.*;
 import org.example.vo.system.SysUserQueryVo;
 import org.springframework.beans.BeanUtils;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 
 @Service("userService")
-public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserService {
+public class EnterpriseAdmin_UserServiceImpl extends ServiceImpl<EnterpriseAdmin_UserDao, User> implements EnterpriseAdmin_UserService {
 
 
     @Autowired
@@ -45,11 +45,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Autowired
     private ThreadPoolExecutor executor;
     @Autowired
-    private UserDao userDao;
+    private EnterpriseAdmin_UserDao adminUserDao;
     @Autowired
     private ShiftSchedulingCalculateFeignService shiftSchedulingCalculateFeignService;
     @Autowired
-    private UserService userService;
+    private EnterpriseAdmin_UserService adminUserService;
 
 
     @Override
@@ -462,7 +462,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public HashMap<Long, Long> getEnterpriseIdAndUserNumMap(List<Long> enterpriseIdList) {
         HashMap<Long, Long> enterpriseIdAndUserNumMap = new HashMap<>();
         for (Long enterpriseId : enterpriseIdList) {
-            Long count = (long) userService.count(new QueryWrapper<User>().eq("enterprise_id", enterpriseId));
+            Long count = (long) adminUserService.count(new QueryWrapper<User>().eq("enterprise_id", enterpriseId));
             enterpriseIdAndUserNumMap.put(enterpriseId, count);
         }
         return enterpriseIdAndUserNumMap;

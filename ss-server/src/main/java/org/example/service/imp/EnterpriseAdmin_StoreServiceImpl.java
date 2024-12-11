@@ -8,13 +8,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
 
-import org.example.dao.StoreDao;
+import org.example.dao.EnterpriseAdmin_StoreDao;
 import org.example.entity.Store;
-import org.example.service.StoreService;
+import org.example.service.EnterpriseAdmin_StoreService;
 
 
 @Service("storeService")
-public class StoreServiceImpl extends ServiceImpl<StoreDao, Store> implements StoreService {
+public class EnterpriseAdmin_StoreServiceImpl extends ServiceImpl<EnterpriseAdmin_StoreDao, Store> implements EnterpriseAdmin_StoreService {
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, QueryWrapper<Store> wrapper) {

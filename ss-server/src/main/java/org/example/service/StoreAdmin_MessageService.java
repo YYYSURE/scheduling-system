@@ -16,7 +16,7 @@ import java.util.Map;
  * @email 1782067308@qq.com
  * @date 2023-02-06 15:50:30
  */
-public interface MessageService extends IService<Message> {
+public interface StoreAdmin_MessageService extends IService<Message> {
 
     /**
      * 发送邮件消息

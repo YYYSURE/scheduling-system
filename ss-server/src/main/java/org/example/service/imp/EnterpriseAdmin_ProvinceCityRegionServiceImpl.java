@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -19,13 +18,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
 
-import org.example.dao.ProvinceCityRegionDao;
+import org.example.dao.EnterpriseAdmin_ProvinceCityRegionDao;
 import org.example.entity.ProvinceCityRegion;
-import org.example.service.ProvinceCityRegionService;
+import org.example.service.EnterpriseAdmin_ProvinceCityRegionService;
 
 
 @Service("provinceCityRegionService")
-public class ProvinceCityRegionServiceImpl extends ServiceImpl<ProvinceCityRegionDao, ProvinceCityRegion> implements ProvinceCityRegionService {
+public class EnterpriseAdmin_ProvinceCityRegionServiceImpl extends ServiceImpl<EnterpriseAdmin_ProvinceCityRegionDao, ProvinceCityRegion> implements EnterpriseAdmin_ProvinceCityRegionService {
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

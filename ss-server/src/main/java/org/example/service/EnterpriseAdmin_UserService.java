@@ -2,15 +2,10 @@ package org.example.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.example.exception.SSSException;
-import org.example.result.Result;
 import org.example.vo.system.UserInfoVo;
 import org.example.utils.PageUtils;
 import org.example.entity.User;
 import org.example.vo.system.SysUserQueryVo;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +18,7 @@ import java.util.Map;
  * @email 1782067308@qq.com
  * @date 2023-02-06 15:50:29
  */
-public interface UserService extends IService<User> {
+public interface EnterpriseAdmin_UserService extends IService<User> {
 
 
     PageUtils queryPage(Map<String, Object> params);

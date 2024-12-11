@@ -13,6 +13,6 @@ import org.example.entity.UserRole;
  * @date 2023-02-06 15:50:30
  */
 @Mapper
-public interface UserRoleDao extends BaseMapper<UserRole> {
+public interface EnterpriseAdmin_UserRoleDao extends BaseMapper<UserRole> {
 
 }

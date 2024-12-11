@@ -1,6 +1,6 @@
 package org.example.service.imp;
 
-import org.example.dao.UserMessageDao;
+import org.example.dao.StoreAdmin_UserMessageDao;
 import org.example.entity.UserMessage;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
@@ -11,11 +11,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 
-import org.example.service.UserMessageService;
+import org.example.service.StoreAdmin_UserMessageService;
 
 
 @Service("userMessageService")
-public class UserMessageServiceImpl extends ServiceImpl<UserMessageDao, UserMessage> implements UserMessageService {
+public class StoreAdmin_UserMessageServiceImpl extends ServiceImpl<StoreAdmin_UserMessageDao, UserMessage> implements StoreAdmin_UserMessageService {
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

@@ -14,7 +14,7 @@ import java.util.Map;
  * @email 1782067308@qq.com
  * @date 2023-02-09 11:17:26
  */
-public interface StoreService extends IService<Store> {
+public interface EnterpriseAdmin_StoreService extends IService<Store> {
 
     PageUtils queryPage(Map<String, Object> params, QueryWrapper<Store> wrapper);
 }

@@ -12,6 +12,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2023-02-09 11:17:26
  */
 @Mapper
-public interface ProvinceCityRegionDao extends BaseMapper<ProvinceCityRegion> {
+public interface EnterpriseAdmin_ProvinceCityRegionDao extends BaseMapper<ProvinceCityRegion> {
 
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.example.service.UserMessageService;
+import org.example.service.StoreAdmin_UserMessageService;
 
 
 
@@ -26,16 +26,16 @@ import org.example.service.UserMessageService;
  */
 @RestController
 @RequestMapping("/enterprise/userMessage")
-public class UserMessageController {
+public class StoreAdmin_UserMessageController {
     @Autowired
-    private UserMessageService userMessageService;
+    private StoreAdmin_UserMessageService storeAdminUserMessageService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     public Result list(@RequestParam Map<String, Object> params){
-        PageUtils page = userMessageService.queryPage(params);
+        PageUtils page = storeAdminUserMessageService.queryPage(params);
 
         return Result.ok().addData("page", page);
     }
@@ -46,7 +46,7 @@ public class UserMessageController {
      */
     @RequestMapping("/info/{id}")
     public Result info(@PathVariable("id") Long id){
-        UserMessage userMessage = userMessageService.getById(id);
+        UserMessage userMessage = storeAdminUserMessageService.getById(id);
 
         return Result.ok().addData("userMessage", userMessage);
     }
@@ -56,7 +56,7 @@ public class UserMessageController {
      */
     @RequestMapping("/save")
     public Result save(@RequestBody UserMessage userMessage){
-        userMessageService.save(userMessage);
+        storeAdminUserMessageService.save(userMessage);
 
         return Result.ok();
     }
@@ -66,7 +66,7 @@ public class UserMessageController {
      */
     @RequestMapping("/update")
     public Result update(@RequestBody UserMessage userMessage){
-        userMessageService.updateById(userMessage);
+        storeAdminUserMessageService.updateById(userMessage);
 
         return Result.ok();
     }
@@ -76,7 +76,7 @@ public class UserMessageController {
      */
     @RequestMapping("/deleteBatch")
     public Result deleteBatch(@RequestBody Long[] ids){
-        userMessageService.removeByIds(Arrays.asList(ids));
+        storeAdminUserMessageService.removeByIds(Arrays.asList(ids));
 
         return Result.ok();
     }

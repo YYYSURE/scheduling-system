@@ -4,7 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.example.dao.MessageDao;
+import org.example.dao.StoreAdmin_MessageDao;
 import org.example.feign.SystemFeignService;
 //import org.example.feign.ThirdPartyFeignService;
 //import com.dam.model.dto.third_party.EmailDto;
@@ -14,8 +14,8 @@ import org.example.entity.User;
 import org.example.enums.ResultCodeEnum;
 import org.example.result.Result;
 import org.example.vo.enterprise.MessageItemVo;
-import org.example.service.MessageService;
-import org.example.service.UserMessageService;
+import org.example.service.StoreAdmin_MessageService;
+import org.example.service.StoreAdmin_UserMessageService;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
 //import org.example.utils.mail.MailUtil;
@@ -27,13 +27,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("messageService")
-public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> implements MessageService {
+public class StoreAdmin_MessageServiceImpl extends ServiceImpl<StoreAdmin_MessageDao, Message> implements StoreAdmin_MessageService {
 //    @Autowired
 //    private ThirdPartyFeignService thirdPartyFeignService;
     @Autowired
     private SystemFeignService systemFeignService;
     @Autowired
-    private UserMessageService userMessageService;
+    private StoreAdmin_UserMessageService storeAdminUserMessageService;
 
     /**
      * 发送邮件消息
@@ -84,7 +84,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         MessageList.addAll(baseMapper.selectList(new QueryWrapper<Message>().eq("type", 1).eq("store_id", storeId).eq("is_publish", 1)));
 
         //查询给用户看的消息
-        List<UserMessage> userMessageList = userMessageService.list(new QueryWrapper<UserMessage>().eq("user_id", userId));
+        List<UserMessage> userMessageList = storeAdminUserMessageService.list(new QueryWrapper<UserMessage>().eq("user_id", userId));
         List<Long> messageIdList = userMessageList.stream().map(UserMessage::getMessageId).collect(Collectors.toList());
         if (messageIdList.size() > 0) {
             MessageList.addAll(baseMapper.selectList(new QueryWrapper<Message>().in("id", messageIdList)));

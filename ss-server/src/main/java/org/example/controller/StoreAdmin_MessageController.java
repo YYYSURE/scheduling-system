@@ -5,10 +5,9 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 //import com.dam.annotation.OperationLog;
 import org.example.entity.Message;
-import org.example.enums.BusinessTypeEnum;
 import org.example.result.Result;
 import org.example.vo.enterprise.MessageItemVo;
-import org.example.service.MessageService;
+import org.example.service.StoreAdmin_MessageService;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.example.utils.StringUtils;
@@ -25,10 +24,10 @@ import java.util.Map;
  * 发布信息
  */
 @RestController
-@RequestMapping("/enterprise/message")
-public class MessageController {
+@RequestMapping("/enterprise/StoreAdmin_message")
+public class StoreAdmin_MessageController {
     @Autowired
-    private MessageService messageService;
+    private StoreAdmin_MessageService storeAdminMessageService;
     private static final String title = "消息管理";
 
     /**
@@ -46,7 +45,7 @@ public class MessageController {
         String message = paramMap.get("message").toString();
         Integer type = Integer.parseInt(paramMap.get("type").toString());
 
-        messageService.sendMailMessage(userIdList, subject, message, type);
+        storeAdminMessageService.sendMailMessage(userIdList, subject, message, type);
         return Result.ok();
     }
 
@@ -75,7 +74,7 @@ public class MessageController {
         }
         queryWrapper.eq("type", 1);
 
-        PageUtils page = messageService.queryPage(params, queryWrapper);
+        PageUtils page = storeAdminMessageService.queryPage(params, queryWrapper);
 
         return Result.ok().addData("page", page);
     }
@@ -87,7 +86,7 @@ public class MessageController {
     @RequestMapping("/info/{id}")
     @PreAuthorize("hasAuthority('bnt.message.list')")
     public Result info(@PathVariable("id") Long id) {
-        Message message = messageService.getById(id);
+        Message message = storeAdminMessageService.getById(id);
 
         return Result.ok().addData("message", message);
     }
@@ -105,7 +104,7 @@ public class MessageController {
        // message.setEnterpriseId(enterpriseId);
         message.setStoreId(storeId);
        // message.setType(1);
-        messageService.save(message);
+        storeAdminMessageService.save(message);
         return Result.ok();
     }
 
@@ -116,7 +115,7 @@ public class MessageController {
     @PreAuthorize("hasAuthority('bnt.message.update')")
     //@OperationLog(title = MessageController.title, businessType = BusinessTypeEnum.UPDATE, detail = "修改消息")
     public Result update(@RequestBody Message message) {
-        messageService.updateById(message);
+        storeAdminMessageService.updateById(message);
 
         return Result.ok();
     }
@@ -128,7 +127,7 @@ public class MessageController {
     @PreAuthorize("hasAuthority('bnt.message.delete')")
     //@OperationLog(title = MessageController.title, businessType = BusinessTypeEnum.DELETE, detail = "删除消息")
     public Result deleteBatch(@RequestBody Long[] ids) {
-        messageService.removeByIds(Arrays.asList(ids));
+        storeAdminMessageService.removeByIds(Arrays.asList(ids));
 
         return Result.ok();
     }
@@ -145,7 +144,7 @@ public class MessageController {
     public Result updateMessagePublishStatus(@RequestBody Map<String, Object> paramMap) {
         Long messageId = Long.parseLong(paramMap.get("messageId").toString());
         Integer isPublish = Integer.parseInt(paramMap.get("isPublish").toString());
-        messageService.updateMessagePublishStatus(messageId, isPublish);
+        storeAdminMessageService.updateMessagePublishStatus(messageId, isPublish);
         return Result.ok();
     }
 
@@ -160,7 +159,7 @@ public class MessageController {
         Long userId = Long.parseLong(JwtUtil.getUserId(httpServletRequest.getHeader("token")));
         Long enterpriseId = Long.parseLong(JwtUtil.getEnterpriseId(httpServletRequest.getHeader("token")));
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
-        List<MessageItemVo> messageList = messageService.listMessageOfUser(userId,enterpriseId,storeId);
+        List<MessageItemVo> messageList = storeAdminMessageService.listMessageOfUser(userId,enterpriseId,storeId);
         return Result.ok().addData("messageList", messageList);
     }
 

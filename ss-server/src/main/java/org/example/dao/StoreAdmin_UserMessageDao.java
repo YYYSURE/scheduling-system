@@ -12,6 +12,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2023-03-20 15:43:46
  */
 @Mapper
-public interface UserMessageDao extends BaseMapper<UserMessage> {
+public interface StoreAdmin_UserMessageDao extends BaseMapper<UserMessage> {
 
 }
