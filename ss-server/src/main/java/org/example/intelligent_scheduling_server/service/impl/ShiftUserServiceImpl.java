@@ -5,7 +5,6 @@ import org.example.entity.SchedulingShift;
 import org.example.entity.ShiftUser;
 import org.example.enums.ResultCodeEnum;
 import org.example.exception.SSSException;
-import org.example.feign.EnterpriseFeignService;
 import org.example.intelligent_scheduling_server.dao.ShiftUserDao;
 import org.example.intelligent_scheduling_server.service.SchedulingShiftService;
 import org.example.intelligent_scheduling_server.service.ShiftUserService;
@@ -32,8 +31,6 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
     private SchedulingShiftService shiftService;
     @Autowired
     private ShiftUserService shiftUserService;
-    @Autowired
-    private EnterpriseFeignService enterpriseFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -66,8 +63,8 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
         ///查询相同时间段，且对应于真实任务的所有班次数据
 //        List<SchedulingShift> shiftList = shiftService.listShiftIdOfShift(shiftStartDate, shiftEndDate, storeId);
         SchedulingShift appointShift = shiftService.getById(shiftId);
-
-        Result r = enterpriseFeignService.getUserIdAndPositionIdMapByUserIdList(userIdList);
+        //TODO
+        /*Result r = enterpriseFeignService.getUserIdAndPositionIdMapByUserIdList(userIdList);
         Map<Long, Long> userIdAndPositionIdMap = null;
         if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
             userIdAndPositionIdMap = r.getData("userIdAndPositionIdMap", new TypeReference<Map<Long, Long>>() {
@@ -120,7 +117,7 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
                 shiftUserEntityList.add(shiftUserEntity);
             }
             shiftUserService.saveBatch(shiftUserEntityList);
-        }
+        }*/
 
     }
 

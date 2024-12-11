@@ -11,7 +11,7 @@
         <result property="isDeleted" column="is_deleted"/>
 
         <result property="businessType" column="business_type"/>
-        <result property="userId" column="user_id"/>
+<!--        <result property="userId" column="user_id"/>-->
 
         <result property="operatorType" column="operator_type"/>
 

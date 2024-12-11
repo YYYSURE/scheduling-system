@@ -32,12 +32,12 @@
         <result property="shiftLengthPreferenceOneWeek" column="shift_length_preference_one_week"/>
     </resultMap>
 
-    <select id="getUserListWithoutPosition" resultMap="userMap">
-        SELECT *
-        FROM user
-        WHERE (SELECT count(*) FROM user_position up WHERE up.user_id = user.id AND up.is_deleted = 0) = 0
-          AND user.store_id = #{storeId}
-    </select>
+<!--    <select id="getUserListWithoutPosition" resultMap="userMap">-->
+<!--        SELECT *-->
+<!--        FROM user-->
+<!--        WHERE (SELECT count(*) FROM user_position up WHERE up.user_id = user.id AND up.is_deleted = 0) = 0-->
+<!--          AND user.store_id = #{storeId}-->
+<!--    </select>-->
     <select id="listAllMailByUserIdList" resultType="java.lang.String">
         select distinct mail from user where user.id in
         <foreach collection="userIdList" item="userId" separator="," open="(" close=")">

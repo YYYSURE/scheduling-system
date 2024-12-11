@@ -72,7 +72,8 @@ public class EnterpriseAdmin_UserController {
                 param.put("shiftStartDate", shiftStartDate);
                 param.put("shiftEndDate", shiftEndDate);
                 param.put("storeId", storeId);
-                Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
+                //TODO
+                /*Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
                 if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                     List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
                     });
@@ -84,7 +85,7 @@ public class EnterpriseAdmin_UserController {
                             userInfoVo.setIsBusy(false);
                         }
                     }
-                }
+                }*/
             }
         } else {
             if (userQueryVo.getBusyStatus() == 0) {

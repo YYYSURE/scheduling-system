@@ -1,10 +1,11 @@
+<!--
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.dam.dao.SchedulingShiftDao">
+<mapper namespace="org.example.intelligent_scheduling_server.dao.SchedulingShiftDao">
 
-    <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.dam.model.entity.shiftScheduling.SchedulingShiftEntity" id="schedulingShiftMap">
+    &lt;!&ndash; 可根据自己的需求，是否要使用 &ndash;&gt;
+    <resultMap type="org.example.entity.SchedulingShift" id="schedulingShiftMap">
         <result property="id" column="id"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
@@ -12,7 +13,7 @@
         <result property="endDate" column="end_date"/>
     </resultMap>
     <select id="listShiftBetweenStartDateAndEndDate"
-            resultType="com.dam.model.entity.shiftScheduling.SchedulingShiftEntity">
+            resultType="org.example.entity.SchedulingShift">
         SELECT *
         FROM scheduling_shift
         WHERE scheduling_date_id IN (SELECT id
@@ -100,4 +101,4 @@
             )
     </select>
 
-</mapper>
+</mapper>-->
