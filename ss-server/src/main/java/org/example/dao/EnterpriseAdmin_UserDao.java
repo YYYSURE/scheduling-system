@@ -15,7 +15,7 @@ import java.util.List;
  * @date 2023-02-06 15:50:29
  */
 @Mapper
-public interface Admin_UserDao extends BaseMapper<User> {
+public interface EnterpriseAdmin_UserDao extends BaseMapper<User> {
 
     List<User> getUserListWithoutPosition(@Param("storeId") long storeId);
 

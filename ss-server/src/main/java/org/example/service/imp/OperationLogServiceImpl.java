@@ -8,7 +8,7 @@ import org.example.entity.OperationLog;
 import org.example.entity.User;
 import org.example.enums.UserCodeEnum;
 import org.example.service.OperationLogService;
-import org.example.service.Admin_UserService;
+import org.example.service.EnterpriseAdmin_UserService;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
@@ -23,7 +23,7 @@ class OperationLogServiceImpl extends ServiceImpl<OperationLogDao, OperationLog>
     @Autowired
     private OperationLogDao OperationLogDao;
     @Autowired
-    private Admin_UserService adminUserService;
+    private EnterpriseAdmin_UserService adminUserService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, String token) {

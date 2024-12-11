@@ -13,7 +13,7 @@ import java.util.Map;
  * @email 1782067308@qq.com
  * @date 2023-03-20 15:43:46
  */
-public interface UserMessageService extends IService<UserMessage> {
+public interface StoreAdmin_UserMessageService extends IService<UserMessage> {
 
     PageUtils queryPage(Map<String, Object> params);
 }

@@ -15,7 +15,7 @@ import org.example.enums.ResultCodeEnum;
 import org.example.result.Result;
 import org.example.vo.enterprise.MessageItemVo;
 import org.example.service.StoreAdmin_MessageService;
-import org.example.service.UserMessageService;
+import org.example.service.StoreAdmin_UserMessageService;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
 //import org.example.utils.mail.MailUtil;
@@ -33,7 +33,7 @@ public class StoreAdmin_MessageServiceImpl extends ServiceImpl<StoreAdmin_Messag
     @Autowired
     private SystemFeignService systemFeignService;
     @Autowired
-    private UserMessageService userMessageService;
+    private StoreAdmin_UserMessageService storeAdminUserMessageService;
 
     /**
      * 发送邮件消息
@@ -84,7 +84,7 @@ public class StoreAdmin_MessageServiceImpl extends ServiceImpl<StoreAdmin_Messag
         MessageList.addAll(baseMapper.selectList(new QueryWrapper<Message>().eq("type", 1).eq("store_id", storeId).eq("is_publish", 1)));
 
         //查询给用户看的消息
-        List<UserMessage> userMessageList = userMessageService.list(new QueryWrapper<UserMessage>().eq("user_id", userId));
+        List<UserMessage> userMessageList = storeAdminUserMessageService.list(new QueryWrapper<UserMessage>().eq("user_id", userId));
         List<Long> messageIdList = userMessageList.stream().map(UserMessage::getMessageId).collect(Collectors.toList());
         if (messageIdList.size() > 0) {
             MessageList.addAll(baseMapper.selectList(new QueryWrapper<Message>().in("id", messageIdList)));

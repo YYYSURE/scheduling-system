@@ -8,7 +8,7 @@ import org.example.entity.LoginLog;
 import org.example.entity.User;
 import org.example.enums.UserCodeEnum;
 import org.example.service.LoginLogService;
-import org.example.service.Admin_UserService;
+import org.example.service.EnterpriseAdmin_UserService;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
@@ -20,7 +20,7 @@ import java.util.Map;
 @Service
 public class LoginLogServiceImpl extends ServiceImpl<LoginLogDao, LoginLog> implements LoginLogService {
     @Autowired
-    private Admin_UserService adminUserService;
+    private EnterpriseAdmin_UserService adminUserService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, String token) {

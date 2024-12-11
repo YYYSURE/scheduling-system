@@ -13,8 +13,8 @@ import org.example.entity.UserRole;
 import org.example.enums.ResultCodeEnum;
 import org.example.result.Result;
 import org.example.vo.system.UserInfoVo;
-import org.example.service.Admin_UserRoleService;
-import org.example.service.Admin_UserService;
+//import org.example.service.StoreAdmin_UserRoleService;
+import org.example.service.StoreAdmin_UserService;
 import org.example.utils.EncryptionUtil;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
@@ -35,11 +35,9 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/system/Admin_user")
-public class Admin_UserController {
+public class StoreAdmin_UserController {
     @Autowired
-    private Admin_UserService adminUserService;
-    @Autowired
-    private Admin_UserRoleService adminUserRoleService;
+    private StoreAdmin_UserService adminUserService;
     @Autowired
     private ShiftSchedulingCalculateFeignService shiftSchedulingCalculateFeignService;
     private static final String title = "用户管理";
@@ -108,18 +106,15 @@ public class Admin_UserController {
     }
 
     @GetMapping("/listUserByStoreId")
-//    @PreAuthorize("hasAnyAuthority('bnt.user.list','bnt.storeUser.list')")
+
     public Result listUserByStoreId(@RequestParam("storeId") Long storeId) {
         long start = System.currentTimeMillis();
         List<User> userList = adminUserService.list(new QueryWrapper<User>().eq("store_id", storeId).eq("is_deleted", 0));
-//        System.out.println("0：" + (System.currentTimeMillis() - start) + "ms");
         List<UserInfoVo> userInfoVoList = adminUserService.buildUserInfoVoList(userList);
-//        System.out.println("1：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("userInfoVoList", userInfoVoList);
     }
 
-    @GetMapping("/listUserByStoreId")
-//    @PreAuthorize("hasAnyAuthority('bnt.user.list','bnt.storeUser.list')")
+    @GetMapping("/listUserEntityByStoreId")
     public Result listUserEntityByStoreId(@RequestParam("storeId") Long storeId) {
         long start = System.currentTimeMillis();
         List<User> userList = adminUserService.list(new QueryWrapper<User>().eq("store_id", storeId).eq("is_deleted", 0));
@@ -142,16 +137,6 @@ public class Admin_UserController {
         }
         return Result.ok().addData("idAndUserMap", idAndUserMap);
     }
-
-    /**
-     * 列表
-     */
-/*    @RequestMapping("/list")
-    public Result list(@RequestParam Map<String, Object> params) {
-        PageUtils page = userService.queryPage(params);
-
-        return Result.ok().addData("page", page);
-    }*/
 
     /**
      * 信息
@@ -197,7 +182,6 @@ public class Admin_UserController {
     public Result listUserInfoVoByUserIds(@RequestBody List<Long> userIds) {
         long start = System.currentTimeMillis();
         List<UserInfoVo> userInfoVoList = adminUserService.listUserInfoVoByUserIds(userIds);
-//        System.out.println("listUserInfoVoByUserIds：" + (System.currentTimeMillis() - start) + "ms");
         return Result.ok().addData("userInfoVoList", userInfoVoList);
     }
 
@@ -220,7 +204,6 @@ public class Admin_UserController {
     @PreAuthorize("hasAnyAuthority('bnt.user.add','bnt.storeUser.add')")
     public Result save(@RequestBody User user) {
         user.setPassword(EncryptionUtil.saltMd5Encrypt(user.getPassword()));
-     //   user.setAvatar("https://smart-scheduling-system-13184.oss-cn-beijing.aliyuncs.com/2023-02-14/338fc2a2-62d4-4196-85f3-c479acf28ff4_头像.png");
         long count = adminUserService.count(new QueryWrapper<User>().eq("username", user.getUsername()));
         if (count > 0) {
             return Result.error(ResultCodeEnum.FAIL.getCode(), "该用户名已经存在，请更换用户名");
@@ -241,7 +224,7 @@ public class Admin_UserController {
         UserRole UserRole = new UserRole();
         UserRole.setRoleId(3L);
         UserRole.setUserId(user.getId());
-        adminUserRoleService.save(UserRole);
+        //adminUserRoleService.save(UserRole);
         return Result.ok();
     }
 
@@ -250,12 +233,6 @@ public class Admin_UserController {
      */
     @PostMapping("/update")
     @PreAuthorize("hasAnyAuthority('bnt.user.update','bnt.storeUser.update')")
-
-//    @Idempotent(
-//            message = "正在执行用户信息修改流程，请稍后...",
-//            scene = IdempotentSceneEnum.RESTAPI,
-//            type = IdempotentTypeEnum.PARAM
-//    )
     public Result update(@RequestBody User user) {
 //        System.out.println("save->user:" + user.toString());
         boolean b = adminUserService.updateById(user);
@@ -341,8 +318,8 @@ public class Admin_UserController {
 
     @RequestMapping("changePassword")
     public Result changePassword(@RequestParam("oldPassword") String oldPassword,
-                            @RequestParam("newPassword") String newPassword,
-                            HttpServletRequest request) {
+                                 @RequestParam("newPassword") String newPassword,
+                                 HttpServletRequest request) {
         String token = request.getHeader("token");
 
         try {
@@ -378,25 +355,6 @@ public class Admin_UserController {
         List<User> userList = adminUserService.getUserListWithoutPosition(storeId);
         return Result.ok().addData("userList", userList);
     }
-
-//    /**
-//     * 随机生成用户数据
-//     *
-//     * @return
-//     */
-//    @GetMapping("generateUserData")
-//    public Result generateUserData() {
-//        List<User> userList = new UserDataGenerateUtil().generateUserData(2000);
-//        for (User user : userList) {
-////            System.out.println("user:" + user);
-//            user.setPassword(EncryptionUtil.saltMd5Encrypt(user.getPassword()));
-//            userService.save(user);
-//        }
-//        return Result.ok();
-//    }
-//
-
-
 
     @GetMapping("shuffleUserToDifferentStores")
     public Result shuffleUserToDifferentStores(@RequestParam("enterpriseId") Long enterpriseId) {

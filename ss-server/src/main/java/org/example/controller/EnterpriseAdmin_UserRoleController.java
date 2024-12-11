@@ -2,7 +2,7 @@ package org.example.controller;
 
 import org.example.entity.UserRole;
 import org.example.result.Result;
-import org.example.service.Admin_UserRoleService;
+import org.example.service.EnterpriseAdmin_UserRoleService;
 import org.example.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +20,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("system/Admin_userrole")
-public class Admin_UserRoleController {
+public class EnterpriseAdmin_UserRoleController {
     @Autowired
-    private Admin_UserRoleService adminUserRoleService;
+    private EnterpriseAdmin_UserRoleService adminUserRoleService;
 
     /**
      * 列表
