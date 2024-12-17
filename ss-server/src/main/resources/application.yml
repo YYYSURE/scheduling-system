@@ -5,16 +5,14 @@ spring:
     allow-circular-references: true
   datasource:
     druid:
-      driver-class-name: ${ss.datasource.driver-class-name}
-      url: jdbc:mysql://${ss.datasource.host}:${ss.datasource.port}/${ss.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${ss.datasource.username}
-      password: ${ss.datasource.password}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/scheduling_system?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: xyk200406
 mybatis:
-  #mapper????
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.sky.entity
+  type-aliases-package: org.example.entity
   configuration:
-    #??????
     map-underscore-to-camel-case: true
 
 logging:
@@ -39,3 +37,7 @@ ss:
     user-ttl: 7200000
     # 设置前端传递过来的令牌名称
     user-token-name: authentication
+  thread:
+    core-size: 10
+    max-size: 50
+    keep-alive-time: 60

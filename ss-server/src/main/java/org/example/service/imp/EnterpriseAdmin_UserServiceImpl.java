@@ -1,201 +1,191 @@
-//package org.example.service.imp;
-//
-//import com.alibaba.fastjson.TypeReference;
-//import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-//import com.baomidou.mybatisplus.core.metadata.IPage;
-//import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import org.example.dao.EnterpriseAdmin_UserDao;
-//import org.example.entity.User;
-//import org.example.exception.SSSException;
-//
-//import org.example.feign.ShiftSchedulingCalculateFeignService;
-//
-//import org.example.entity.Position;
-//import org.example.entity.Store;
-//import org.example.entity.UserPosition;
-//import org.example.enums.ResultCodeEnum;
-//import org.example.enums.UserCodeEnum;
-//import org.example.result.Result;
-//import org.example.feign.EnterpriseFeignService;
-//import org.example.vo.system.UserInfoVo;
-//import org.example.service.EnterpriseAdmin_UserService;
-//import org.example.utils.*;
-//import org.example.vo.system.SysUserQueryVo;
-//import org.springframework.beans.BeanUtils;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.StringUtils;
-//import org.springframework.web.context.request.RequestAttributes;
-//import org.springframework.web.context.request.RequestContextHolder;
-//
-//import java.util.*;
-//import java.util.concurrent.CompletableFuture;
-//import java.util.concurrent.ExecutionException;
-//import java.util.concurrent.ThreadPoolExecutor;
-//import java.util.stream.Collectors;
-//
-//
-//@Service
-//public class EnterpriseAdmin_UserServiceImpl extends ServiceImpl<EnterpriseAdmin_UserDao, User> implements EnterpriseAdmin_UserService {
-//
-//
-////    @Autowired
-////    private EnterpriseFeignService enterpriseFeignService;
-//    @Autowired
-//    private ThreadPoolExecutor executor;
-//    @Autowired
-//    private EnterpriseAdmin_UserDao adminUserDao;
-////    @Autowired
-////    private ShiftSchedulingCalculateFeignService shiftSchedulingCalculateFeignService;
-//    @Autowired
-//    private EnterpriseAdmin_UserService adminUserService;
-//
-//
-//    @Override
-//    public PageUtils queryPage(Map<String, Object> params) {
-//        IPage<User> page = this.page(
-//                new Query<User>().getPage(params),
-//                new QueryWrapper<User>()
-//        );
-//
-//        return new PageUtils(page);
-//    }
-//
-//    @Override
-//    public User getUserInfoByUsername(String username) {
-//        User user = baseMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-//        return user;
-//    }
-//
-//
-//
-//
-//    /**
-//     * @param page
-//     * @param limit
-//     * @param enterpriseId 当前用户所在企业id
-//     * @param storeId      当前用户所在门店id
-//     * @param userQueryVo
-//     * @return
-//     */
-//    @Override
-//    public PageUtils selectPage(Long page, Long limit, Long enterpriseId, Long storeId, int userType, SysUserQueryVo userQueryVo) {
-//        Page<User> pageMps = new Page<>(page, limit);
-//
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-//        if (userType == UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode()) {
-//            //--if--如果用户是系统管理员，只查询企业管理员
-//            queryWrapper.eq("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode());
-//        } else if (userType == UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode()) {
-//            //--if--如果用户是企业管理员，查询企业的所有用户
-//            queryWrapper.eq("enterprise_id", enterpriseId)
-//                    //不能查询企业管理员
-//                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
-//                    //不能查询系统管理员
-//                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
-//        } else if (userType == UserCodeEnum.TYPE_STORE_MANAGER.getCode()) {
-//            //--if--如果用户是企业管理员，查询门店的所有用户
-//            queryWrapper.eq("store_id", storeId)
-//                    //不能查询门店管理员
-//                    .ne("type", UserCodeEnum.TYPE_STORE_MANAGER.getCode())
-//                    //不能查询企业管理员
-//                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
-//                    //不能查询系统管理员
-//                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
-//        }
-////        System.out.println("userQueryVo.getPositionIdArr():"+userQueryVo.getPositionIdArr());
-//        if (userQueryVo.getPositionIdArr() == null) {
-//
-//        } else if (userQueryVo.getPositionIdArr().size() == 0) {
-//            //职位为空，一个用户都不用查
-//            queryWrapper.eq("id", -1);
-//        } else {
-//            //查出职位对应的所有用户Id
-//            // TODO:
-//            // List<Long> userIdList = enterpriseFeignService.listUserIdList(userQueryVo.getPositionIdArr());
-//            List<Long> userIdList = new ArrayList<>();
-//            if (userIdList.size() > 0) {
-//                queryWrapper.in("id", userIdList);
-//            } else {
-//                queryWrapper.eq("id", -1);
+package org.example.service.imp;
+
+import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.example.dao.EnterpriseAdmin_UserDao;
+import org.example.entity.User;
+import org.example.exception.SSSException;
+import org.example.entity.Position;
+import org.example.entity.Store;
+import org.example.entity.UserPosition;
+import org.example.enums.ResultCodeEnum;
+import org.example.enums.UserCodeEnum;
+import org.example.result.Result;
+import org.example.vo.system.UserInfoVo;
+import org.example.service.EnterpriseAdmin_UserService;
+import org.example.utils.*;
+import org.example.vo.system.SysUserQueryVo;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
+
+
+@Service
+public class EnterpriseAdmin_UserServiceImpl extends ServiceImpl<EnterpriseAdmin_UserDao, User> implements EnterpriseAdmin_UserService {
+
+
+    @Autowired
+    private EnterpriseAdmin_UserDao adminUserDao;
+    @Autowired
+    private EnterpriseAdmin_UserService adminUserService;
+
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<User> page = this.page(
+                new Query<User>().getPage(params),
+                new QueryWrapper<User>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public User getUserInfoByUsername(String username) {
+        User user = baseMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+        return user;
+    }
+
+
+
+
+    /**
+     * @param page
+     * @param limit
+     * @param enterpriseId 当前用户所在企业id
+     * @param storeId      当前用户所在门店id
+     * @param userQueryVo
+     * @return
+     */
+    @Override
+    public PageUtils selectPage(Long page, Long limit, Long enterpriseId, Long storeId, int userType, SysUserQueryVo userQueryVo) {
+        Page<User> pageMps = new Page<>(page, limit);
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (userType == UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode()) {
+            //--if--如果用户是系统管理员，只查询企业管理员
+            queryWrapper.eq("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode());
+        } else if (userType == UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode()) {
+            //--if--如果用户是企业管理员，查询企业的所有用户
+            queryWrapper.eq("enterprise_id", enterpriseId)
+                    //不能查询企业管理员
+                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
+                    //不能查询系统管理员
+                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
+        } else if (userType == UserCodeEnum.TYPE_STORE_MANAGER.getCode()) {
+            //--if--如果用户是企业管理员，查询门店的所有用户
+            queryWrapper.eq("store_id", storeId)
+                    //不能查询门店管理员
+                    .ne("type", UserCodeEnum.TYPE_STORE_MANAGER.getCode())
+                    //不能查询企业管理员
+                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
+                    //不能查询系统管理员
+                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
+        }
+//        System.out.println("userQueryVo.getPositionIdArr():"+userQueryVo.getPositionIdArr());
+        if (userQueryVo.getPositionIdArr() == null) {
+
+        } else if (userQueryVo.getPositionIdArr().size() == 0) {
+            //职位为空，一个用户都不用查
+            queryWrapper.eq("id", -1);
+        } else {
+            //查出职位对应的所有用户Id
+            // TODO:
+            // List<Long> userIdList = enterpriseFeignService.listUserIdList(userQueryVo.getPositionIdArr());
+            List<Long> userIdList = new ArrayList<>();
+            if (userIdList.size() > 0) {
+                queryWrapper.in("id", userIdList);
+            } else {
+                queryWrapper.eq("id", -1);
+            }
+        }
+        if (userQueryVo.getSearchStoreId() != null) {
+            queryWrapper.in("store_id", userQueryVo.getSearchStoreId());
+        }
+        if (userQueryVo.getSearchUserType() != null) {
+            queryWrapper.in("type", userQueryVo.getSearchUserType());
+        }
+
+        queryWrapper.orderByDesc("create_time");
+
+        String keyword = userQueryVo.getKeyword();
+        if (!StringUtils.isEmpty(keyword)) {
+            queryWrapper.like("username", "%" + keyword + "%").or()
+                    .like("name", "%" + keyword + "%").or()
+                    .like("phone", "%" + keyword + "%").or()
+                    .like("mail", "%" + keyword + "%");
+        }
+
+        ///查询用户的繁忙状态
+        if (userQueryVo.getIsNeedSearchBusyStatus() != null && userQueryVo.getIsNeedSearchBusyStatus() == true && userQueryVo.getBusyStatus() != null) {
+            //--if--需要查询用书在当前班次时间段内是否繁忙
+            Date shiftStartDate = userQueryVo.getShiftStartDate();
+            Date shiftEndDate = userQueryVo.getShiftEndDate();
+            Map<String, Object> param = new HashMap<>();
+            param.put("shiftStartDate", shiftStartDate);
+            param.put("shiftEndDate", shiftEndDate);
+            param.put("storeId", storeId);
+            // TODO:
+
+//            Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
+//            if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
+//                List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
+//                });
+//                if (userQueryVo.getBusyStatus() == 0) {
+//                    //--if--需要查询空闲的用户
+//                    queryWrapper.notIn("id", userIdListIsBusy);
+//                } else {
+//                    //--if--需要查询繁忙的用户
+//                    queryWrapper.in("id", userIdListIsBusy);
+//                }
 //            }
-//        }
-//        if (userQueryVo.getSearchStoreId() != null) {
-//            queryWrapper.in("store_id", userQueryVo.getSearchStoreId());
-//        }
-//        if (userQueryVo.getSearchUserType() != null) {
-//            queryWrapper.in("type", userQueryVo.getSearchUserType());
-//        }
-//
-//        queryWrapper.orderByDesc("create_time");
-//
-//        String keyword = userQueryVo.getKeyword();
-//        if (!StringUtils.isEmpty(keyword)) {
-//            queryWrapper.like("username", "%" + keyword + "%").or()
-//                    .like("name", "%" + keyword + "%").or()
-//                    .like("phone", "%" + keyword + "%").or()
-//                    .like("mail", "%" + keyword + "%");
-//        }
-//
-//        ///查询用户的繁忙状态
-//        if (userQueryVo.getIsNeedSearchBusyStatus() != null && userQueryVo.getIsNeedSearchBusyStatus() == true && userQueryVo.getBusyStatus() != null) {
-//            //--if--需要查询用书在当前班次时间段内是否繁忙
-//            Date shiftStartDate = userQueryVo.getShiftStartDate();
-//            Date shiftEndDate = userQueryVo.getShiftEndDate();
-//            Map<String, Object> param = new HashMap<>();
-//            param.put("shiftStartDate", shiftStartDate);
-//            param.put("shiftEndDate", shiftEndDate);
-//            param.put("storeId", storeId);
-//            // TODO:
-//
-////            Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
-////            if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-////                List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
-////                });
-////                if (userQueryVo.getBusyStatus() == 0) {
-////                    //--if--需要查询空闲的用户
-////                    queryWrapper.notIn("id", userIdListIsBusy);
-////                } else {
-////                    //--if--需要查询繁忙的用户
-////                    queryWrapper.in("id", userIdListIsBusy);
-////                }
-////            }
-//        }
-//
-//        ///查询日期段内有班次安排的员工
-//        if (userQueryVo.getStartDate() != null && userQueryVo.getEndDate() != null) {
-//            //查询日期段内有班次安排的员工id
-//            HashMap<String, Object> param = new HashMap<>();
-//            param.put("storeId", storeId);
-//            param.put("startDate", userQueryVo.getStartDate().toString());
-//            param.put("endDate", userQueryVo.getEndDate().toString());
-//            if (userQueryVo.getTaskId() != null) {
-//                param.put("taskId", userQueryVo.getTaskId());
+        }
+
+        ///查询日期段内有班次安排的员工
+        if (userQueryVo.getStartDate() != null && userQueryVo.getEndDate() != null) {
+            //查询日期段内有班次安排的员工id
+            HashMap<String, Object> param = new HashMap<>();
+            param.put("storeId", storeId);
+            param.put("startDate", userQueryVo.getStartDate().toString());
+            param.put("endDate", userQueryVo.getEndDate().toString());
+            if (userQueryVo.getTaskId() != null) {
+                param.put("taskId", userQueryVo.getTaskId());
+            }
+            // TODO:
+//            Result r = shiftSchedulingCalculateFeignService.listUserIdByDateSegment(param);
+//            if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
+//                List<Long> userIdList = r.getData("userIdList", new TypeReference<List<Long>>() {
+//                });
+//                if (userIdList.size() > 0) {
+//                    queryWrapper.in("id", userIdList);
+//                }
 //            }
-//            // TODO:
-////            Result r = shiftSchedulingCalculateFeignService.listUserIdByDateSegment(param);
-////            if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
-////                List<Long> userIdList = r.getData("userIdList", new TypeReference<List<Long>>() {
-////                });
-////                if (userIdList.size() > 0) {
-////                    queryWrapper.in("id", userIdList);
-////                }
-////            }
-//        }
-//
-//        baseMapper.selectPage(pageMps, queryWrapper);
-//        return new PageUtils(pageMps);
-//    }
-//
-//    /**
-//     * 根据user构建出userInfoVo
-//     *
-//     * @param user
-//     * @return
-//     */
-//    @Override
-//    public UserInfoVo buildUserInfoVo(User user) {
+        }
+
+        baseMapper.selectPage(pageMps, queryWrapper);
+        return new PageUtils(pageMps);
+    }
+
+    /**
+     * 根据user构建出userInfoVo
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public UserInfoVo buildUserInfoVo(User user) {
 //        UserInfoVo userInfoVo = new UserInfoVo();
 //        BeanUtils.copyProperties(user, userInfoVo);
 //
@@ -279,10 +269,11 @@
 //        }
 //
 //        return userInfoVo;
-//    }
-//
-//    @Override
-//    public List<UserInfoVo> buildUserInfoVoList(List<User> userList) {
+        return new UserInfoVo();
+    }
+
+    @Override
+    public List<UserInfoVo> buildUserInfoVoList(List<User> userList) {
 //        ////声明变量
 //        //存储所有企业Id
 //        HashSet<Long> enterpriseIdSet = new HashSet<>();
@@ -413,74 +404,75 @@
 //            e.printStackTrace();
 //            return null;
 //        }
-//    }
-//
-//    @Override
-//    public boolean changePassword(String token, String oldPassword, String newPassword) throws SSSException {
-//        String username = JwtUtil.getUsername(token);
-//        User user = this.getUserInfoByUsername(username);
-//        String oldEncryptPassword = user.getPassword();
-//
-//        //判断旧密码是否正确
-//        if (!EncryptionUtil.isSaltMd5Match(oldPassword, oldEncryptPassword)) {
-//            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "原密码不合法");
-//        }
-//
-//        //存储新密码
-//        if (CheckUtil.passwordCheck(newPassword)) {
-//            user.setPassword(EncryptionUtil.saltMd5Encrypt(newPassword));
-//            baseMapper.updateById(user);
-//            return true;
-//        } else {
-//            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "新密码不合法");
-//        }
-//    }
-//
-//    /**
-//     * 获取门店中还没有被分配职位的用户列表
-//     *
-//     * @param storeId
-//     * @return
-//     */
-//    @Override
-//    public List<User> getUserListWithoutPosition(long storeId) {
-//        return baseMapper.getUserListWithoutPosition(storeId);
-//    }
-//    @Override
-//    public List<UserInfoVo> listUserInfoVoByUserIds(List<Long> userIds) {
-//        List<User> userList = new ArrayList<>();
-//        if (userIds.size() > 0) {
-//            userList.addAll(baseMapper.selectList(new QueryWrapper<User>().in("id", userIds)));
-//        }
-//        return this.buildUserInfoVoList(userList);
-//    }
-//
-//    @Override
-//    public List<User> listUserByUserIds(List<Long> userIds) {
-//        List<User> userList = new ArrayList<>();
-//        if (userIds.size() > 0) {
-//            userList.addAll(baseMapper.selectList(new QueryWrapper<User>().in("id", userIds)));
-//        }
-//        return userList;
-//    }
-//
-//    @Override
-//    public HashMap<Long, Long> getEnterpriseIdAndUserNumMap(List<Long> enterpriseIdList) {
-//        HashMap<Long, Long> enterpriseIdAndUserNumMap = new HashMap<>();
-//        for (Long enterpriseId : enterpriseIdList) {
-//            Long count = (long) adminUserService.count(new QueryWrapper<User>().eq("enterprise_id", enterpriseId));
-//            enterpriseIdAndUserNumMap.put(enterpriseId, count);
-//        }
-//        return enterpriseIdAndUserNumMap;
-//    }
-//
-//    /**
-//     * 打乱企业的用户到不同的门店
-//     *
-//     * @param enterpriseId
-//     */
-//    @Override
-//    public void shuffleUserToDifferentStores(Long enterpriseId) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean changePassword(String token, String oldPassword, String newPassword) throws SSSException {
+        String username = JwtUtil.getUsername(token);
+        User user = this.getUserInfoByUsername(username);
+        String oldEncryptPassword = user.getPassword();
+
+        //判断旧密码是否正确
+        if (!EncryptionUtil.isSaltMd5Match(oldPassword, oldEncryptPassword)) {
+            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "原密码不合法");
+        }
+
+        //存储新密码
+        if (CheckUtil.passwordCheck(newPassword)) {
+            user.setPassword(EncryptionUtil.saltMd5Encrypt(newPassword));
+            baseMapper.updateById(user);
+            return true;
+        } else {
+            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "新密码不合法");
+        }
+    }
+
+    /**
+     * 获取门店中还没有被分配职位的用户列表
+     *
+     * @param storeId
+     * @return
+     */
+    @Override
+    public List<User> getUserListWithoutPosition(long storeId) {
+        return baseMapper.getUserListWithoutPosition(storeId);
+    }
+    @Override
+    public List<UserInfoVo> listUserInfoVoByUserIds(List<Long> userIds) {
+        List<User> userList = new ArrayList<>();
+        if (userIds.size() > 0) {
+            userList.addAll(baseMapper.selectList(new QueryWrapper<User>().in("id", userIds)));
+        }
+        return this.buildUserInfoVoList(userList);
+    }
+
+    @Override
+    public List<User> listUserByUserIds(List<Long> userIds) {
+        List<User> userList = new ArrayList<>();
+        if (userIds.size() > 0) {
+            userList.addAll(baseMapper.selectList(new QueryWrapper<User>().in("id", userIds)));
+        }
+        return userList;
+    }
+
+    @Override
+    public HashMap<Long, Long> getEnterpriseIdAndUserNumMap(List<Long> enterpriseIdList) {
+        HashMap<Long, Long> enterpriseIdAndUserNumMap = new HashMap<>();
+        for (Long enterpriseId : enterpriseIdList) {
+            Long count = (long) adminUserService.count(new QueryWrapper<User>().eq("enterprise_id", enterpriseId));
+            enterpriseIdAndUserNumMap.put(enterpriseId, count);
+        }
+        return enterpriseIdAndUserNumMap;
+    }
+
+    /**
+     * 打乱企业的用户到不同的门店
+     *
+     * @param enterpriseId
+     */
+    @Override
+    public void shuffleUserToDifferentStores(Long enterpriseId) {
 //        Random random = new Random();
 //        ///查询企业的所有普通用户
 //        List<User> allUserList = baseMapper.selectList(new QueryWrapper<User>()
@@ -524,7 +516,7 @@
 //
 //        ///修改用户
 //        this.updateBatchById(allUserList);
-//    }
-//
-//
-//}
+    }
+
+
+}

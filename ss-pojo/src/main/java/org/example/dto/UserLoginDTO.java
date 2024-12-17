@@ -2,7 +2,6 @@ package org.example.dto;
 
 
 import lombok.Data;
-
 import java.io.Serializable;
 
 @Data

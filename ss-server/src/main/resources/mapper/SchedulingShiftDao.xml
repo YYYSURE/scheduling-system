@@ -1,10 +1,9 @@
-<!--
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.example.intelligent_scheduling_server.dao.SchedulingShiftDao">
 
-    &lt;!&ndash; 可根据自己的需求，是否要使用 &ndash;&gt;
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="org.example.entity.SchedulingShift" id="schedulingShiftMap">
         <result property="id" column="id"/>
         <result property="createTime" column="create_time"/>
@@ -33,7 +32,7 @@
             AND st.is_publish = 1
         </if>
     </select>
-    <select id="listShiftIdOfShift" resultType="com.dam.model.entity.shiftScheduling.SchedulingShiftEntity">
+    <select id="listShiftIdOfShift" resultType="org.example.entity.SchedulingShift">
         SELECT *
         FROM scheduling_shift shift
         WHERE shift.start_date = #{shiftStartDate}
@@ -65,7 +64,7 @@
         )>0
     </select>
     <select id="selectUnAssignedShiftsByDateId"
-            resultType="com.dam.model.entity.shiftScheduling.SchedulingShiftEntity">
+            resultType="org.example.entity.SchedulingShift">
         SELECT
             *
         FROM
@@ -75,7 +74,7 @@
           AND ( SELECT count(*) FROM shift_user WHERE shift_user.shift_id = scheduling_shift.id )= 0
     </select>
     <select id="getOneDayShiftListOfUser"
-            resultType="com.dam.model.entity.shiftScheduling.SchedulingShiftEntity">
+            resultType="org.example.entity.SchedulingShift">
         SELECT
             *
         FROM
@@ -101,4 +100,4 @@
             )
     </select>
 
-</mapper>-->
+</mapper>

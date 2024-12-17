@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-package org.example.utils.threadpool.eager;
+package org.example.thread.eager;
+
 
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 快速消费线程池
  */
-@Component
 public class EagerThreadPoolExecutor extends ThreadPoolExecutor {
 
     /**
@@ -45,7 +45,7 @@ public class EagerThreadPoolExecutor extends ThreadPoolExecutor {
      * @param threadFactory        线程工厂，用于创建新线程
      * @param handler              拒绝策略，当线程池和队列无法接受新任务时的处理方式
      */
-    public  EagerThreadPoolExecutor(int corePoolSize,
+    public EagerThreadPoolExecutor(int corePoolSize ,
                                    int maximumPoolSize,
                                    long keepAliveTime,
                                    TimeUnit unit,
