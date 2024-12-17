@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.dam.dao.SchedulingDateDao">
+<mapper namespace="org.example.intelligent_scheduling_server.dao.SchedulingDateDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.dam.model.entity.shiftScheduling.SchedulingDateEntity" id="schedulingDateMap">
+    <resultMap type="org.example.entity.SchedulingDate" id="schedulingDateMap">
         <result property="id" column="id"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
-        <result property="isDeleted" column="is_deleted"/>
+<!--        <result property="isDeleted" column="is_deleted"/>-->
         <result property="date" column="date"/>
         <result property="isNeedWork" column="is_need_work"/>
         <result property="startWorkTime" column="start_work_time"/>
         <result property="endWorkTime" column="end_work_time"/>
     </resultMap>
 
-<!--    <select id="listDateBetweenStartDateAndEndDate"-->
-<!--            resultType="com.dam.model.entity.shiftScheduling.SchedulingDateEntity">-->
-<!--        SELECT-->
-<!--            *-->
-<!--        FROM-->
-<!--            scheduling_date-->
-<!--        WHERE-->
-<!--            scheduling_date.date BETWEEN #{startDate} and #{endDate}-->
-<!--        AND scheduling_date.store_id = #{storeId}-->
-<!--&#45;&#45;           当天对应的任务必须是真实任务-->
-<!--        AND (select type from scheduling_task where scheduling_task.id=scheduling_date.task_id)=0-->
-<!--        ORDER BY scheduling_date.date ASC-->
-<!--    </select>-->
+    <select id="listDateBetweenStartDateAndEndDate"
+            resultType="org.example.entity.SchedulingDate">
+        SELECT
+            *
+        FROM
+            scheduling_date
+        WHERE
+            scheduling_date.date BETWEEN #{startDate} and #{endDate}
+        AND scheduling_date.store_id = #{storeId}
+        AND (select type from scheduling_task where scheduling_task.id=scheduling_date.task_id)=0
+        ORDER BY scheduling_date.date ASC
+    </select>
 
     <select id="listDateBetweenStartDateAndEndDate"
-            resultType="com.dam.model.entity.shiftScheduling.SchedulingDateEntity">
+            resultType="org.example.entity.SchedulingDate">
         SELECT
         distinct *
         FROM

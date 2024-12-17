@@ -9,6 +9,7 @@
 package org.example.utils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  *
  * @author Mark sunlightcs@gmail.com
  */
+@NoArgsConstructor
 public class PageUtils implements Serializable {
 	private static final long serialVersionUID = 1L;
 	/**

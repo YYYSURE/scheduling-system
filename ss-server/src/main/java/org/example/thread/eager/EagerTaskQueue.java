@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.example.utils.threadpool.eager;
+package org.example.thread.eager;
 
 import lombok.Data;
 

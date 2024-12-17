@@ -31,6 +31,7 @@ public class LoginController {
     // 用户登录
     @PostMapping("/login")
     public Result login(@RequestBody UserLoginDTO userLoginDTO) {
+        System.out.println(userLoginDTO);
         User user = userService.login(userLoginDTO);
 
         // 生成 jwt 令牌

@@ -14,7 +14,7 @@
         <result property="ipaddr" column="ipaddr"/>
 
         <result property="status" column="status"/>
-        <result property="accessTime" column="access_time"/>
+<!--        <result property="accessTime" column="access_time"/>-->
     </resultMap>
 
 

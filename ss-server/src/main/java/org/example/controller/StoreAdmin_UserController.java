@@ -33,7 +33,7 @@ import java.util.*;
  * @date 2022-12-03 11:10:46
  */
 @RestController
-@RequestMapping("/system/Admin_user")
+@RequestMapping("/system/StoreAdmin_user")
 public class StoreAdmin_UserController {
     @Autowired
     private StoreAdmin_UserService adminUserService;

@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.constant.RedisConstant;
 import org.example.entity.*;
 import org.example.enums.ResultCodeEnum;
-import org.example.feign.EnterpriseFeignService;
-import org.example.feign.SystemFeignService;
 import org.example.intelligent_scheduling_server.service.*;
 import org.example.result.Result;
 import org.example.utils.DateUtil;
@@ -30,8 +28,6 @@ import java.util.stream.Collectors;
 @Service
 public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStatisticsService {
     @Autowired
-    private EnterpriseFeignService enterpriseFeignService;
-    @Autowired
     private SchedulingTaskService schedulingTaskService;
     @Autowired
     private SchedulingDateService schedulingDateService;
@@ -39,8 +35,6 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
     private SchedulingShiftService shiftService;
     @Autowired
     private ShiftUserService shiftUserService;
-    @Autowired
-    private SystemFeignService systemFeignService;
 
     /**
      * 员工日均工作时长 = ∑(当天班次总工作时长/当天参与工作的员工数量)/该月工作日数量
@@ -53,8 +47,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
     @Override
 //    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]+'-'+#root.args[1]+'-'+#root.args[2]", sync = true)
     public List<StoreAverageStaffWorkTimeVo> getStoreAverageStaffWorkTime(Integer year, Integer month, Long enterpriseId) {
-
-        List<StoreAverageStaffWorkTimeVo> storeAverageStaffWorkTimeVoList = new ArrayList<>();
+        //TODO
+        /*List<StoreAverageStaffWorkTimeVo> storeAverageStaffWorkTimeVoList = new ArrayList<>();
         Date[] dateArr = DateUtil.getStartAndEndDateOfMonth(year, month);
 
         Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
@@ -87,8 +81,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
                 storeAverageStaffWorkTimeVoList.add(storeAverageStaffWorkTimeVo);
             }
         }
-
-        return storeAverageStaffWorkTimeVoList;
+        return storeAverageStaffWorkTimeVoList;*/
+        return new ArrayList<StoreAverageStaffWorkTimeVo>() {{}};
     }
 
     /**
@@ -102,7 +96,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
     @Override
 //    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]+'-'+#root.args[1]+'-'+#root.args[2]", sync = true)
     public List<StoreShiftNumAndAllocationRateVo> getStoreShiftNumAndAllocationRate(Integer year, Integer month, Long enterpriseId) {
-        List<StoreShiftNumAndAllocationRateVo> storeShiftNumAndAllocationRateVoList = new ArrayList<>();
+        //TODO
+        /*List<StoreShiftNumAndAllocationRateVo> storeShiftNumAndAllocationRateVoList = new ArrayList<>();
         Date[] dateArr = DateUtil.getStartAndEndDateOfMonth(year, month);
 
         Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
@@ -128,7 +123,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
                 storeShiftNumAndAllocationRateVoList.add(storeShiftNumAndAllocationRateVo);
             }
         }
-        return storeShiftNumAndAllocationRateVoList;
+        return storeShiftNumAndAllocationRateVoList;*/
+        return new ArrayList<>();
     }
 
     /**
@@ -142,7 +138,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
     @Override
 //    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]+'-'+#root.args[1]+'-'+#root.args[2]", sync = true)
     public List<StoreAveragePassengerFlowVo> getAveragePassengerFlow(Integer year, Integer month, Long enterpriseId) {
-        List<StoreAveragePassengerFlowVo> storeAveragePassengerFlowVoList = new ArrayList<>();
+        //TODO
+        /*List<StoreAveragePassengerFlowVo> storeAveragePassengerFlowVoList = new ArrayList<>();
         Date[] dateArr = DateUtil.getStartAndEndDateOfMonth(year, month);
 
         Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
@@ -181,7 +178,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
                 storeAveragePassengerFlowVoList.add(storeShiftNumAndAllocationRateVo);
             }
         }
-        return storeAveragePassengerFlowVoList;
+        return storeAveragePassengerFlowVoList;*/
+        return new ArrayList<>();
     }
 
 
@@ -196,7 +194,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
     @Override
 //    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]+'-'+#root.args[1]+'-'+#root.args[2]", sync = true)
     public List<TotalLunchNumAndDinnerNumVo> getTotalLunchNumAndDinnerNum(Integer year, Integer month, Long enterpriseId) {
-        List<TotalLunchNumAndDinnerNumVo> totalLunchNumAndDinnerNumVoList = new ArrayList<>();
+        //TODO
+        /*List<TotalLunchNumAndDinnerNumVo> totalLunchNumAndDinnerNumVoList = new ArrayList<>();
         Date[] dateArr = DateUtil.getStartAndEndDateOfMonth(year, month);
 
         Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
@@ -223,7 +222,8 @@ public class ShiftSchedulingStatisticsServiceImpl implements ShiftSchedulingStat
             }
         }
 
-        return totalLunchNumAndDinnerNumVoList;
+        return totalLunchNumAndDinnerNumVoList;*/
+        return new ArrayList<>();
     }
 
     /**
