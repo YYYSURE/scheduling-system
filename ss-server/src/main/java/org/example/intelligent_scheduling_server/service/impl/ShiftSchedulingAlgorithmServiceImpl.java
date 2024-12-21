@@ -21,6 +21,7 @@ import org.example.intelligent_scheduling_server.enums.WebSocketEnum;
 import org.example.intelligent_scheduling_server.service.*;
 import org.example.result.Result;
 import org.example.service.EmployeeService;
+import org.example.service.imp.EnterpriseAdmin_StoreServiceImpl;
 import org.example.vo.enterprise.SchedulingRuleVo;
 import org.example.vo.scheduling_calculate_service.DateVo;
 import org.example.vo.scheduling_calculate_service.PassengerFlowVo;
@@ -62,7 +63,8 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
     private AdminService adminService;
     @Autowired
     private SchedulingRuleService schedulingRuleService;
-
+    @Autowired
+    private EnterpriseAdmin_StoreServiceImpl storeService;
     /**
      * @param schedulingCalculateVo
      * @param instance
@@ -71,26 +73,12 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @param isSendMessage         是否发送消息给客户端通知客户端计算完成
      */
     @Override
-    public void caculate(SchedulingCalculateVo schedulingCalculateVo, Instance instance, Long storeId, Boolean isSendMessage) throws SSSException {
-        HashMap<String, Object> message = new HashMap<>();
-        message.put("taskId", schedulingCalculateVo.getTaskId());
-        message.put("type", WebSocketEnum.CalculateEnd.getType());
-        long start = System.currentTimeMillis();
+    public void caculate(Instance instance, Long storeId, Boolean isSendMessage) throws SSSException {
         try {
             Solution solution = new IntelligentSchedulingPureAlgo().solve(instance);
-            long end = System.currentTimeMillis();
-            this.saveSolutionToDatabase(storeId, schedulingCalculateVo, instance, solution, end - start);
-            message.put("isSuccess", 1);
-            message.put("calculateTime", end - start);
+            this.saveSolutionToDatabase(storeId,instance, solution);
         } catch (Exception e) {
             e.printStackTrace();
-            message.put("isSuccess", 0);
-            message.put("cause", e.getMessage());
-            SchedulingTask schedulingTaskEntity = schedulingTaskService.getById(schedulingCalculateVo.getTaskId());
-            // 修改任务状态
-            schedulingTaskEntity.setStatus(3);
-            schedulingTaskService.updateById(schedulingTaskEntity);
-            message.put("calculateTime", System.currentTimeMillis() - start);
         }
         //TODO 发送消息给前端
     }
@@ -134,11 +122,10 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @param solution
      */
     @Transactional
-//开始事务
-    public void saveSolutionToDatabase(Long storeId, SchedulingCalculateVo schedulingCalculateVo, Instance instance, Solution solution, long calculateTime) {
+    public void saveSolutionToDatabase(Long storeId, Instance instance, Solution solution) {
 
         Employee[] employees = instance.getEmployees();
-        List<String> staffIdList = new ArrayList<>();
+        List<String> staffIdList = new ArrayList<>();//员工编号
         for (Employee employee : employees) {
             staffIdList.add(employee.getId());
         }
@@ -146,23 +133,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         //// 获取solution信息
         // 排班班次信息
         List<List<ShiftPlanning>> shiftPlanningListList = solution.getShiftPlanningListList();
-
-        //// 存储排班任务相关数据
-        SchedulingTask task = new SchedulingTask();
-        task.setId(schedulingCalculateVo.getTaskId());
-//        System.out.println("schedulingCalculateVo.getTaskId():"+schedulingCalculateVo.getTaskId());
-//        System.out.println("solution.getTotalMinute():"+solution.getTotalMinute());
-        task.setTotalMinute(solution.getTotalMinute());
-        task.setTotalAssignedMinute(solution.getTotalAssignedMinute());
-//        System.out.println("solution.getAllocationRatio():" + solution.getAllocationRatio());
-        task.setAllocationRatio(new BigDecimal(solution.getAllocationRatio()));
-        task.setCalculateTime(new BigDecimal(calculateTime));
-        task.setStatus(2);
-        boolean b = schedulingTaskService.updateById(task);
-        System.out.println("更新数据是否成功：" + b);
-
-        //// 删除相关数据
-        deleteRelevantDataOfTask(schedulingCalculateVo.getTaskId());
 
         //// 声明变量
         List<DateVo> dateVoList = schedulingCalculateVo.getDateVoList();
@@ -172,6 +142,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         List<SchedulingShift> unAssignedShiftEntityList = new ArrayList<>();
         List<ShiftUser> shiftUserEntityList = new ArrayList<>();
 
+        //TODO 存放排班工作日数据
         for (int i = 0; i < shiftPlanningListList.size(); i++) {
             /// 存储排班工作日相关数据
             DateVo dateVo = dateVoList.get(i);
@@ -598,17 +569,13 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @return
      */
     @Override
-    public Instance buildInstance(SchedulingCalculateVo schedulingCalculateVo, Long storeId) throws SSSException {
+    public Instance buildInstance(Long storeId,Date beginDate, Date endDate) throws SSSException {
         long start = System.currentTimeMillis();
         //// 声明变量
         Instance instance = new Instance();
-        //TODO 生成客流量数据
+        //TODO 获取客流量数据
         List<DateVo> dateVoList = null;
-        // 一段需要多少分钟
-        int duration = schedulingCalculateVo.getDuration();
-        instance.setMinuteEachC(duration);
-        instance.setIntervalC(schedulingCalculateVo.getIntervalC());
-
+        int duration = instance.getMinuteEachC();
 
         // 设置门店员工信息
         //TODO
@@ -633,8 +600,9 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         }
         instance.setEmployees(employees);
 
+        Long ruleId = schedulingRuleService.queryRuleIdByStoreId(storeId);
         // 解析排班规则
-        SchedulingRuleVo schedulingRuleVo = schedulingRuleService.getSchedulingRuleVoByRuleId(schedulingCalculateVo.getSchedulingRuleId());
+        SchedulingRuleVo schedulingRuleVo = schedulingRuleService.getSchedulingRuleVoByRuleId(ruleId);
         // 解析门店工作时间段
         List<Time[]> oneWeekTimeFrameList = getWeekTimeFrameList(schedulingRuleVo);
         // 员工每天最多工作多少段

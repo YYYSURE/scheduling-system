@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class StoreServiceImpl extends ServiceImpl<StoreDao, Store> implements StoreService {
 
+
     @Override
     public PageUtils queryPage(Map<String, Object> params, QueryWrapper<Store> wrapper) {
         IPage<Store> page = this.page(
@@ -24,5 +25,6 @@ public class StoreServiceImpl extends ServiceImpl<StoreDao, Store> implements St
 
         return new PageUtils(page);
     }
+
 
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.entity.SchedulingRule;
 import org.example.intelligent_scheduling_server.dao.SchedulingRuleDao;
+import org.example.intelligent_scheduling_server.mapper.SchedulingRuleMapper;
 import org.example.intelligent_scheduling_server.service.PositionService;
 import org.example.intelligent_scheduling_server.service.SchedulingRuleService;
 import org.example.intelligent_scheduling_server.service.StoreService;
@@ -29,6 +30,8 @@ public class SchedulingRuleServiceImpl extends ServiceImpl<SchedulingRuleDao, Sc
     private StoreService storeService;
     @Autowired
     private PositionService positionService;
+    @Autowired
+    private SchedulingRuleMapper schedulingRuleMapper;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -108,6 +111,11 @@ public class SchedulingRuleServiceImpl extends ServiceImpl<SchedulingRuleDao, Sc
 //                lock.unlock();
 //            }
 //        }
+    }
+
+    @Override
+    public Long queryRuleIdByStoreId(Long storeId) {
+        return schedulingRuleMapper.ruleIdByStoreId(storeId);
     }
 
 }

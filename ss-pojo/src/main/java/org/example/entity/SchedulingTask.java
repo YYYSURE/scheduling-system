@@ -129,7 +129,6 @@ public class SchedulingTask implements Serializable {
         this.storeId = storeId;
         this.duration = duration;
         this.intervalc = intervalc;
-        this.datevolist = datevolist;
         this.calculateTime = calculateTime;
         this.startDate = startDate;
         this.endDate = endDate;

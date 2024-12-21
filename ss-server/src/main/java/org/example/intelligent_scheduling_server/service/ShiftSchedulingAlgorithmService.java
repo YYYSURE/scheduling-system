@@ -7,11 +7,12 @@ import org.example.enums.AlgoEnum;
 import org.example.exception.SSSException;
 import org.example.vo.scheduling_calculate_service.SchedulingCalculateVo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface ShiftSchedulingAlgorithmService {
-    public void caculate(SchedulingCalculateVo schedulingCalculateVo, Instance instance, Long storeId, Boolean isSendMessage) throws SSSException;
+    public void caculate(Instance instance, Long storeId, Boolean isSendMessage) throws SSSException;
 
     /**
      * 删除任务相关数据，班次、工作日、user_shift
@@ -42,7 +43,7 @@ public interface ShiftSchedulingAlgorithmService {
      */
     public boolean judgeWhetherSchedulingCalculateVoEffective(SchedulingCalculateVo schedulingCalculateVo) throws SSSException;
 
-    public Instance buildInstance(SchedulingCalculateVo schedulingCalculateVo, Long storeId) throws SSSException;
+    public Instance buildInstance(Long storeId, Date beginDate, Date endDate) throws SSSException;
 
     /**
      * 准备多算法计算的数据

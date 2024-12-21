@@ -25,5 +25,7 @@ public interface SchedulingRuleService extends IService<SchedulingRule> {
     SchedulingRuleVo getSchedulingRuleVoByRuleId(Long ruleId);
 
     void saveRule(SchedulingRule schedulingRule, Long storeId);
+
+    Long queryRuleIdByStoreId(Long id);
 }
 
