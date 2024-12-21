@@ -7,7 +7,9 @@ import java.io.Serializable;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户表
@@ -18,6 +20,8 @@ import lombok.Data;
  */
 @Data
 @TableName("user")
+@AllArgsConstructor
+@NoArgsConstructor
 public class User extends Base implements Serializable {
     private static final long serialVersionUID = 1L;
     

@@ -16,8 +16,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     public User login(UserLoginDTO userLoginDTO) {
-        String username = userLoginDTO.getUsername();
-        String password = userLoginDTO.getPassword();
+        String username = userLoginDTO.getAccount().getEmail();
+        String password = userLoginDTO.getAccount().getPassword();
 
         //1、根据用户名查询数据库中的数据
         User user = userMapper.getByUsername(username);
