@@ -1,19 +1,20 @@
 package org.example.controller.employee;
 
+import org.example.dto.EmployeeInfoDTO;
 import org.example.entity.User;
 import org.example.enums.ResultCodeEnum;
 import org.example.result.Result;
 import org.example.service.EmployeeService;
 import org.example.service.UserService;
 import org.example.utils.JwtUtil;
+import org.example.vo.employee.EmployeeInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 
-// TODO:
 @RestController
-@RequestMapping("/system/login")
+@RequestMapping("/users")
 public class EmployeeController {
     @Autowired
     private UserService userService;
@@ -25,27 +26,54 @@ public class EmployeeController {
      *
      * @return
      */
-    @GetMapping("/info")
-    public Result info(@RequestParam("token") String token) {
-        if (token == null || StringUtils.isEmpty(token)) {
-            return Result.error(ResultCodeEnum.ARGUMENT_VALID_ERROR.getCode(), "传入token为空，请注意");
-        }
-        //获取用户名
-        String username = JwtUtil.getUsername(token);
+    @GetMapping("/{email}")
+    public Result info(@PathVariable String email) {
+//        if (token == null || StringUtils.isEmpty(token)) {
+//            return Result.error(ResultCodeEnum.ARGUMENT_VALID_ERROR.getCode(), "传入token为空，请注意");
+//        }
+//        //获取用户名
+//        String username = JwtUtil.getUsername(token);
         //根据用户名来获取用户信息
-        User user = employeeService.getByName(username);
+        // User user = employeeService.getByName(username);
 
-        return Result.ok().addData("data", user);
+
+        EmployeeInfoVo employeeInfoVo = new EmployeeInfoVo(
+                "hhh",
+                "男",
+                "员工",
+                "杭州店",
+                30,
+                "12345",
+                "1",
+                "8点-12点",
+                "2",
+                "123456789012345678",
+                "杭州"
+        );
+
+        // TODO:
+        // User user = employeeService.getByUserName(email);
+
+
+        return Result.ok().addData("data", employeeInfoVo);
     }
 
     /**
-     * 修改员工信息
+     * 更新员工信息
      * @return
      */
-    @PostMapping("/update")
-    public Result update(@RequestBody User user) {
-        employeeService.updateById(user);
-        return Result.ok();
+    @PutMapping("/info")
+    public Result update(@RequestBody EmployeeInfoDTO employeeInfoDTO) {
+        // employeeService.updateById(user);
+        System.out.println(employeeInfoDTO);
+
+        User user = new User();
+        // TODO:
+        // 将 employeeInfoDTO copy 到 user
+
+        // employeeService.update(user);
+
+        return Result.ok().addData("msg", "succeed");
     }
 
     /**
