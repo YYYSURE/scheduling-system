@@ -75,10 +75,6 @@ public class SchedulingTask implements Serializable {
      */
     private Integer intervalc;
     /**
-     * 排班工作日及其客流量
-     */
-    private String datevolist;
-    /**
      * 计算结果
      */
     private BigDecimal calculateTime;

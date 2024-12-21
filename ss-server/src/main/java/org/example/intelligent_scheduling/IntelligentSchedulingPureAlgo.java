@@ -14,33 +14,30 @@ import java.io.IOException;
 import java.util.*;
 
 public class IntelligentSchedulingPureAlgo {
-    public Solution solve(Instance instance, AlgoEnum.PhaseOne phaseOne, AlgoEnum.PhaseTwo phaseTwo, Map<String, Object> parameter) throws IOException, SSSException {
+    public Solution solve(Instance instance) throws IOException, SSSException {
         // 初始化 solution
         Solution solution = new Solution();
         long phaseOneStartTime = System.currentTimeMillis();
         int totalMinute = 0;
         List<List<Shift>> shiftListList = new ArrayList<>();
-        int[] shiftNumArr = new int[instance.getTimeFramesEachDay().size()];
-        int[] shiftMinuteArr = new int[instance.getTimeFramesEachDay().size()];
-        for (int i = 0; i < instance.getTimeFramesEachDay().size(); i++) {
+        //TODO 看完这个代码纠正下面两个注释
+        int[] shiftNumArr = new int[instance.getTimeFramesEachDay().size()];//班次数量
+        int[] shiftMinuteArr = new int[instance.getTimeFramesEachDay().size()];//总时长
+        for (int i = 0; i < instance.getTimeFramesEachDay().size(); i++) {//为每一天生成班次
             List<Shift> shiftList = new ArrayList<>();
             if (instance.getTimeFramesEachDay().get(i) != null) {
-                if (phaseOne.equals(AlgoEnum.PhaseOne.GOA)) {
-                    shiftList = new SG_GOA(instance.getTimeFramesEachDay().get(i), // 时间段集合，例如：TimeFrame{earliestTime = 8 h 0 min , latestTime = 8 h 30 min , duration = 30.0 min}
-                            instance.getEmployeesRequiredArrEachDay().get(i), // 每个时间段需要的员工数：employeesRequiredArr.len = timeFrames.len
-                            instance.getEmployees().length, // 员工数
-                            instance.getMinC(), // 最小班次时间的时间段数，例如：以30分钟为一段，最小班次为2小时，那么这个值就是4
-                            instance.getMaxC(), // 最大班次时间的时间段数，例如：以30分钟为一段，最大班次为4小时，那么这个值就是8
-                            instance.getIntervalC(), // 以多少个段为基准去排班，例如：以30分钟为一段，如果这个值设置为2，就代表每个班次的时长必须是2*30=60分钟的整数倍
-                            instance.getMinuteEachC(), // 以多少分钟为一段，设置为30，就是以30分钟为一段
-                            instance.getLunchFrames().get(i), // 午餐时间范围，在timeFrames中的索引范围
-                            instance.getDinnerFrames().get(i), // 晚餐时间范围，在timeFrames中的索引范围
-                            instance.getLunchC(), // 午餐时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表午餐时间为30分钟
-                            instance.getDinnerC() // 晚餐时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表晚餐时间为30分钟
-                    ).solve();
-                } else {
-                    throw new RuntimeException("【班次生成阶段】无法识别的算法: " + phaseOne);
-                }
+                shiftList = new SG_GOA(instance.getTimeFramesEachDay().get(i), // 时间段集合
+                        instance.getEmployeesRequiredArrEachDay().get(i), // 每个时间段需要的员工数：employeesRequiredArr.len = timeFrames.len
+                        instance.getEmployees().length, // 员工数
+                        instance.getMinC(), // 最小班次时间的时间段数，例如：以30分钟为一段，最小班次为2小时，那么这个值就是4
+                        instance.getMaxC(), // 最大班次时间的时间段数，例如：以30分钟为一段，最大班次为4小时，那么这个值就是8
+                        instance.getIntervalC(), // 以多少个段为基准去排班，例如：以30分钟为一段，如果这个值设置为2，就代表每个班次的时长必须是2*30=60分钟的整数倍
+                        instance.getMinuteEachC(), // 以多少分钟为一段，设置为30，就是以30分钟为一段
+                        instance.getLunchFrames().get(i), // 午餐时间范围，在timeFrames中的索引范围
+                        instance.getDinnerFrames().get(i), // 晚餐时间范围，在timeFrames中的索引范围
+                        instance.getLunchC(), // 午餐时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表午餐时间为30分钟
+                        instance.getDinnerC() // 晚餐时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表晚餐时间为30分钟
+                ).solve();
                 shiftList.sort(new Comparator<Shift>() {
                     @Override
                     public int compare(Shift o1, Shift o2) {
@@ -67,13 +64,7 @@ public class IntelligentSchedulingPureAlgo {
 
         // 班次分配阶段
         long phaseTwoStartTime = System.currentTimeMillis();
-        if (phaseTwo.equals(AlgoEnum.PhaseTwo.SAEA)) {
-            new PS_SAEA(solution, instance.getRestC(), instance.getMaxWorkCEachDay(), instance.getMaxWorkCEachWeek(), instance.getMaxContinuousWorkC(), instance.getTimeFramesEachDay(), instance.getWeekArr(), instance.getEmployees(), instance.getPositionConstraintArr(), instance.getDoubleShiftTimeFramesEachDay(), shiftListList).solve();
-        } else if (phaseTwo.equals(AlgoEnum.PhaseTwo.EASA)) {
-            new PS_EASA(solution, instance.getRestC(), instance.getMaxWorkCEachDay(), instance.getMaxWorkCEachWeek(), instance.getMaxContinuousWorkC(), instance.getTimeFramesEachDay(), instance.getWeekArr(), instance.getEmployees(), instance.getPositionConstraintArr(), instance.getDoubleShiftTimeFramesEachDay(), shiftListList).solve();
-        }else {
-            throw new RuntimeException("【班次分配阶段】无法识别的算法: " + phaseOne);
-        }
+        new PS_SAEA(solution, instance.getRestC(), instance.getMaxWorkCEachDay(), instance.getMaxWorkCEachWeek(), instance.getMaxContinuousWorkC(), instance.getTimeFramesEachDay(), instance.getWeekArr(), instance.getEmployees(), instance.getPositionConstraintArr(), instance.getDoubleShiftTimeFramesEachDay(), shiftListList).solve();
         long phaseTwoUseTime = System.currentTimeMillis() - phaseTwoStartTime;
         solution.setPhaseTwoUseTime(phaseTwoUseTime);
         // 输出结果
@@ -108,5 +99,4 @@ public class IntelligentSchedulingPureAlgo {
         // 求解完毕，返回 solution
         return solution;
     }
-
 }

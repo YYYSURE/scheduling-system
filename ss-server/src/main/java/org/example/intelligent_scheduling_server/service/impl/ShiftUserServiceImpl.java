@@ -1,26 +1,19 @@
 package org.example.intelligent_scheduling_server.service.impl;
 
-import com.alibaba.fastjson.TypeReference;
 import org.example.entity.SchedulingShift;
 import org.example.entity.ShiftUser;
-import org.example.enums.ResultCodeEnum;
 import org.example.exception.SSSException;
 import org.example.intelligent_scheduling_server.dao.ShiftUserDao;
 import org.example.intelligent_scheduling_server.service.SchedulingShiftService;
 import org.example.intelligent_scheduling_server.service.ShiftUserService;
-import org.example.result.Result;
 import org.example.utils.PageUtils;
 import org.example.utils.Query;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -29,8 +22,6 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
 
     @Autowired
     private SchedulingShiftService shiftService;
-    @Autowired
-    private ShiftUserService shiftUserService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -49,13 +40,6 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
 
     /**
      * 为班次替换人员或者追加人员
-     *
-     * @param shiftStartDate
-     * @param shiftEndDate
-     * @param appointType
-     * @param userIdList
-     * @param storeId
-     * @param shiftId
      */
     @Override
     @Transactional
@@ -124,8 +108,6 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
     /**
      * 查询出任务相关的员工
      *
-     * @param taskId
-     * @return
      */
     @Override
     public List<Long> listRelevantUserId(Long taskId) {
@@ -135,15 +117,15 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
     /**
      * 根据工作日查询出所有需要工作的员工id
      *
-     * @param workDate
-     * @param storeId
-     * @return
      */
     @Override
     public List<Long> listUserIdByWorkDate(Date workDate, Long storeId) {
         return baseMapper.listUserIdByWorkDate(workDate, storeId);
     }
 
+    /**
+     * 根据工作日查找所有排班_员工信息
+     */
     @Override
     public List<ShiftUser> listStaffWorkDtoByWorkDate(Date workDate, Long storeId) {
         return baseMapper.listStaffWorkDtoByWorkDate(workDate, storeId);
@@ -151,9 +133,6 @@ public class ShiftUserServiceImpl extends ServiceImpl<ShiftUserDao, ShiftUser> i
 
     /**
      * 查询出班次对应的员工id集合
-     *
-     * @param shiftIdList
-     * @return
      */
     @Override
     public List<Long> listUserIdByShiftIdList(List<Long> shiftIdList) {

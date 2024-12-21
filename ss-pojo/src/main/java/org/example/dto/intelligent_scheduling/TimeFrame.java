@@ -5,15 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-/**
- * @Author：WSKH
- * @ClassName：TimeFrame
- * @ClassType：
- * @Description：
- * @Date：2023/1/7/15:53
- * @Email：1187560563@qq.com
- * @Blog：https://blog.csdn.net/weixin_51545953?type=blog
- */
+//时间段 TODO 哪里生成的?
 @Data
 @NoArgsConstructor
 public class TimeFrame {

@@ -15,7 +15,6 @@ import org.example.vo.shiftScheduling.applet.WeeklyTaskVo;
 import org.example.vo.shiftScheduling.applet.WeeklyViewDayVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,13 +24,12 @@ import java.util.*;
 /**
  * 排班班次表
  *
- * @author dam
- * @email 1782067308@qq.com
- * @date 2023-03-04 14:30:17
  */
 @RestController
 @RequestMapping("/scheduling/schedulingshift")
 public class SchedulingShiftController {
+    //根据门店id获得排班信息,显每个时间段有多少人和是否包含就餐或休息时间
+
     @Autowired
     private SchedulingShiftService schedulingShiftService;
 
@@ -52,7 +50,6 @@ public class SchedulingShiftController {
      * @return
      */
     @PostMapping("listSchedulingShiftVoByDateId")
-//    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_SHIFT}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]", sync = true)
     public Result listSchedulingShiftVoByDateId(@RequestBody Map<String, Object> map) {
         long start = System.currentTimeMillis();
         Long dateId = Long.parseLong(map.get("dateId").toString());
@@ -107,7 +104,6 @@ public class SchedulingShiftController {
     @RequestMapping("/delete")
     public Result delete(@RequestBody Long[] ids) {
         schedulingShiftService.removeByIds(Arrays.asList(ids));
-
         return Result.ok();
     }
 

@@ -7,6 +7,6 @@ import org.example.entity.User;
 @Mapper
 public interface UserMapper {
 
-    @Select("select * from employee wheter username = #{username}")
+    @Select("select * from user where username = #{username}")
     User getByUsername(String username);
 }

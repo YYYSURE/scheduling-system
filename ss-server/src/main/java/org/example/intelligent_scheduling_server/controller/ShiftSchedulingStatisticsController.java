@@ -27,14 +27,12 @@ import java.util.concurrent.TimeUnit;
 import static org.example.constant.RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_ENTERPRISE_STATISTIC;
 import static org.example.constant.RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC;
 
+//统计数据获取
 @RestController
 @RequestMapping("/scheduling/statistics")
 public class ShiftSchedulingStatisticsController {
     @Autowired
     private ShiftSchedulingStatisticsService shiftSchedulingStatisticsService;
-
-    @Qualifier("distributedCache")
-    //private StringRedisTemplateProxy distributedCache;
 
     /**
      * 获取指定月份的各门店的员工日均工作时长 员工日均工作时长 = ∑(当天班次总工作时长/当天参与工作的员工数量)/该月工作日数量
@@ -235,16 +233,16 @@ public class ShiftSchedulingStatisticsController {
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
 
         //TODO
-        /*StatisticsVo statisticsVo = (StatisticsVo) distributedCache.safeGet(
-                MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getStatisticsVoByStoreId:" + storeId,
-                new TypeReference<StatisticsVo>() {
-                },
-                () -> shiftSchedulingStatisticsService.getStatisticsVoByStoreId(storeId),
-                1,
-                TimeUnit.DAYS);
-
-        System.out.println("getStatisticsVoByStoreId耗时：" + (System.currentTimeMillis() - start) + "ms");
-        return Result.ok().addData("statisticsVo", statisticsVo);*/
+//        StatisticsVo statisticsVo = (StatisticsVo) distributedCache.safeGet(
+//                MODULE_SHIFT_SCHEDULING_CALCULATE_STORE_STATISTIC + "getStatisticsVoByStoreId:" + storeId,
+//                new TypeReference<StatisticsVo>() {
+//                },
+//                () -> shiftSchedulingStatisticsService.getStatisticsVoByStoreId(storeId),
+//                1,
+//                TimeUnit.DAYS);
+//
+//        System.out.println("getStatisticsVoByStoreId耗时：" + (System.currentTimeMillis() - start) + "ms");
+//        return Result.ok().addData("statisticsVo", statisticsVo);
         return Result.ok();
     }
 

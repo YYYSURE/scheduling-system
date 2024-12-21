@@ -130,7 +130,7 @@ public class PS_SAEA {
         int[] sequence = shellSort(shiftList, employeeIndexList);
         // 排序完，开始挑选
         HashSet<Integer> set = new HashSet<>(); // 记录已经被分配的员工
-        List<Integer> removeIndexList = new ArrayList<>();
+        List<Integer> removeIndexList = new ArrayList<>();//记录已经分配的班次
         for (int i : sequence) {
             for (int j = 0; j < employeeIndexList.get(i).size(); j++) {
                 int e = employeeIndexList.get(i).get(j);

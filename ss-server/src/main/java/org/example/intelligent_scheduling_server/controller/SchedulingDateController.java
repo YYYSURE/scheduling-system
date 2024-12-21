@@ -52,10 +52,8 @@ public class SchedulingDateController {
     /**
      * 查询出有安排班次的date
      *
-     * @return
      */
     @PostMapping("/listDateByCondition")
-//    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_DATE}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]", sync = true)
     public Result listDateByCondition(@RequestBody Map<String, Object> conditionMap, HttpServletRequest httpServletRequest) throws ParseException {
         long start = System.currentTimeMillis();
         Map<String, SchedulingDate> dateAndDateEntityMap = null;
@@ -164,7 +162,6 @@ public class SchedulingDateController {
     @RequestMapping("/save")
     public Result save(@RequestBody SchedulingDate schedulingDate) {
         schedulingDateService.save(schedulingDate);
-
         return Result.ok();
     }
 

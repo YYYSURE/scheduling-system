@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 // TODO:
 @RestController
@@ -34,8 +37,10 @@ public class EmployeeController {
         String username = JwtUtil.getUsername(token);
         //根据用户名来获取用户信息
         User user = employeeService.getByName(username);
-
-        return Result.ok().addData("data", user);
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", user.getName());
+        data.put("userType",user.getType());
+        return Result.ok().addData("data", data);
     }
 
     /**

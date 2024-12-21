@@ -17,14 +17,10 @@ import lombok.Data;
  * @date 2023-02-06 15:50:29
  */
 @Data
-@TableName("user")
-public class User extends Base implements Serializable {
+@TableName("employee")
+public class Employee extends Base implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    /**
-     * 姓名
-     */
-    private String name;
+
     /**
      * 电话
      */
@@ -111,8 +107,7 @@ public class User extends Base implements Serializable {
     @Override
     public String toString() {
         return "UserEntity{" +
-                "name='" + name + '\'' +
-                ", id=" + getId() +
+                "id=" + getId() +
                 ", phone='" + phone + '\'' +
                 ", mail='" + mail + '\'' +
                 ", enterpriseId=" + enterpriseId +

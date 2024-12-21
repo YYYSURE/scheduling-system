@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface ShiftSchedulingAlgorithmService {
-    public void caculate(SchedulingCalculateVo schedulingCalculateVo, Instance instance, Long storeId, String token, Boolean isSendMessage) throws SSSException;
+    public void caculate(SchedulingCalculateVo schedulingCalculateVo, Instance instance, Long storeId, Boolean isSendMessage) throws SSSException;
 
     /**
-     * 删除任务相关数据，班次、工作日、useshift
+     * 删除任务相关数据，班次、工作日、user_shift
      *
      * @param taskId
      */
@@ -29,7 +29,6 @@ public interface ShiftSchedulingAlgorithmService {
 
     void multiAlgorithmSolve(List<Instance> instanceList, List<SchedulingCalculateVo> schedulingCalculateVoList, Long taskId, Long storeId, String token) throws SSSException;
 
-    public Map<String, Object> getPhaseTwoParameter(SchedulingCalculateVo schedulingCalculateVo, AlgoEnum.PhaseTwo phaseTwo);
 
     public void saveSolutionToDatabase(Long storeId, SchedulingCalculateVo schedulingCalculateVo, Instance instance, Solution solution, long calculateTime);
 

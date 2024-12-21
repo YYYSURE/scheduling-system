@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.intelligent_scheduling.*;
 import org.example.dto.intelligent_scheduling_server.AlgoGroupDto;
 import org.example.entity.SchedulingDate;
@@ -19,6 +20,7 @@ import org.example.intelligent_scheduling_server.component.WebSocketServer;
 import org.example.intelligent_scheduling_server.enums.WebSocketEnum;
 import org.example.intelligent_scheduling_server.service.*;
 import org.example.result.Result;
+import org.example.service.EmployeeService;
 import org.example.vo.enterprise.SchedulingRuleVo;
 import org.example.vo.scheduling_calculate_service.DateVo;
 import org.example.vo.scheduling_calculate_service.PassengerFlowVo;
@@ -54,6 +56,12 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
     private WebSocketServer webSocketServer;
     @Autowired
     private ThreadPoolExecutor executor;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private AdminService adminService;
+    @Autowired
+    private SchedulingRuleService schedulingRuleService;
 
     /**
      * @param schedulingCalculateVo
@@ -63,22 +71,13 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @param isSendMessage         是否发送消息给客户端通知客户端计算完成
      */
     @Override
-    public void caculate(SchedulingCalculateVo schedulingCalculateVo, Instance instance, Long storeId, String token, Boolean isSendMessage) throws SSSException {
-        System.out.println("调用排班算法");
-
-        // 第一阶段算法设置
-        AlgoEnum.PhaseOne phaseOne = getPhaseOneAlgorithm(schedulingCalculateVo);
-        // 第二阶段算法设置
-        AlgoEnum.PhaseTwo phaseTwo = getPhaseTwoAlgorithm(schedulingCalculateVo);
-        // 第二阶段算法参数设置
-        Map<String, Object> parameter = getPhaseTwoParameter(schedulingCalculateVo, phaseTwo);
-
+    public void caculate(SchedulingCalculateVo schedulingCalculateVo, Instance instance, Long storeId, Boolean isSendMessage) throws SSSException {
         HashMap<String, Object> message = new HashMap<>();
         message.put("taskId", schedulingCalculateVo.getTaskId());
         message.put("type", WebSocketEnum.CalculateEnd.getType());
         long start = System.currentTimeMillis();
         try {
-            Solution solution = new IntelligentSchedulingPureAlgo().solve(instance, phaseOne, phaseTwo, parameter);
+            Solution solution = new IntelligentSchedulingPureAlgo().solve(instance);
             long end = System.currentTimeMillis();
             this.saveSolutionToDatabase(storeId, schedulingCalculateVo, instance, solution, end - start);
             message.put("isSuccess", 1);
@@ -93,10 +92,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             schedulingTaskService.updateById(schedulingTaskEntity);
             message.put("calculateTime", System.currentTimeMillis() - start);
         }
-        // 发送消息给前端
-        if (isSendMessage) {
-            webSocketServer.sendMessage(JSON.toJSONString(message), WebSocketServer.tokenAndSessionMap.get(token));
-        }
+        //TODO 发送消息给前端
     }
 
     /**
@@ -110,20 +106,11 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         Long taskId = schedulingCalculateVo.getTaskId();
         Long schedulingRuleId = schedulingCalculateVo.getSchedulingRuleId();
         List<DateVo> dateVoList = schedulingCalculateVo.getDateVoList();
-        String stepOneAlg = schedulingCalculateVo.getStepOneAlg();
-        String stepTwoAlg = schedulingCalculateVo.getStepTwoAlg();
-        String stepTwoAlgParam = schedulingCalculateVo.getStepTwoAlgParam();
 
         if (taskId == null) {
             throw new SSSException(ResultCodeEnum.FAIL.getCode(), "taskId为空");
         } else if (schedulingRuleId == null) {
             throw new SSSException(ResultCodeEnum.FAIL.getCode(), "门店规则还没有设置");
-        } else if (stepOneAlg == null) {
-            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "阶段一算法未设置完成");
-        } else if (stepTwoAlg == null) {
-            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "阶段二算法未设置完成");
-        } else if (stepTwoAlgParam == null) {
-            throw new SSSException(ResultCodeEnum.FAIL.getCode(), "阶段二算法参数未设置完成");
         }
 
         if (dateVoList == null) {
@@ -139,136 +126,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         }
 
         return true;
-    }
-
-    /**
-     * 获取第一阶段算法
-     *
-     * @param schedulingCalculateVo
-     * @return
-     */
-    private AlgoEnum.PhaseOne getPhaseOneAlgorithm(SchedulingCalculateVo schedulingCalculateVo) {
-        AlgoEnum.PhaseOne phaseOne = AlgoEnum.PhaseOne.GOA;
-        switch (schedulingCalculateVo.getStepOneAlg()) {
-            case "GOA":
-                phaseOne = AlgoEnum.PhaseOne.GOA;
-                break;
-//            case "CG":
-//                phaseOne = AlgoEnum.PhaseOne.CG;
-//                break;
-//            case "BP":
-//                phaseOne = AlgoEnum.PhaseOne.BP;
-//                break;
-//            case "SC":
-//                phaseOne = AlgoEnum.PhaseOne.SC;
-//                break;
-        }
-        return phaseOne;
-    }
-
-    /**
-     * 获取第二阶段算法
-     *
-     * @param schedulingCalculateVo
-     * @return
-     */
-    private AlgoEnum.PhaseTwo getPhaseTwoAlgorithm(SchedulingCalculateVo schedulingCalculateVo) {
-        AlgoEnum.PhaseTwo phaseTwo = AlgoEnum.PhaseTwo.EASA;
-        JSONArray arr = JSONObject.parseArray(schedulingCalculateVo.getStepTwoAlg());
-        String algorithmName = arr.get(1).toString();
-        switch (algorithmName) {
-//            case "SA":
-//                phaseTwo = AlgoEnum.PhaseTwo.SA;
-//                break;
-//            case "TS":
-//                phaseTwo = AlgoEnum.PhaseTwo.TS;
-//                break;
-//            case "VNS":
-//                phaseTwo = AlgoEnum.PhaseTwo.VNS;
-//                break;
-//            case "ALNS":
-//                phaseTwo = AlgoEnum.PhaseTwo.ALNS;
-//                break;
-//            case "AGA":
-//                phaseTwo = AlgoEnum.PhaseTwo.AGA;
-//                break;
-//            case "ILS":
-//                phaseTwo = AlgoEnum.PhaseTwo.ILS;
-//                break;
-
-            case "SAEA":
-                phaseTwo = AlgoEnum.PhaseTwo.SAEA;
-                break;
-            case "EASA":
-                phaseTwo = AlgoEnum.PhaseTwo.EASA;
-                break;
-//            case "GMMA":
-//                phaseTwo = AlgoEnum.PhaseTwo.GMMA;
-//                break;
-//            case "CG":
-//                phaseTwo = AlgoEnum.PhaseTwo.CG;
-//                break;
-        }
-        return phaseTwo;
-    }
-
-    /**
-     * 获取第二阶段算法的计算参数
-     *
-     * @param schedulingCalculateVo
-     * @param phaseTwo
-     * @return
-     */
-    public Map<String, Object> getPhaseTwoParameter(SchedulingCalculateVo schedulingCalculateVo, AlgoEnum.PhaseTwo phaseTwo) {
-        Map<String, Object> parameter = new HashMap<>();
-        JSONObject stepTwoAlgParamJsonObject = JSONObject.parseObject(schedulingCalculateVo.getStepTwoAlgParam());
-//        if (phaseTwo.equals(AlgoEnum.PhaseTwo.SA)) {
-//            parameter = new HashMap<>();
-//            parameter.put("T", Double.parseDouble(stepTwoAlgParamJsonObject.get("sa_T").toString()));
-//            parameter.put("a", Double.parseDouble(stepTwoAlgParamJsonObject.get("sa_a").toString()));
-//            parameter.put("timer", Long.parseLong(stepTwoAlgParamJsonObject.get("sa_timer").toString()));
-//        } else if (phaseTwo.equals(AlgoEnum.PhaseTwo.TS)) {
-//            parameter = new HashMap<>();
-//            parameter.put("tabuLen", Integer.parseInt(stepTwoAlgParamJsonObject.get("ts_tabuLen").toString()));
-//            parameter.put("N", Integer.parseInt(stepTwoAlgParamJsonObject.get("ts_N").toString()));
-//            parameter.put("timer", Long.parseLong(stepTwoAlgParamJsonObject.get("ts_timer").toString()));
-//        } else if (phaseTwo.equals(AlgoEnum.PhaseTwo.ILS)) {
-//            parameter = new HashMap<>();
-//            parameter.put("maxLocalSearchNoLiftCnt", Integer.parseInt(stepTwoAlgParamJsonObject.get("ils_maxLocalSearchNoLiftCnt").toString()));
-//            parameter.put("disturbanceCnt", Integer.parseInt(stepTwoAlgParamJsonObject.get("ils_disturbanceCnt").toString()));
-//            parameter.put("groupCnt", Integer.parseInt(stepTwoAlgParamJsonObject.get("ils_groupCnt").toString()));
-//            parameter.put("timer", Long.parseLong(stepTwoAlgParamJsonObject.get("ils_timer").toString()));
-//        } else if (phaseTwo.equals(AlgoEnum.PhaseTwo.ALNS)) {
-//            parameter = new HashMap<>();
-//            parameter.put("T", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_T").toString()));
-//            parameter.put("a", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_a").toString()));
-//            parameter.put("ro", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_ro").toString()));
-//            parameter.put("N", Integer.parseInt(stepTwoAlgParamJsonObject.get("alns_N").toString()));
-//            parameter.put("tabuLen", Integer.parseInt(stepTwoAlgParamJsonObject.get("alns_tabuLen").toString()));
-//            parameter.put("score1", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_score1").toString()));
-//            parameter.put("score2", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_score2").toString()));
-//            parameter.put("score3", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_score3").toString()));
-//            parameter.put("score4", Double.parseDouble(stepTwoAlgParamJsonObject.get("alns_score4").toString()));
-//            parameter.put("timer", Long.parseLong(stepTwoAlgParamJsonObject.get("alns_timer").toString()));
-//        } else if (phaseTwo.equals(AlgoEnum.PhaseTwo.AGA)) {
-//            parameter = new HashMap<>();
-//            parameter.put("popSize", stepTwoAlgParamJsonObject.get("aga_popSize"));
-//            double[] arr1 = new double[2];
-//            double[] arr2 = new double[2];
-//            JSONArray jsonArr1 = JSON.parseArray(stepTwoAlgParamJsonObject.get("aga_mutationRateBoundArr").toString());
-//            JSONArray jsonArr2 = JSON.parseArray(stepTwoAlgParamJsonObject.get("aga_crossoverRateBoundArr").toString());
-//            for (int i = 0; i < jsonArr1.size(); i++) {
-//                arr1[i] = Double.parseDouble(jsonArr1.get(i).toString());
-//                arr2[i] = Double.parseDouble(jsonArr2.get(i).toString());
-//            }
-//            parameter.put("mutationRateBoundArr", arr1);
-//            parameter.put("crossoverRateBoundArr", arr2);
-//            parameter.put("timer", Long.parseLong(stepTwoAlgParamJsonObject.get("aga_timer").toString()));
-//        } else if (phaseTwo.equals(AlgoEnum.PhaseTwo.VNS)) {
-//            parameter = new HashMap<>();
-//            parameter.put("timer", Long.parseLong(stepTwoAlgParamJsonObject.get("vns_timer").toString()));
-//        }
-        return parameter;
     }
 
     /**
@@ -433,12 +290,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
     /**
      * 存储未分配的班次
      *
-     * @param instance
-     * @param solution
-     * @param shiftEntityList
-     * @param i
-     * @param timeFrameArr
-     * @param sdf1
      */
     private void saveUnAssignedShifts(Instance instance, Solution solution, List<SchedulingShift> shiftEntityList, int i, String[] timeFrameArr, SimpleDateFormat sdf1) {
         List<Shift> unAssignedShiftList = solution.getUnabsorbedShiftListList().get(i);
@@ -484,8 +335,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 用虚拟任务的结果覆盖任务结果
-     *
-     * @param virtualTaskId
      */
     @Override
     @Transactional
@@ -562,8 +411,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 删除任务相关数据，班次、工作日、user_shift
-     *
-     * @param taskId
      */
     public void deleteRelevantDataOfTask(Long taskId) {
         ////查询当前任务所对应的数据
@@ -597,8 +444,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 删除任务集合的所有相关数据，班次、工作日、user_shift
-     *
-     * @param taskIdList
      */
     public void deleteRelevantDataOfTaskList(List<Long> taskIdList) {
         ////查询当前任务所对应的数据
@@ -691,12 +536,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 计算不同的算法组合
-     *
-     * @param schedulingCalculateVoList
-     * @param taskId
-     * @param storeId
-     * @param token
-     * @return
      */
     @Override
     public void multiAlgorithmSolve(List<Instance> instanceList, List<SchedulingCalculateVo> schedulingCalculateVoList, Long taskId, Long storeId, String token) throws SSSException {
@@ -760,104 +599,57 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      */
     @Override
     public Instance buildInstance(SchedulingCalculateVo schedulingCalculateVo, Long storeId) throws SSSException {
-        System.out.println("buildInstance-------------------------------------------------------------------------------------------");
         long start = System.currentTimeMillis();
-
         //// 声明变量
         Instance instance = new Instance();
-        List<DateVo> dateVoList = schedulingCalculateVo.getDateVoList();
+        //TODO 生成客流量数据
+        List<DateVo> dateVoList = null;
         // 一段需要多少分钟
         int duration = schedulingCalculateVo.getDuration();
-
-        //// 设置简单变量
-        // 多少分钟为一段
         instance.setMinuteEachC(duration);
         instance.setIntervalC(schedulingCalculateVo.getIntervalC());
 
-        // 1.获取之前的请求头数据
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
-        //// 设置门店员工信息
+        // 设置门店员工信息
         //TODO
-        /*CompletableFuture<Void> searchEmployeeFuture = CompletableFuture.runAsync(() -> {
-            // 2.每一个线程都共享之前的请求数据
-            RequestContextHolder.setRequestAttributes(requestAttributes);
-            /// 调用远程服务查询门店的员工
-            Result userR = systemFeignService.listUserByStoreId(storeId);
-//            System.out.println("员工数据构建，调用远程服务查询门店的员工，userR：" + JSON.toJSONString(userR));
-            if (userR.getCode() != ResultCodeEnum.SUCCESS.getCode().intValue()) {
-                try {
-                    throw new SSSException(ResultCodeEnum.Feign_ERROR.getCode(), "远程服务调用失败——查询门店的所有员工");
-                } catch (SSSException e) {
-                    throw new RuntimeException(e);
-                }
+        List<UserInfoVo> userInfoVoList = adminService.listUserByStoreId(storeId);
+        // 移除有问题的员工数据，如没有职位信息，或者没有排班长度偏好
+        List<UserInfoVo> userInfoVoListWithoutPosition = new ArrayList<>();
+        for (UserInfoVo userInfoVo : userInfoVoList) {
+            if (userInfoVo.getPositionId() == null ||
+                    userInfoVo.getShiftLengthPreferenceOneDay() == null ||
+                    userInfoVo.getShiftLengthPreferenceOneWeek() == null ||
+                    userInfoVo.getWorkTimePreference() == null) {
+                userInfoVoListWithoutPosition.add(userInfoVo);
             }
-            // 门店的员工数据
-            List<UserInfoVo> userInfoVoList = userR.getData("userInfoVoList", new TypeReference<List<UserInfoVo>>() {
-            });
-            // 移除有问题的员工数据，如没有职位信息，或者没有排班长度偏好
-            List<UserInfoVo> userInfoVoListWithoutPosition = new ArrayList<>();
-            for (UserInfoVo userInfoVo : userInfoVoList) {
-                if (userInfoVo.getPositionId() == null ||
-                        userInfoVo.getShiftLengthPreferenceOneDay() == null ||
-                        userInfoVo.getShiftLengthPreferenceOneWeek() == null ||
-                        userInfoVo.getWorkTimePreference() == null) {
-                    userInfoVoListWithoutPosition.add(userInfoVo);
-                }
-            }
-            userInfoVoList.removeAll(userInfoVoListWithoutPosition);
-            // 转化为算法需要的用户数据
-            Employee[] employees = new Employee[userInfoVoList.size()];
-            for (int i = 0; i < userInfoVoList.size(); i++) {
-                UserInfoVo userInfoVo = userInfoVoList.get(i);
-                Employee employee = buildEmployee(duration, userInfoVo);
-                employees[i] = employee;
-            }
-            instance.setEmployees(employees);
-            System.out.println("员工数据构建完成----");
-        }, executor);*/
+        }
+        userInfoVoList.removeAll(userInfoVoListWithoutPosition);
+        // 转化为算法需要的用户数据
+        Employee[] employees = new Employee[userInfoVoList.size()];
+        for (int i = 0; i < userInfoVoList.size(); i++) {
+            UserInfoVo userInfoVo = userInfoVoList.get(i);
+            Employee employee = buildEmployee(duration, userInfoVo);
+            employees[i] = employee;
+        }
+        instance.setEmployees(employees);
 
-        //// 调用远程服务查询门店的排班规则
-/*        CompletableFuture<Void> searchRuleFuture = CompletableFuture.runAsync(() -> {
-            // 2.每一个线程都共享之前的请求数据
-            RequestContextHolder.setRequestAttributes(requestAttributes);
-            Result ruleR = enterpriseFeignService.getSchedulingRuleVoById(schedulingCalculateVo.getSchedulingRuleId());
-//            System.out.println("基础规则构建，调用远程服务查询规则，ruleR：" + JSON.toJSONString(ruleR));
-            if (ruleR.getCode() != ResultCodeEnum.SUCCESS.getCode().intValue()) {
-                try {
-                    throw new SSSException(ResultCodeEnum.Feign_ERROR.getCode(), "远程服务调用失败——查询门店排班规则");
-                } catch (SSSException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            // 解析排班规则
-            SchedulingRuleVo schedulingRuleVo = ruleR.getData("schedulingRuleVo", new TypeReference<SchedulingRuleVo>() {
-            });
-            // 解析门店工作时间段
-            List<Time[]> oneWeekTimeFrameList = getWeekTimeFrameList(schedulingRuleVo);
-            // 员工每天最多工作多少段
-            instance.setMaxWorkCEachDay((schedulingRuleVo.getMostWorkHourInOneDay().intValue() * 60) / duration);
-            // 员工每周最多工作多少段
-            instance.setMaxWorkCEachWeek((schedulingRuleVo.getMostWorkHourInOneWeek().intValue() * 60) / duration);
-            // 设置最小班次时间的时间段数
-            instance.setMinC(schedulingRuleVo.getMinShiftMinute() / duration);
-            // 设置最大班次时间的时间段数
-            instance.setMaxC(schedulingRuleVo.getMaxShiftMinute() / duration);
-            // 员工最长连续工作时间段数
-            instance.setMaxContinuousWorkC(schedulingRuleVo.getMaximumContinuousWorkTime().intValue() / duration);
-            System.out.println("基础规则构建完成---");
-            // 设置每一天是星期几，每一天所被分成的时间段
-            this.setWeekArrAndTimeFrameEachDay(instance, schedulingRuleVo, dateVoList, duration, oneWeekTimeFrameList);
-        }, executor);
+        // 解析排班规则
+        SchedulingRuleVo schedulingRuleVo = schedulingRuleService.getSchedulingRuleVoByRuleId(schedulingCalculateVo.getSchedulingRuleId());
+        // 解析门店工作时间段
+        List<Time[]> oneWeekTimeFrameList = getWeekTimeFrameList(schedulingRuleVo);
+        // 员工每天最多工作多少段
+        instance.setMaxWorkCEachDay((schedulingRuleVo.getMostWorkHourInOneDay().intValue() * 60) / duration);
+        // 员工每周最多工作多少段
+        instance.setMaxWorkCEachWeek((schedulingRuleVo.getMostWorkHourInOneWeek().intValue() * 60) / duration);
+        // 设置最小班次时间的时间段数
+        instance.setMinC(schedulingRuleVo.getMinShiftMinute() / duration);
+        // 设置最大班次时间的时间段数
+        instance.setMaxC(schedulingRuleVo.getMaxShiftMinute() / duration);
+        // 员工最长连续工作时间段数
+        instance.setMaxContinuousWorkC(schedulingRuleVo.getMaximumContinuousWorkTime().intValue() / duration);
+        // 设置每一天是星期几，每一天所被分成的时间段
+        this.setWeekArrAndTimeFrameEachDay(instance, schedulingRuleVo, dateVoList, duration, oneWeekTimeFrameList);
 
-        try {
-            CompletableFuture.allOf(searchEmployeeFuture, searchRuleFuture).get();
-            return instance;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }*/
         return new Instance();
     }
 
@@ -912,6 +704,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
                 if (timeFrameList.size() == 0) {
                     timeFrameList.add(workTimePreference[j]);
                 } else {
+                    //合并连续的时间段
                     TimeFrame lastTimeFrame = timeFrameList.get(timeFrameList.size() - 1);
                     if (getTotalMinuteNum(lastTimeFrame.getLatestTime()) == getTotalMinuteNum(workTimePreference[j].getEarliestTime())) {
                         lastTimeFrame.setLatestTime((workTimePreference[j].getLatestTime()));
@@ -1138,8 +931,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * 比较两个日期先更后，date1更后返回1，相同返回0，否则返回-1
      *
      * @param date1 格式:2023/3/10
-     * @param date2
-     * @return
      */
     private int dateStrCompare(String date1, String date2) {
         String[] split1 = date1.split("/");
@@ -1165,12 +956,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 获取两根线段的重叠长度
-     *
-     * @param start1
-     * @param end1
-     * @param start2
-     * @param end2
-     * @return
      */
     private int getIntersectMinute(int start1, int end1, int start2, int end2) {
         int line1Max;
@@ -1205,9 +990,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
     /**
      * 将start加上duration分钟，返回新的time
      *
-     * @param start
-     * @param duration
-     * @return
      */
     private Time getTimeAfterAdd(Time start, int duration) {
         int endMinute = getTotalMinuteNum(start) + duration;
@@ -1277,8 +1059,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 解析门店工作时间段
-     *
-     * @param storeWorkTimeFrame
      */
     private Time[] parseStoreWorkTimeFrame(String storeWorkTimeFrame, String key) {
         JSONObject storeWorkTimeFrameObject = JSON.parseObject(storeWorkTimeFrame);
@@ -1294,9 +1074,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 解析时间字符串为时间类型 8:00
-     *
-     * @param formatTime
-     * @return
      */
     private Time parseStrToTime(String formatTime) {
         String[] split = formatTime.split(":");
@@ -1305,9 +1082,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 将国际时间格式：yyyy-MM-dd'T'HH:mm:ss.S'Z' 格式化 为北京时间（时：分）
-     *
-     * @param raw
-     * @return
      */
     private String formatTime(String raw) {
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
@@ -1328,8 +1102,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 计算时间段数
-     *
-     * @return
      */
     private int getSegmentNum(Time time, int duration) {
         int totalMinuteNum = getTotalMinuteNum(time);
@@ -1338,9 +1110,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 计算Time有多少分钟
-     *
-     * @param time
-     * @return
      */
     private int getTotalMinuteNum(Time time) {
         return time.getHour() * 60 + time.getMinute();
@@ -1348,8 +1117,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
     /**
      * 计算时间段数
-     *
-     * @return
      */
     private int getSegmentNum(TimeFrame timeFrame, int duration) {
         int latestTotalMinuteNum = getTotalMinuteNum(timeFrame.getLatestTime());

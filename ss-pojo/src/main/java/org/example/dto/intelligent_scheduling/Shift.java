@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+//班次信息
 @Data
 @AllArgsConstructor
 public class Shift {
