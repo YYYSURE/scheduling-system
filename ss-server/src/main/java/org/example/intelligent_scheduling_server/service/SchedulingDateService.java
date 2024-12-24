@@ -12,9 +12,6 @@ import java.util.Map;
 /**
  * 排班日期表
  *
- * @author dam
- * @email 1782067308@qq.com
- * @date 2023-03-04 14:30:17
  */
 public interface SchedulingDateService extends IService<SchedulingDate> {
 

@@ -48,7 +48,7 @@ public class SchedulingShiftController {
 
     /**
      * 获取这个班次时间内空闲的员工
-     * @param storeId
+     * @param shiftId
      * @return
      */
     @GetMapping("/available")

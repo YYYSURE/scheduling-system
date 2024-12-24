@@ -29,7 +29,6 @@ public class SchedulingDateServiceImpl extends ServiceImpl<SchedulingDateDao, Sc
     private SchedulingTaskService schedulingTaskService;
     @Autowired
     private SchedulingDateMapper schedulingDateMapper;
-
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SchedulingDate> page = this.page(
@@ -89,6 +88,5 @@ public class SchedulingDateServiceImpl extends ServiceImpl<SchedulingDateDao, Sc
     public Long getByStoreId(Long storeId, Date date) {
         return schedulingDateMapper.getIdByDate(storeId,date);
     }
-
 
 }

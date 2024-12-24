@@ -17,10 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class Base {
 
-    /**
-     * 设置主键自增
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id")
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 

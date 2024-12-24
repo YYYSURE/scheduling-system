@@ -11,16 +11,14 @@ import java.util.Date;
 /**
  * 排班日期表
  *
- * @author dam
- * @email 1782067308@qq.com
- * @date 2023-03-04 14:30:17
+
  */
 @Data
 @TableName("scheduling_date")
 public class SchedulingDate implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.NONE)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 

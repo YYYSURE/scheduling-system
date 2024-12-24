@@ -231,6 +231,4 @@ public class ShiftUserController {
 
         return Result.ok().addData("userIdList", userIdList);
     }
-
-    //TODO 查询某个员工某段时间的所有班次
 }

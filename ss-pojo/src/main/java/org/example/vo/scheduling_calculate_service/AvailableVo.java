@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class AvailableVo {
-
+    private Long id;
+    private String name;
 }
