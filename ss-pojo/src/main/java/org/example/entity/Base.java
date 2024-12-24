@@ -24,13 +24,6 @@ public class Base {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 是否删除 0：未删除 1：已删除
-     */
-    @TableLogic
-    @TableField("is_deleted")
-    private Integer isDeleted = 0;
-
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private Date createTime;
 

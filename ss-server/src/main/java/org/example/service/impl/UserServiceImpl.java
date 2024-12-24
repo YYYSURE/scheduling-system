@@ -2,47 +2,76 @@ package org.example.service.impl;
 
 import org.example.constant.MessageConstant;
 import org.example.dto.UserLoginDTO;
-import org.example.entity.User;
+import org.example.entity.Employee;
 import org.example.exception.AccountNotFoundException;
 import org.example.exception.PasswordErrorException;
+import org.example.intelligent_scheduling_server.mapper.PositionMapper;
 import org.example.mapper.UserMapper;
 import org.example.service.UserService;
+import org.example.utils.StringUtils;
+import org.example.vo.system.UserInfoVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PositionMapper positionMapper;
 
-    public User login(UserLoginDTO userLoginDTO) {
-        String username = userLoginDTO.getAccount().getEmail();
-        String password = userLoginDTO.getAccount().getPassword();
-
-        //1、根据用户名查询数据库中的数据
-        User user = userMapper.getByUsername(username);
-
-        //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
-        if (user == null) {
-            //账号不存在
-            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
-        }
-
-        //密码比对
-        // TODO 后期需要进行md5加密，然后再进行比对
-        if (!password.equals(user.getPassword())) {
-            //密码错误
-            throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
-        }
-
-        //3、返回实体对象
-        return user;
-    }
 
     @Override
-    public User getByName(String name) {
-        return userMapper.getByUsername(name);
+    public List<UserInfoVo> listUserByStoreId(Long storeId) {
+        List<Employee> list = userMapper.list(storeId);
+
+        //存储所有门店Id
+        HashSet<Long> storeIdSet = new HashSet<>();
+        //存储所有用户Id
+        List<Long> userIdList = new ArrayList<>();
+        //存储封装的用户信息集合
+        List<UserInfoVo> userInfoVoList = new ArrayList<>();
+
+        ////初始化数据
+        for (Employee userEntity : list) {
+            userIdList.add(userEntity.getId());
+            storeIdSet.add(userEntity.getStoreId());
+            //复制基本信息
+            UserInfoVo userInfoVo = new UserInfoVo();
+            BeanUtils.copyProperties(userEntity, userInfoVo);
+            userInfoVo.setPositionId(userEntity.getPositionId());
+            //工作日偏好数据处理
+            List<Integer> workDayPreferenceList = new ArrayList<>();
+            if (!StringUtils.isEmpty(userEntity.getWorkDayPreference())) {
+                String[] wordDayList = userEntity.getWorkDayPreference().split("\\|");
+                for (String s : wordDayList) {
+                    workDayPreferenceList.add(Integer.parseInt(s));
+                }
+            }
+            userInfoVo.setWorkDayPreferenceList(workDayPreferenceList);
+            userInfoVoList.add(userInfoVo);
+        }
+
+        //TODO 门店信息
+/*        ////查询门店信息
+        //查询门店名称
+        //2.每一个线程都共享之前的请求数据
+        if (storeIdSet.size() > 0) {
+            System.out.println("查询门店信息");
+                for (UserInfoVo userInfoVo : userInfoVoList) {
+                    if (userInfoVo.getStoreId() != null && idAndStoreEntityMap.get(userInfoVo.getStoreId()) != null) {
+                        userInfoVo.setStoreName(idAndStoreEntityMap.get(userInfoVo.getStoreId()).getName());
+                    } else {
+                        userInfoVo.setStoreName(null);
+                    }
+                }
+        }*/
+
+        return userInfoVoList;
     }
-
-
 }

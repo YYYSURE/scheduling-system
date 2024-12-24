@@ -17,10 +17,14 @@ import lombok.Data;
  * @date 2023-02-06 15:50:29
  */
 @Data
-@TableName("employee")
-public class Employee extends Base implements Serializable {
+@TableName("user")
+public class User extends Base implements Serializable {
     private static final long serialVersionUID = 1L;
-
+    
+    /**
+     * 姓名
+     */
+    private String name;
     /**
      * 电话
      */
@@ -30,14 +34,19 @@ public class Employee extends Base implements Serializable {
      */
     private String mail;
     /**
+     * 企业id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long enterpriseId;
+    /**
      * 门店id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
     /**
-     * 职位id
+     * 用户类型 0：系统管理员 1：企业管理员 2：门店管理员 10：普通用户
      */
-    private Long positionId;
+    private Integer type;
     /**
      * 用户名
      */
@@ -47,6 +56,26 @@ public class Employee extends Base implements Serializable {
      */
     private String password;
     /**
+     * 微信登录所提供的id
+     */
+    private String openid;
+    /**
+     * 微信名
+     */
+    private String wechatName;
+    /**
+     * 微信头像
+     */
+    private String wechatAvatar;
+    /**
+     * 用户所绑定的qq
+     */
+    private String qq;
+    /**
+     * 昵称（注册时默认设置用户名）
+     */
+    private String nickname;
+    /**
      * 性别 0：男 1：女
      */
     private Integer gender;
@@ -54,6 +83,14 @@ public class Employee extends Base implements Serializable {
      * 年龄
      */
     private Integer age;
+    /**
+     * 头像（用户不设置就给一个默认头像）
+     */
+    private String avatar;
+    /**
+     * 用户状态 0：正常状态 1：封禁状态
+     */
+    private Integer status;
     /**
      * 工作日偏好（喜欢星期几工作1|3|4喜欢星期一、三、四工作），缺省为全部
      */
@@ -74,19 +111,25 @@ public class Employee extends Base implements Serializable {
     @Override
     public String toString() {
         return "UserEntity{" +
-                "id=" + getId() +
+                "name='" + name + '\'' +
+                ", id=" + getId() +
                 ", phone='" + phone + '\'' +
                 ", mail='" + mail + '\'' +
+                ", enterpriseId=" + enterpriseId +
                 ", storeId=" + storeId +
-                ", position_id=" + positionId +
+                ", type=" + type +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", openid='" + openid + '\'' +
+                ", qq='" + qq + '\'' +
+                ", nickname='" + nickname + '\'' +
                 ", gender=" + gender +
                 ", age=" + age +
+                ", avatar='" + avatar + '\'' +
+                ", status=" + status +
                 ", workDayPreference='" + workDayPreference + '\'' +
                 ", workTimePreference='" + workTimePreference + '\'' +
                 ", shiftLengthPreference=" + shiftLengthPreferenceOneDay +
-                ", shiftLengthPreferenceOneWeek=" + shiftLengthPreferenceOneWeek +
                 '}';
     }
 }

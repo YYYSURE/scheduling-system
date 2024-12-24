@@ -20,14 +20,8 @@ public interface PositionService extends IService<Position> {
 
     PageUtils queryPage(Map<String, Object> params, QueryWrapper<Position> wrapper);
 
-    List<Position> findNodes(Long storeId,String name,String detail );
 
     List<PositionVo> buildTree(long storeId);
 
-    List<Position> listPositionListByPositionIdList(List<Long> positionIdList);
-
-    List<Position> listAllSonPosition(Long storeId);
-
-    void copyPositionToOtherStore(Long storeId);
 }
 

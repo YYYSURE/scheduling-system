@@ -24,29 +24,6 @@ public interface SchedulingTaskService extends IService<SchedulingTask> {
 
     PageUtils queryPage(Map<String, Object> params, QueryWrapper<SchedulingTask> wrapper);
 
-    List<TaskCreateTimeTreeItemVo> listAllDate(long storeId);
-
-    List<PassengerFlowVo> readPassengerFlowFromWorkbook(Workbook workbook);
-
-    List<String> savePassengerFlowVoList(Long taskId, List<PassengerFlowVo> passengerFlowVoList) throws SSSException;
-
-    void removeByIdArr(List<Long> asList);
-
-    PageUtils listVirtualTask(Map<String, Object> params, Long taskId);
-
-    /**
-     * 删除所有虚拟任务
-     * @param taskId
-     */
-    void deleteAllVirtualTask(Long taskId);
-
-    long countVirtualTask(String name, String toJSONString, Long taskId);
-
-    List<String> listHaveCalculateAlgoGroup(Long taskId);
-
-    Date getMaxEndDate(long storeId);
-
-
     void updateTaskPublishStatus(Long taskId, Integer isPublish);
 
     /**
@@ -55,17 +32,8 @@ public interface SchedulingTaskService extends IService<SchedulingTask> {
      */
     public void deleteAllResultOfTask(Long taskId);
 
-    Long getTotalTaskByEnterpriseId(Long enterpriseId, Date firstDateOfYear, Date endDateOfYear) throws SSSException;
 
-    Long getTotalTaskByStoreId(Long storeId, Date firstDateOfYear, Date endDateOfYear);
-
-    Double getTotalPassengerFlowByEnterpriseId(Long enterpriseId, Date firstDateOfYear, Date endDateOfYear) throws SSSException;
-
-    Double getTotalPassengerFlowByStoreId(Long storeId, Date firstDateOfYear, Date endDateOfYear);
-
-    List<SchedulingTask> getRealTaskListBetweenDateFrame(Date startDate, Date endDate, Long storeId);
-
-
+    public void insert(SchedulingTask schedulingTask) throws SSSException;
 
 }
 

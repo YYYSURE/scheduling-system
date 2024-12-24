@@ -25,25 +25,20 @@ public class Store extends Base implements Serializable {
      */
     private String name;
     /**
-     * 企业id
-     */
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long enterpriseId;
-    /**
      * 省
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long provinceId;
+    private String province;
     /**
      * 市
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long cityId;
+    private String city;
     /**
      * 区
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long regionId;
+    private String region;
     /**
      * 详细地址
      */

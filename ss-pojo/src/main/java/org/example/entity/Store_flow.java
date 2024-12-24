@@ -13,5 +13,7 @@ public class Store_flow {
 
     private int month;
 
+    private int day;
+
     private String flow;
 }

@@ -12,11 +12,7 @@ import java.util.List;
 @ToString
 public class UserInfoVo extends Base {
     /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 职位
+     * 职位id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long positionId;
@@ -29,19 +25,6 @@ public class UserInfoVo extends Base {
      */
     private String phone;
     /**
-     * 邮箱
-     */
-    private String mail;
-    /**
-     * 企业id
-     */
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long enterpriseId;
-    /**
-     * 企业名称
-     */
-    private String enterpriseName;
-    /**
      * 门店id
      */
     @JsonSerialize(using = ToStringSerializer.class)
@@ -51,37 +34,9 @@ public class UserInfoVo extends Base {
      */
     private String storeName;
     /**
-     * 用户类型 0：系统管理员 1：企业管理员 2：门店管理员 10：普通用户
-     */
-    private Integer type;
-    /**
      * 用户名
      */
     private String username;
-    /**
-     * 密码
-     */
-//    private String password;
-    /**
-     * 微信登录所提供的id
-     */
-    private String openid;
-    /**
-     * 微信名
-     */
-    private String wechatName;
-    /**
-     * 微信头像
-     */
-    private String wechatAvatar;
-    /**
-     * 用户所绑定的qq
-     */
-    private String qq;
-    /**
-     * 昵称（注册时默认设置用户名）
-     */
-    private String nickname;
     /**
      * 性别 0：男 1：女
      */
@@ -90,14 +45,6 @@ public class UserInfoVo extends Base {
      * 年龄
      */
     private Integer age;
-    /**
-     * 头像（用户不设置就给一个默认头像）
-     */
-    private String avatar;
-    /**
-     * 用户状态 0：正常状态 1：封禁状态
-     */
-    private Integer status;
     /**
      * 工作日偏好（喜欢星期几工作1|3|4喜欢星期一、三、四工作），缺省为全部
      */

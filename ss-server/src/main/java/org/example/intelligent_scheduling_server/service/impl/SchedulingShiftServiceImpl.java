@@ -1,55 +1,89 @@
 package org.example.intelligent_scheduling_server.service.impl;
 
-import com.alibaba.druid.util.StringUtils;
-import com.alibaba.fastjson.TypeReference;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.entity.*;
-import org.example.enums.ResultCodeEnum;
-import org.example.exception.SSSException;
 import org.example.intelligent_scheduling_server.dao.SchedulingShiftDao;
+import org.example.intelligent_scheduling_server.mapper.EmployeeXyMapper;
+import org.example.intelligent_scheduling_server.mapper.SchedulingShiftMapper;
 import org.example.intelligent_scheduling_server.service.SchedulingDateService;
 import org.example.intelligent_scheduling_server.service.SchedulingShiftService;
 import org.example.intelligent_scheduling_server.service.ShiftUserService;
-import org.example.result.Result;
-import org.example.utils.JwtUtil;
-import org.example.utils.PageUtils;
-import org.example.utils.Query;
-import org.example.vo.shiftScheduling.GanttShiftVo;
-import org.example.vo.shiftScheduling.GanttStatisticsVo;
-import org.example.vo.shiftScheduling.WeekViewShiftVo;
-import org.example.vo.shiftScheduling.WeekViewVo;
-import org.example.vo.system.UserInfoVo;
-import org.springframework.beans.BeanUtils;
+import org.example.vo.scheduling_calculate_service.DayShiftVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
+import static java.util.Arrays.stream;
 
 @Service("schedulingShiftService")
 public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, SchedulingShift> implements SchedulingShiftService {
     @Autowired
     private ShiftUserService shiftUserService;
     @Autowired
-    private SchedulingDateService dateService;
+    private SchedulingDateService schedulingDateService;
     @Autowired
     private SchedulingShiftService shiftService;
     @Autowired
     private ThreadPoolExecutor executor;
+    @Autowired
+    private SchedulingShiftMapper schedulingShiftMapper;
+    @Autowired
+    private EmployeeXyMapper employeeMapper;
 
     @Override
+    public List<DayShiftVo> getDayShiftList(Long storeId, Date date) {
+        List<DayShiftVo> dayShiftVoList = new ArrayList<>();
+
+        Long dateId = schedulingDateService.getByStoreId(storeId,date);
+        List<SchedulingShift> shiftList = schedulingShiftMapper.getByDateId(dateId);
+        for (SchedulingShift shift : shiftList) {
+            DayShiftVo dayShiftVo = new DayShiftVo();
+            dayShiftVo.setId(shift.getId());
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            String startDate = sdf.format(shift.getStartDate());
+            String endDate = sdf.format(shift.getEndDate());
+            dayShiftVo.setStartTime(startDate);
+            dayShiftVo.setEndTime(endDate);
+            dayShiftVo.setEmployeeId(shift.getUserId());
+            if(shift.getUserId() == -1) {
+                dayShiftVo.setEmployeeName("");
+            }else {
+                String name = employeeMapper.getNameById(shift.getUserId());
+                dayShiftVo.setEmployeeName(name);
+            }
+            Integer mealType = shift.getMealType();
+            String mealStartDate = null;
+            String mealEndDate = null;
+            if(mealType != 2){
+                mealStartDate = sdf.format(shift.getMealStartDate());
+                mealEndDate = sdf.format(shift.getMealEndDate());
+            }
+            if(mealType == 0) {
+                dayShiftVo.setLunchStartTime(mealStartDate);
+                dayShiftVo.setLunchEndTime(mealEndDate);
+                dayShiftVo.setDinnerStartTime(null);
+                dayShiftVo.setDinnerEndTime(null);
+            }else if(mealType == 1) {
+                dayShiftVo.setLunchStartTime(null);
+                dayShiftVo.setLunchEndTime(null);
+                dayShiftVo.setDinnerStartTime(mealStartDate);
+                dayShiftVo.setDinnerEndTime(mealEndDate);
+            }else{
+                dayShiftVo.setLunchStartTime(null);
+                dayShiftVo.setLunchEndTime(null);
+                dayShiftVo.setDinnerStartTime(null);
+                dayShiftVo.setDinnerEndTime(null);
+            }
+            dayShiftVoList.add(dayShiftVo);
+        }
+        dayShiftVoList.sort(Comparator.comparing(DayShiftVo::getStartTime));
+        return dayShiftVoList;
+    }
+
+/*    @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SchedulingShift> page = this.page(
                 new Query<SchedulingShift>().getPage(params),
@@ -105,12 +139,12 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
         return baseMapper.listShiftIdOfShift(shiftStartDate, shiftEndDate, storeId);
     }
 
-    /**
+    *//**
      * 查询出有未分配班次的 date id
      *
      * @param curMonthDateIdList
      * @return
-     */
+     *//*
     @Override
     public List<Long> listDateIdWithUnAssignedShifts(List<Long> curMonthDateIdList) {
         List<Long> dateIdListWithUnAssignedShifts = new ArrayList<>();
@@ -149,12 +183,12 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
 //        return baseMapper.listDateIdWithUnAssignedShifts(curMonthDateIdList);
     }
 
-    /**
+    *//**
      * 查询一天没有分配的班次
      *
      * @param dateId
      * @return
-     */
+     *//*
     @Override
     public List<SchedulingShift> selectUnAssignedShiftsByDateId(Long dateId) {
         return baseMapper.selectUnAssignedShiftsByDateId(dateId);
@@ -201,7 +235,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
     @Override
     public Long getTotalShiftNumByEnterpriseId(Long enterpriseId, Date startDate, Date endDate) throws SSSException {
         //TODO
-        /*Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
+        *//*Result r = enterpriseFeignService.listAllStoreByAppointEnterpriseId(enterpriseId);
         if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
             List<Store> storeEntityList = r.getData("list", new TypeReference<List<Store>>() {
             });
@@ -217,7 +251,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             return totalShiftNum;
         } else {
             throw new SSSException(ResultCodeEnum.Feign_ERROR);
-        }*/
+        }*//*
         return 0L;
     }
 
@@ -247,13 +281,13 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
         return shiftEntityList;
     }
 
-    /**
+    *//**
      * 查询某天某人的所有班次
      *
      * @param date
      * @param userId
      * @return
-     */
+     *//*
     @Override
     public List<SchedulingShift> getOneDayShiftListOfUser(Date date, Long userId) {
         List<SchedulingShift> shiftEntityList = baseMapper.getOneDayShiftListOfUser(date, userId);
@@ -266,14 +300,14 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
         return shiftEntityList;
     }
 
-    /**
+    *//**
      * 获取起止日期内，每天的班次集合
      *
      * @param startDate
      * @param endDate
      * @param userId
      * @return
-     */
+     *//*
     @Override
     public List<List<SchedulingShift>> getWeekShiftListOfUser(Date startDate, Date endDate, Long userId) {
         List<List<SchedulingShift>> shiftListList = new ArrayList<>();
@@ -289,14 +323,14 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
     }
 
 
-    /**
+    *//**
      * 根据dateId查询出所有班次的信息
      *
      * @param dateId
      * @param positionIdList   只查询这些职位的员工所涉及的班次信息
      * @param searchUserIdList 只查询这些员工所设计的班次信息
      * @return
-     */
+     *//*
     @Override
     public List<GanttShiftVo> listSchedulingShiftVoByDateId(Long dateId, List<Long> positionIdList, List<Long> searchUserIdList, Boolean isSearchUnAssignedShifts) {
         System.out.println("positionIdList:" + positionIdList);
@@ -483,7 +517,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             System.out.println("totalUserIdList数量：" + totalUserIdList.size());
             if (totalUserIdList.size() > 0) {
                 //TODO
-                /*Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(totalUserIdList));
+                *//*Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(totalUserIdList));
                 if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                     List<UserInfoVo> userInfoVoList = r.getData("userInfoVoList", new TypeReference<List<UserInfoVo>>() {
                     });
@@ -493,7 +527,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
                         }
                     }
 
-                }*/
+                }*//*
 //                System.out.println("listSchedulingShiftVoByDateId 3：" + (System.currentTimeMillis() - start) + "ms");
             }
 
@@ -501,13 +535,13 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             System.out.println("totalPositionIdSet数量：" + totalPositionIdSet.size());
             if (totalPositionIdSet.size() > 0) {
                 //TODO
-                /*Result r1 = enterpriseFeignService.listPositionListByPositionIdList(new ArrayList<>(totalPositionIdSet));
+                *//*Result r1 = enterpriseFeignService.listPositionListByPositionIdList(new ArrayList<>(totalPositionIdSet));
                 if (r1.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                     for (Position position : r1.getData("positionEntityList", new TypeReference<List<Position>>() {
                     })) {
                         positionIdAndPositionMap.put(position.getId(), position);
                     }
-                }*/
+                }*//*
 //                System.out.println("listSchedulingShiftVoByDateId 4：" + (System.currentTimeMillis() - start) + "ms");
             }
 
@@ -521,7 +555,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
                 //存储员工姓名
                 List<String> staffNameList = new ArrayList<>();
                 for (Long userId : shiftIdAndUserIdList.get(Long.parseLong(shiftVoId))) {
-                    staffNameList.add(userIdAndUserInfoVoMap.get(userId).getName());
+                    staffNameList.add(userIdAndUserInfoVoMap.get(userId).getUsername());
                 }
                 schedulingShiftVo.setStaffNameList(staffNameList);
                 //存储员工职位
@@ -563,7 +597,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
         return baseMapper.listShiftBetweenStartDateAndEndDate(sdf.format(startDate), sdf.format(endDate), storeId);
     }
 
-    /**
+    *//**
      * 查询周视图数据
      *
      * @param startDate      周视图的起始日期
@@ -573,7 +607,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
      * @param storeId
      * @param taskId
      * @return
-     */
+     *//*
     @Override
     public WeekViewVo listWeekViewShiftVoBetweenStartDateAndEndDate(Date startDate, Date endDate,
                                                                     Integer realStartIndex, Integer realEndIndex,
@@ -613,14 +647,14 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
 //        System.out.println("listWeekViewShiftVoBetweenStartDateAndEndDate查询时间2："+(System.currentTimeMillis()-start)+"ms");
             // 调用远程服务，根据id查询用户的具体信息
             //TODO
-/*            Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(userIdSet));
+*//*            Result r = systemFeignService.listUserInfoVoByUserIds(new ArrayList<>(userIdSet));
 //        System.out.println("listWeekViewShiftVoBetweenStartDateAndEndDate查询时间3："+(System.currentTimeMillis()-start)+"ms");
             if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
                 for (UserInfoVo userInfoVo : r.getData("userInfoVoList", new TypeReference<List<UserInfoVo>>() {
                 })) {
                     userIdAndUserInfoVoMap.put(userInfoVo.getId(), userInfoVo);
                 }
-            }*/
+            }*//*
 //        System.out.println("listWeekViewShiftVoBetweenStartDateAndEndDate查询时间4："+(System.currentTimeMillis()-start)+"ms");
         }
 
@@ -714,12 +748,12 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
     }
 
 
-    /**
+    *//**
      * 按照起始时间-结束时间 对班次进行分组并排序
      *
      * @param shiftList
      * @return 按照时间段分组之后的班次信息
-     */
+     *//*
     private List<List<SchedulingShift>> groupShiftByStartDateAndEndDate(List<SchedulingShift> shiftList) {
         // 按照时间戳对班次进行分组
         Map<Long, List<SchedulingShift>> timeStampAndShiftListMap = new HashMap<>();
@@ -745,6 +779,6 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
         }
 
         return groupList;
-    }
+    }*/
 
 }

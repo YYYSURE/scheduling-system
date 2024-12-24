@@ -8,11 +8,10 @@
         <result property="id" column="id"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
-        <result property="isDeleted" column="is_deleted"/>
         <result property="name" column="name"/>
-        <result property="provinceId" column="province_id"/>
-        <result property="cityId" column="city_id"/>
-        <result property="regionId" column="region_id"/>
+        <result property="province" column="province_id"/>
+        <result property="city" column="city_id"/>
+        <result property="region" column="region_id"/>
         <result property="address" column="address"/>
         <result property="size" column="size"/>
         <result property="status" column="status"/>

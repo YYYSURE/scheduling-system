@@ -1,37 +1,22 @@
 package org.example.service.imp;
 
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.dao.StoreAdmin_UserDao;
 import org.example.entity.User;
 import org.example.exception.SSSException;
 
 
-import org.example.entity.Position;
-import org.example.entity.Store;
-import org.example.entity.UserPosition;
 import org.example.enums.ResultCodeEnum;
-import org.example.enums.UserCodeEnum;
-import org.example.result.Result;
 import org.example.vo.system.UserInfoVo;
 import org.example.service.StoreAdmin_UserService;
 import org.example.utils.*;
 import org.example.vo.system.SysUserQueryVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 
 @Service

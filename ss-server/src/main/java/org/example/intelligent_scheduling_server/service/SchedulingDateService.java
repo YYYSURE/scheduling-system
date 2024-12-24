@@ -25,5 +25,7 @@ public interface SchedulingDateService extends IService<SchedulingDate> {
     Boolean judgeOneDateIsRest(Long storeId, Date workDate);
 
     List<SchedulingDate> getWorkDayList(Date startDate, Date endDate, Long storeId);
+
+    Long getByStoreId(Long storeId, Date date);
 }
 

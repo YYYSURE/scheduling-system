@@ -67,7 +67,6 @@ public class SchedulingRuleServiceImpl extends ServiceImpl<SchedulingRuleDao, Sc
 
     /**
      * 根据id查询规则
-     *
      * @param ruleId
      * @return
      */
@@ -81,10 +80,8 @@ public class SchedulingRuleServiceImpl extends ServiceImpl<SchedulingRuleDao, Sc
 
         ///设置门店面积
         schedulingRuleVo.setStoreSize(storeService.getById(schedulingRuleEntity.getStoreId()).getSize());
-
         ///设置职位选择树
         schedulingRuleVo.setPositionSelectTree(positionService.buildTree(schedulingRuleEntity.getStoreId()));
-
         return schedulingRuleVo;
     }
 

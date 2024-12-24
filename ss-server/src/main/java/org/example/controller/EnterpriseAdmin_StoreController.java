@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.result.Result;
 import org.example.vo.enterprise.StoreVo;
-import org.example.service.EnterpriseAdmin_ProvinceCityRegionService;
 import org.example.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,6 @@ import org.example.service.EnterpriseAdmin_StoreService;
 public class EnterpriseAdmin_StoreController {
     @Autowired
     private EnterpriseAdmin_StoreService enterpriseAdminStoreService;
-    @Autowired
-    private EnterpriseAdmin_ProvinceCityRegionService enterpriseAdminProvinceCityRegionService;
     private static final String title = "门店管理";
 
     /**
@@ -68,10 +65,6 @@ public class EnterpriseAdmin_StoreController {
             Store store = JSON.parseObject(json, Store.class);
             StoreVo storeVo = new StoreVo();
             BeanUtils.copyProperties(store, storeVo);
-            //查询名字省市区的名字
-            storeVo.setProvinceName(enterpriseAdminProvinceCityRegionService.getById(store.getProvinceId()).getName());
-            storeVo.setCityName(enterpriseAdminProvinceCityRegionService.getById(store.getCityId()).getName());
-            storeVo.setRegionName(enterpriseAdminProvinceCityRegionService.getById(store.getRegionId()).getName());
             return storeVo;
         }).collect(Collectors.toList());
         page.setList(storeVoList);

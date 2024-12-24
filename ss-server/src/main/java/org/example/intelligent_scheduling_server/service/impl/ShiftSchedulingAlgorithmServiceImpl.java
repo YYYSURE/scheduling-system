@@ -21,6 +21,7 @@ import org.example.intelligent_scheduling_server.enums.WebSocketEnum;
 import org.example.intelligent_scheduling_server.service.*;
 import org.example.result.Result;
 import org.example.service.EmployeeService;
+import org.example.service.UserService;
 import org.example.service.imp.EnterpriseAdmin_StoreServiceImpl;
 import org.example.vo.enterprise.SchedulingRuleVo;
 import org.example.vo.scheduling_calculate_service.DateVo;
@@ -60,7 +61,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
     @Autowired
     private EmployeeService employeeService;
     @Autowired
-    private AdminService adminService;
+    private UserService userService;
     @Autowired
     private SchedulingRuleService schedulingRuleService;
     @Autowired
@@ -73,10 +74,10 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @param isSendMessage         是否发送消息给客户端通知客户端计算完成
      */
     @Override
-    public void caculate(Instance instance, Long storeId, Boolean isSendMessage) throws SSSException {
+    public void caculate(List<DateVo> dateVoList,Instance instance, Long storeId, Boolean isSendMessage,SchedulingTask schedulingTask) throws SSSException {
         try {
             Solution solution = new IntelligentSchedulingPureAlgo().solve(instance);
-            this.saveSolutionToDatabase(storeId,instance, solution);
+            this.saveSolutionToDatabase(dateVoList,storeId,instance, solution,schedulingTask);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,8 +122,9 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      *
      * @param solution
      */
+    @Override
     @Transactional
-    public void saveSolutionToDatabase(Long storeId, Instance instance, Solution solution) {
+    public void saveSolutionToDatabase(List<DateVo> dateVoList,Long storeId, Instance instance, Solution solution,SchedulingTask schedulingTask) {
 
         Employee[] employees = instance.getEmployees();
         List<String> staffIdList = new ArrayList<>();//员工编号
@@ -130,19 +132,18 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             staffIdList.add(employee.getId());
         }
 
+        schedulingTaskService.insert(schedulingTask);
         //// 获取solution信息
         // 排班班次信息
         List<List<ShiftPlanning>> shiftPlanningListList = solution.getShiftPlanningListList();
 
         //// 声明变量
-        List<DateVo> dateVoList = schedulingCalculateVo.getDateVoList();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/M/d");
         List<SchedulingDate> dateEntityList = new ArrayList<>();
         List<SchedulingShift> assignedShiftEntityList = new ArrayList<>();
         List<SchedulingShift> unAssignedShiftEntityList = new ArrayList<>();
         List<ShiftUser> shiftUserEntityList = new ArrayList<>();
 
-        //TODO 存放排班工作日数据
         for (int i = 0; i < shiftPlanningListList.size(); i++) {
             /// 存储排班工作日相关数据
             DateVo dateVo = dateVoList.get(i);
@@ -156,7 +157,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             schedulingDateEntity.setStartWorkTime(dateVo.getStartWorkTime());
             schedulingDateEntity.setEndWorkTime(dateVo.getEndWorkTime());
             schedulingDateEntity.setStoreId(storeId);
-            schedulingDateEntity.setTaskId(schedulingCalculateVo.getTaskId());
+            schedulingDateEntity.setTaskId(schedulingTask.getId());
             dateEntityList.add(schedulingDateEntity);
             /// 存储每天对应班次相关数据
             String[] timeFrameArr = dateVo.getTimeFrameArr();
@@ -168,7 +169,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         }
 
         //// 批量存储
-        /// 先批量存储任务
+        /// 先批量存储日期
         schedulingDateService.saveBatch(dateEntityList);
         /// 给班次设置dateId，存储已经分配的班次
         for (SchedulingShift schedulingShiftEntity : assignedShiftEntityList) {
@@ -236,14 +237,11 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
                 } else {
                     schedulingShiftEntity.setShiftType(0);
                 }
-//                    schedulingShiftService.save(schedulingShiftEntity);
+                schedulingShiftEntity.setUserId(Long.parseLong(instance.getEmployees()[shiftPlanning.getEmployeeIndex()].getId().split(":")[1]));
                 shiftEntityList.add(schedulingShiftEntity);
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-//                if ("id:7".equals(employees[shiftPlanning.getEmployeeIndex()].getId())) {
-//                    System.out.println("wqdqwdw: " + schedulingShiftEntity);
-//                }
 
             ///存储班次和用户的对应关系
             ShiftUser shiftUserEntity = new ShiftUser();
@@ -251,7 +249,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             if (staffIdList.indexOf(instance.getEmployees()[shiftPlanning.getEmployeeIndex()].getId()) != -1) {
                 staffIdList.remove(staffIdList.indexOf(instance.getEmployees()[shiftPlanning.getEmployeeIndex()].getId()));
             }
-            shiftUserEntity.setUserId(Long.parseLong(instance.getEmployees()[shiftPlanning.getEmployeeIndex()].getId().split(":")[1]));
+            shiftUserEntity.setUserId(Long.parseLong(instance.getEmployees()[shiftPlanning.getEmployeeIndex()].getId().split(":")[1]));//"id:"
             shiftUserEntity.setPositionId(Long.parseLong(instance.getEmployees()[shiftPlanning.getEmployeeIndex()].getPosition()));
             shiftUserEntityList.add(shiftUserEntity);
 
@@ -277,8 +275,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             try {
                 schedulingShiftEntity.setStartDate(sdf1.parse(timeFrameArr[head].split(",")[0]));
                 schedulingShiftEntity.setEndDate(sdf1.parse(timeFrameArr[head + len - 1].split(",")[1]));
-                //还没有id，可以先存储一下索引，批量存储结束之后，根据索引获取id
-//                    schedulingShiftEntity.setSchedulingDateId(schedulingDateEntity.getId());
                 long index = i;
                 schedulingShiftEntity.setSchedulingDateId(index);
                 if (mealHead != -1) {
@@ -297,6 +293,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
                     schedulingShiftEntity.setShiftType(0);
                 }
 //                    schedulingShiftService.save(schedulingShiftEntity);
+                schedulingShiftEntity.setUserId((long) -1);
                 shiftEntityList.add(schedulingShiftEntity);
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -304,263 +301,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         }
     }
 
-    /**
-     * 用虚拟任务的结果覆盖任务结果
-     */
-    @Override
-    @Transactional
-    public void overlayResult(Long virtualTaskId) {
-        ////查询出虚拟任务所对应的真实任务
-        SchedulingTask virtualTask = schedulingTaskService.getById(virtualTaskId);
-        SchedulingTask realTask = schedulingTaskService.getById(virtualTask.getParentId());
-
-        ////删除任务的结果
-        this.deleteRelevantDataOfTask(realTask.getParentId());
-
-        ////复制虚拟任务的结果到真实任务
-        ///覆盖task信息
-        BeanUtils.copyProperties(virtualTask, realTask,
-                "id", "createTime", "updateTime", "name", "schedulingRuleId", "storeId",
-                "duration", "intervalc", "datevolist", "startDate", "endDate", "type", "parentId", "isPublish");
-        schedulingTaskService.updateById(realTask);
-
-        ///复制其他信息
-        List<SchedulingDate> dateEntityList = schedulingDateService.list(new QueryWrapper<SchedulingDate>().eq("task_id", virtualTaskId));
-        List<SchedulingDate> newDateList = new ArrayList<>();
-        List<SchedulingShift> newShiftList = new ArrayList<>();
-        List<SchedulingShift>[] newShiftListArr = new List[dateEntityList.size()];
-        Map<String, List<ShiftUser>> keyAndShiftUserListMap = new HashMap<>();
-        List<ShiftUser> newShiftUserList = new ArrayList<>();
-        for (int i = 0; i < dateEntityList.size(); i++) {
-            SchedulingDate schedulingDateEntity = dateEntityList.get(i);
-            //复制date
-            SchedulingDate newDate = new SchedulingDate();
-            BeanUtils.copyProperties(schedulingDateEntity, newDate);
-            newDate.setTaskId(realTask.getId());
-            //复制shift
-            List<SchedulingShift> shiftEntityList = schedulingShiftService.list(new QueryWrapper<SchedulingShift>().eq("scheduling_date_id", schedulingDateEntity.getId()));
-            newShiftListArr[i] = new ArrayList<>();
-            for (int j = 0; j < shiftEntityList.size(); j++) {
-                SchedulingShift shift = shiftEntityList.get(j);
-                SchedulingShift newShift = new SchedulingShift();
-                BeanUtils.copyProperties(shift, newShift);
-                newShiftListArr[i].add(newShift);
-                //复制shiftUser
-                List<ShiftUser> shiftUserEntityList = shiftUserService.list(new QueryWrapper<ShiftUser>().eq("shift_id", shift.getId()));
-                List<ShiftUser> shiftUserList = new ArrayList<>();
-                for (int k = 0; k < shiftUserEntityList.size(); k++) {
-                    ShiftUser shiftUser = new ShiftUser();
-                    BeanUtils.copyProperties(shiftUserEntityList.get(k), shiftUser);
-                    shiftUserList.add(shiftUser);
-                }
-                keyAndShiftUserListMap.put(i + "-" + j, shiftUserList);
-            }
-        }
-        ///存储task
-        schedulingDateService.saveBatch(newDateList);
-        ///存储shift
-        for (int i = 0; i < newDateList.size(); i++) {
-            SchedulingDate date = newDateList.get(i);
-            for (int j = 0; j < newShiftListArr[i].size(); j++) {
-                //设置dateId
-                newShiftListArr[i].get(j).setSchedulingDateId(date.getId());
-                newShiftList.add(newShiftListArr[i].get(j));
-                //索引对应集合
-                keyAndShiftUserListMap.put((newShiftList.size() - 1) + "", keyAndShiftUserListMap.get(i + "-" + j));
-            }
-        }
-        schedulingShiftService.saveBatch(newShiftList);
-        ///存储shiftUser
-        for (int index = 0; index < newShiftList.size(); index++) {
-            for (ShiftUser shiftUserEntity : keyAndShiftUserListMap.get(index + "")) {
-                shiftUserEntity.setShiftId(newShiftList.get(index).getId());
-                newShiftUserList.add(shiftUserEntity);
-            }
-        }
-        shiftUserService.saveBatch(newShiftUserList);
-    }
-
-    /**
-     * 删除任务相关数据，班次、工作日、user_shift
-     */
-    public void deleteRelevantDataOfTask(Long taskId) {
-        ////查询当前任务所对应的数据
-        List<SchedulingDate> schedulingDateEntityList = schedulingDateService.list(new QueryWrapper<SchedulingDate>().eq("task_id", taskId));
-        List<Long> shiftIdList = new ArrayList<>();
-        List<Long> schedulingDateIdList = schedulingDateEntityList.stream().map(date -> {
-            //查询每天的相关班次数据
-            List<SchedulingShift> schedulingShiftEntityList = schedulingShiftService.list(new QueryWrapper<SchedulingShift>().eq("scheduling_date_id", date.getId()));
-            shiftIdList.addAll(schedulingShiftEntityList.stream().map(shift -> {
-                return shift.getId();
-            }).collect(Collectors.toList()));
-
-            return date.getId();
-        }).collect(Collectors.toList());
-
-
-        ////批量删除
-        //删除当前任务所对应的数据
-        if (schedulingDateIdList.size() > 0) {
-            schedulingDateService.removeByIds(schedulingDateIdList);
-        }
-
-        if (shiftIdList.size() > 0) {
-            //删除相关班次数据
-            schedulingShiftService.removeByIds(shiftIdList);
-            //删除用户-班次中间数据
-            shiftUserService.remove(new QueryWrapper<ShiftUser>().in("shift_id", shiftIdList));
-        }
-
-    }
-
-    /**
-     * 删除任务集合的所有相关数据，班次、工作日、user_shift
-     */
-    public void deleteRelevantDataOfTaskList(List<Long> taskIdList) {
-        ////查询当前任务所对应的数据
-        List<SchedulingDate> schedulingDateEntityList = schedulingDateService.list(new QueryWrapper<SchedulingDate>().in("task_id", taskIdList));
-        List<Long> shiftIdList = new ArrayList<>();
-        List<Long> schedulingDateIdList = schedulingDateEntityList.stream().map(date -> {
-            //查询每天的相关班次数据
-            List<SchedulingShift> schedulingShiftEntityList = schedulingShiftService.list(new QueryWrapper<SchedulingShift>().eq("scheduling_date_id", date.getId()));
-            shiftIdList.addAll(schedulingShiftEntityList.stream().map(shift -> {
-                return shift.getId();
-            }).collect(Collectors.toList()));
-
-            return date.getId();
-        }).collect(Collectors.toList());
-
-
-        ////批量删除
-        //删除当前任务所对应的数据
-        if (schedulingDateIdList.size() > 0) {
-            schedulingDateService.removeByIds(schedulingDateIdList);
-        }
-
-        if (shiftIdList.size() > 0) {
-            //删除相关班次数据
-            schedulingShiftService.removeByIds(shiftIdList);
-            //删除用户-班次中间数据
-            shiftUserService.remove(new QueryWrapper<ShiftUser>().in("shift_id", shiftIdList));
-        }
-
-    }
-
-    @Override
-    public void multiAlgorithmInstancePrepare(List<AlgoGroupDto> algoGroupDtoList, List<Instance> instanceList, List<SchedulingCalculateVo> schedulingCalculateVoList, Long taskId, Long storeId, String token) throws SSSException {
-        System.out.println("调用多算法数据准备--------------------------------------------------------------------------------------");
-        long start = System.currentTimeMillis();
-
-        SchedulingTask schedulingTaskEntity = schedulingTaskService.getById(taskId);
-        ////将任务复制多份
-        List<SchedulingTask> newTaskList = new ArrayList<>();
-        for (AlgoGroupDto algoGroupDto : algoGroupDtoList) {
-            SchedulingTask newTask = schedulingTaskEntity.clone();
-            newTask.setType(1);
-            newTask.setParentId(schedulingTaskEntity.getId());
-            newTask.setStepOneAlg(algoGroupDto.getPhaseOne().getName());
-            String[] arr = new String[]{algoGroupDto.getPhaseTwo().getCategoryName(), algoGroupDto.getPhaseTwo().getName()};
-            newTask.setStepTwoAlg(JSON.toJSONString(arr));
-            newTaskList.add(newTask);
-        }
-
-        //将虚拟任务批量保存到数据库中
-        schedulingTaskService.saveBatch(newTaskList);
-        System.out.println("虚拟任务创建完成");
-        System.out.println("创建计算数据vo完成");
-
-        ////构造计算数据
-        for (SchedulingTask task : newTaskList) {
-            //获取schedulingCalculateVo
-            SchedulingCalculateVo schedulingCalculateVo = new SchedulingCalculateVo();
-            schedulingCalculateVo.setStepOneAlg(task.getStepOneAlg());
-            schedulingCalculateVo.setStepTwoAlg(task.getStepTwoAlg());
-            schedulingCalculateVo.setStepTwoAlgParam(task.getStepTwoAlgParam());
-            schedulingCalculateVo.setDuration(task.getDuration());
-            schedulingCalculateVo.setIntervalC(task.getIntervalc());
-            schedulingCalculateVo.setDateVoList(JSON.parseObject(task.getDatevolist(), new TypeReference<List<DateVo>>() {
-            }));
-            schedulingCalculateVo.setTaskId(task.getId());
-            schedulingCalculateVo.setSchedulingRuleId(task.getSchedulingRuleId());
-
-            boolean flag = this.judgeWhetherSchedulingCalculateVoEffective(schedulingCalculateVo);
-            if (flag == false) {
-                HashMap<String, Object> message = new HashMap<>();
-                message.put("taskId", schedulingCalculateVo.getTaskId());
-                message.put("type", WebSocketEnum.CalculateEnd.getType());
-                message.put("isSuccess", 0);
-                message.put("cause", "计算数据出错，请检查工作日设置是否正确？修改了任务的起止日期之后，需要重新设置工作日");
-                SchedulingTask schedulingTaskEntity1 = schedulingTaskService.getById(schedulingCalculateVo.getTaskId());
-                //todo 判断是计算成功还是失败
-                //修改任务状态
-                schedulingTaskEntity1.setStatus(3);
-                schedulingTaskService.updateById(schedulingTaskEntity1);
-                message.put("calculateTime", System.currentTimeMillis() - start);
-                webSocketServer.sendMessage(JSON.toJSONString(message), WebSocketServer.tokenAndSessionMap.get(token));
-            } else {
-                schedulingCalculateVoList.add(schedulingCalculateVo);
-                Instance instance = this.buildInstance(schedulingCalculateVo, storeId);
-                instanceList.add(instance);
-            }
-        }
-    }
-
-    /**
-     * 计算不同的算法组合
-     */
-    @Override
-    public void multiAlgorithmSolve(List<Instance> instanceList, List<SchedulingCalculateVo> schedulingCalculateVoList, Long taskId, Long storeId, String token) throws SSSException {
-        System.out.println("调用多算法计算");
-
-        ////添加计算(多线程)
-/*         long start = System.currentTimeMillis();
-       CompletableFuture<Void>[] completableFutureArr = new CompletableFuture[schedulingCalculateVoList.size()];
-        for (int i = 0; i < schedulingCalculateVoList.size(); i++) {
-            SchedulingCalculateVo schedulingCalculateVo = schedulingCalculateVoList.get(i);
-            completableFutureArr[i] = CompletableFuture.runAsync(() -> {
-                try {
-                    this.caculate(schedulingCalculateVo, storeId, token, false);
-                } catch (SSSException e) {
-
-                }
-            }, executor).whenComplete((res, e) -> {
-                e.printStackTrace();
-            });
-        }
-        try {
-            CompletableFuture.allOf(completableFutureArr).get();
-            //当所有算法都计算完成之后
-            Map<String, Object> message = new HashMap<>();
-            message.put("type", WebSocketEnum.AllAlgorithmCalculateEnd.getType());
-            message.put("isSuccess", 1);
-            message.put("calculateTime", System.currentTimeMillis() - start);
-            webSocketServer.sendMessage(JSON.toJSONString(message), WebSocketServer.tokenAndSessionMap.get(token));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }*/
-
-        ////添加计算（单线程）
-        long start = System.currentTimeMillis();
-
-        for (int i = 0; i < instanceList.size(); i++) {
-            SchedulingCalculateVo schedulingCalculateVo = schedulingCalculateVoList.get(i);
-            this.caculate(schedulingCalculateVo, instanceList.get(i), storeId, token, false);
-            System.out.println(schedulingCalculateVo.getStepTwoAlg() + "+" + schedulingCalculateVo.getStepTwoAlg() + "计算完成");
-        }
-
-        //当所有算法都计算完成之后
-        Map<String, Object> message = new HashMap<>();
-        message.put("type", WebSocketEnum.AllAlgorithmCalculateEnd.getType());
-        message.put("taskId", taskId);
-        message.put("isSuccess", 1);
-        message.put("calculateTime", System.currentTimeMillis() - start);
-        message.put("cause", "");
-        webSocketServer.sendMessage(JSON.toJSONString(message), WebSocketServer.tokenAndSessionMap.get(token));
-
-        System.out.println("所有算法计算完成，耗时：" + (System.currentTimeMillis() - start) + "ms");
-    }
 
     /**
      * 构建计算实例
@@ -569,17 +309,14 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @return
      */
     @Override
-    public Instance buildInstance(Long storeId,Date beginDate, Date endDate) throws SSSException {
+    public Instance buildInstance(List<DateVo> dateVoList,Long storeId,Date beginDate, Date endDate,SchedulingTask schedulingTask) throws SSSException {
         long start = System.currentTimeMillis();
         //// 声明变量
         Instance instance = new Instance();
-        //TODO 获取客流量数据
-        List<DateVo> dateVoList = null;
         int duration = instance.getMinuteEachC();
 
         // 设置门店员工信息
-        //TODO
-        List<UserInfoVo> userInfoVoList = adminService.listUserByStoreId(storeId);
+        List<UserInfoVo> userInfoVoList = userService.listUserByStoreId(storeId);
         // 移除有问题的员工数据，如没有职位信息，或者没有排班长度偏好
         List<UserInfoVo> userInfoVoListWithoutPosition = new ArrayList<>();
         for (UserInfoVo userInfoVo : userInfoVoList) {
@@ -601,6 +338,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         instance.setEmployees(employees);
 
         Long ruleId = schedulingRuleService.queryRuleIdByStoreId(storeId);
+        schedulingTask.setSchedulingRuleId(ruleId);
         // 解析排班规则
         SchedulingRuleVo schedulingRuleVo = schedulingRuleService.getSchedulingRuleVoByRuleId(ruleId);
         // 解析门店工作时间段
@@ -617,8 +355,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         instance.setMaxContinuousWorkC(schedulingRuleVo.getMaximumContinuousWorkTime().intValue() / duration);
         // 设置每一天是星期几，每一天所被分成的时间段
         this.setWeekArrAndTimeFrameEachDay(instance, schedulingRuleVo, dateVoList, duration, oneWeekTimeFrameList);
-
-        return new Instance();
+        return instance;
     }
 
     /**
@@ -812,9 +549,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
                 Time[] times = oneWeekTimeFrameList.get(week - 1);
                 dateVo.setStartWorkTime(times[0].toFormatString());
                 dateVo.setEndWorkTime(times[1].toFormatString());
-                // 计算当前的段数
-//                System.out.println("times[0]:" + times[0]);
-//                System.out.println("times[1]:" + times[1]);
+
                 int startMinute = getTotalMinuteNum(times[0]) - openStorePrepareMinute;
                 int endMinute = getTotalMinuteNum(times[1]) + closeStoreCloseMinute;
                 int segmentNum = (endMinute - startMinute) / duration;
@@ -1035,8 +770,8 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
     }
 
     private Time[] getTimes(JSONArray arr) {
-        Time startTime = parseStrToTime(formatTime((String) arr.get(0)));
-        Time endTime = parseStrToTime(formatTime((String) arr.get(1)));
+        Time startTime = parseStrToTime((String) arr.get(0));
+        Time endTime = parseStrToTime((String) arr.get(1));
         return new Time[]{startTime, endTime};
     }
 
@@ -1048,25 +783,6 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
         return new Time(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
     }
 
-    /**
-     * 将国际时间格式：yyyy-MM-dd'T'HH:mm:ss.S'Z' 格式化 为北京时间（时：分）
-     */
-    private String formatTime(String raw) {
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-        Date dateTime = null;
-        try {
-            dateTime = sdf1.parse(raw);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
-        String format = sdf2.format(dateTime);
-        //将时间改为东八区时间，即将小时数+8
-        String[] split = format.split(":");
-        int hour = (Integer.parseInt(split[0]) + 8) % 24;
-        String time = hour / 10 > 0 ? hour + ":" + split[1] : "0" + hour + ":" + split[1];
-        return time;
-    }
 
     /**
      * 计算时间段数

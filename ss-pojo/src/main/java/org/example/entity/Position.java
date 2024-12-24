@@ -34,20 +34,4 @@ public class Position extends Base implements Serializable {
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long storeId;
-    /**
-     * 没有父元素设置为-1
-     */
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long parentId;
-    /**
-     * 下级列表
-     */
-    @TableField(exist = false)
-    private List<Position> children;
-    /**
-     * 是否选中
-     */
-    @TableField(exist = false)
-    private boolean isSelect;
-
 }

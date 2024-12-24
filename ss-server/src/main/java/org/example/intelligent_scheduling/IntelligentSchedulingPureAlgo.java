@@ -4,9 +4,7 @@ import org.example.dto.intelligent_scheduling.Instance;
 import org.example.dto.intelligent_scheduling.Shift;
 import org.example.dto.intelligent_scheduling.Solution;
 import org.example.dto.intelligent_scheduling.ShiftPlanning;
-import org.example.enums.AlgoEnum;
 import org.example.exception.SSSException;
-import org.example.intelligent_scheduling.personal_scheduling.PS_EASA;
 import org.example.intelligent_scheduling.personal_scheduling.PS_SAEA;
 import org.example.intelligent_scheduling.shift_genetation.SG_GOA;
 
