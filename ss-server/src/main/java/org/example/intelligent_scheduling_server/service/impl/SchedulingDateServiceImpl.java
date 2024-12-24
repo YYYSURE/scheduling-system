@@ -89,4 +89,11 @@ public class SchedulingDateServiceImpl extends ServiceImpl<SchedulingDateDao, Sc
         return schedulingDateMapper.getIdByDate(storeId,date);
     }
 
+    @Override
+    public void insert(List<SchedulingDate> dateEntityList) {
+        for (SchedulingDate d : dateEntityList) {
+            schedulingDateMapper.insert(d);
+        }
+    }
+
 }

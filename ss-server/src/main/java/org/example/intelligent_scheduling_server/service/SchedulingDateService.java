@@ -24,5 +24,7 @@ public interface SchedulingDateService extends IService<SchedulingDate> {
     List<SchedulingDate> getWorkDayList(Date startDate, Date endDate, Long storeId);
 
     Long getByStoreId(Long storeId, Date date);
+
+    void insert(List<SchedulingDate> dateEntityList);
 }
 

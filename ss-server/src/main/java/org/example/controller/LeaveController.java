@@ -5,7 +5,6 @@ import org.example.dto.HolidayDTO;
 import org.example.entity.Leave;
 import org.example.result.Result;
 import org.example.service.LeaveService;
-import org.example.vo.holiday.HolidayApprovalVO;
 import org.example.vo.holiday.HolidayVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.example.dto.StoreDTO;
 import org.example.result.Result;
 import org.example.vo.enterprise.StoreVo;
 
