@@ -53,6 +53,13 @@ public class Result extends HashMap<String, Object> {
         r.put("message", resultCodeEnum.getMessage());
         return r;
     }
+    // 新增的 error 方法
+    public static Result error(String message) {
+        Result r = new Result();
+        r.put("code", ResultCodeEnum.FAIL.getCode()); // 假设失败的代码为 ResultCodeEnum.FAIL.getCode()
+        r.put("message", message);
+        return r;
+    }
 
 
     /**

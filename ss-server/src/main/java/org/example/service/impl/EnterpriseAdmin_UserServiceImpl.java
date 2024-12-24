@@ -1,9 +1,13 @@
-package org.example.service.imp;
+package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.dao.EnterpriseAdmin_UserDao;
 import org.example.entity.User;
 import org.example.exception.SSSException;
@@ -16,7 +20,9 @@ import org.example.vo.system.SysUserQueryVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -24,12 +30,67 @@ import java.util.*;
 public class EnterpriseAdmin_UserServiceImpl extends ServiceImpl<EnterpriseAdmin_UserDao, User> implements EnterpriseAdmin_UserService {
 
 
+
     @Autowired
     private EnterpriseAdmin_UserDao adminUserDao;
     @Autowired
     private EnterpriseAdmin_UserService adminUserService;
+    @Override
+    public void uploadExcel(MultipartFile file) {
+        List<User> userList = new ArrayList<>();
 
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个工作表
 
+            for (Row row : sheet) {
+                // 跳过表头
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+
+                User user = new User();
+                user.setName(row.getCell(0).getStringCellValue()); // 假设姓名在第一列
+                user.setPhone(row.getCell(1).getStringCellValue()); // 假设电话在第二列
+                user.setMail(row.getCell(2).getStringCellValue()); // 假设邮箱在第三列
+                user.setUsername(row.getCell(3).getStringCellValue()); // 假设用户名在第四列
+                user.setPassword(row.getCell(4).getStringCellValue()); // 假设密码在第五列
+                // 继续设置其他字段...
+
+                userList.add(user);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("文件读取失败", e);
+        }
+
+        // 批量保存用户
+        this.saveBatch(userList);
+    }
+    @Override
+    public PageUtils getEmployeePages(int currentPage, Long storeId, String employeeName, Long userId) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+
+        // 根据员工姓名进行模糊查询
+        if (employeeName != null && !employeeName.isEmpty()) {
+            wrapper.like("name", employeeName);
+        }
+
+        // 根据用户类型进行条件查询
+        if (storeId != null) {
+            wrapper.eq("store_id", storeId);
+        } else if (userId != null) {
+            wrapper.eq("id", userId); // 仅查询当前用户
+        }
+
+        // 创建查询参数的 Map
+        Map<String, Object> params = new HashMap<>();
+        params.put(org.example.utils.Constant.PAGE, currentPage);
+        params.put(org.example.utils.Constant.LIMIT, 10); // 假设每页显示10条数据
+
+        // 执行分页查询
+        IPage<User> page = this.page(new Query<User>().getPage(params), wrapper);
+
+        return new PageUtils(page);
+    }
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<User> page = this.page(
