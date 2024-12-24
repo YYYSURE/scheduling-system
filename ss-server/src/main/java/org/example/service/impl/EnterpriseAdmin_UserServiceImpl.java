@@ -1,48 +1,96 @@
-package org.example.service.imp;
+package org.example.service.impl;
 
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.example.dao.StoreAdmin_UserDao;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.dao.EnterpriseAdmin_UserDao;
 import org.example.entity.User;
 import org.example.exception.SSSException;
-
-
-import org.example.entity.Position;
-import org.example.entity.Store;
-import org.example.entity.UserPosition;
 import org.example.enums.ResultCodeEnum;
 import org.example.enums.UserCodeEnum;
-import org.example.result.Result;
 import org.example.vo.system.UserInfoVo;
-import org.example.service.StoreAdmin_UserService;
+import org.example.service.EnterpriseAdmin_UserService;
 import org.example.utils.*;
 import org.example.vo.system.SysUserQueryVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 
 @Service
-public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, User> implements StoreAdmin_UserService {
+public class EnterpriseAdmin_UserServiceImpl extends ServiceImpl<EnterpriseAdmin_UserDao, User> implements EnterpriseAdmin_UserService {
+
+
 
     @Autowired
-    private StoreAdmin_UserDao adminUserDao;
+    private EnterpriseAdmin_UserDao adminUserDao;
     @Autowired
-    private StoreAdmin_UserService adminUserService;
+    private EnterpriseAdmin_UserService adminUserService;
+    @Override
+    public void uploadExcel(MultipartFile file) {
+        List<User> userList = new ArrayList<>();
 
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个工作表
 
+            for (Row row : sheet) {
+                // 跳过表头
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+
+                User user = new User();
+                user.setName(row.getCell(0).getStringCellValue()); // 假设姓名在第一列
+                user.setPhone(row.getCell(1).getStringCellValue()); // 假设电话在第二列
+                user.setMail(row.getCell(2).getStringCellValue()); // 假设邮箱在第三列
+                user.setUsername(row.getCell(3).getStringCellValue()); // 假设用户名在第四列
+                user.setPassword(row.getCell(4).getStringCellValue()); // 假设密码在第五列
+                // 继续设置其他字段...
+
+                userList.add(user);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("文件读取失败", e);
+        }
+
+        // 批量保存用户
+        this.saveBatch(userList);
+    }
+    @Override
+    public PageUtils getEmployeePages(int currentPage, Long storeId, String employeeName, Long userId) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+
+        // 根据员工姓名进行模糊查询
+        if (employeeName != null && !employeeName.isEmpty()) {
+            wrapper.like("name", employeeName);
+        }
+
+        // 根据用户类型进行条件查询
+        if (storeId != null) {
+            wrapper.eq("store_id", storeId);
+        } else if (userId != null) {
+            wrapper.eq("id", userId); // 仅查询当前用户
+        }
+
+        // 创建查询参数的 Map
+        Map<String, Object> params = new HashMap<>();
+        params.put(org.example.utils.Constant.PAGE, currentPage);
+        params.put(org.example.utils.Constant.LIMIT, 10); // 假设每页显示10条数据
+
+        // 执行分页查询
+        IPage<User> page = this.page(new Query<User>().getPage(params), wrapper);
+
+        return new PageUtils(page);
+    }
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<User> page = this.page(
@@ -59,6 +107,9 @@ public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, 
         return user;
     }
 
+
+
+
     /**
      * @param page
      * @param limit
@@ -69,70 +120,74 @@ public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, 
      */
     @Override
     public PageUtils selectPage(Long page, Long limit, Long enterpriseId, Long storeId, int userType, SysUserQueryVo userQueryVo) {
-//        Page<User> pageMps = new Page<>(page, limit);
-//
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-//        if (userType == UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode()) {
-//            //--if--如果用户是系统管理员，只查询企业管理员
-//            queryWrapper.eq("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode());
-//        } else if (userType == UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode()) {
-//            //--if--如果用户是企业管理员，查询企业的所有用户
-//            queryWrapper.eq("enterprise_id", enterpriseId)
-//                    //不能查询企业管理员
-//                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
-//                    //不能查询系统管理员
-//                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
-//        } else if (userType == UserCodeEnum.TYPE_STORE_MANAGER.getCode()) {
-//            //--if--如果用户是企业管理员，查询门店的所有用户
-//            queryWrapper.eq("store_id", storeId)
-//                    //不能查询门店管理员
-//                    .ne("type", UserCodeEnum.TYPE_STORE_MANAGER.getCode())
-//                    //不能查询企业管理员
-//                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
-//                    //不能查询系统管理员
-//                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
-//        }
-////        System.out.println("userQueryVo.getPositionIdArr():"+userQueryVo.getPositionIdArr());
-//        if (userQueryVo.getPositionIdArr() == null) {
-//
-//        } else if (userQueryVo.getPositionIdArr().size() == 0) {
-//            //职位为空，一个用户都不用查
-//            queryWrapper.eq("id", -1);
-//        } else {
-//            //查出职位对应的所有用户Id
-//            List<Long> userIdList = enterpriseFeignService.listUserIdList(userQueryVo.getPositionIdArr());
-//            if (userIdList.size() > 0) {
-//                queryWrapper.in("id", userIdList);
-//            } else {
-//                queryWrapper.eq("id", -1);
-//            }
-//        }
-//        if (userQueryVo.getSearchStoreId() != null) {
-//            queryWrapper.in("store_id", userQueryVo.getSearchStoreId());
-//        }
-//        if (userQueryVo.getSearchUserType() != null) {
-//            queryWrapper.in("type", userQueryVo.getSearchUserType());
-//        }
-//
-//        queryWrapper.orderByDesc("create_time");
-//
-//        String keyword = userQueryVo.getKeyword();
-//        if (!StringUtils.isEmpty(keyword)) {
-//            queryWrapper.like("username", "%" + keyword + "%").or()
-//                    .like("name", "%" + keyword + "%").or()
-//                    .like("phone", "%" + keyword + "%").or()
-//                    .like("mail", "%" + keyword + "%");
-//        }
-//
-//        ///查询用户的繁忙状态
-//        if (userQueryVo.getIsNeedSearchBusyStatus() != null && userQueryVo.getIsNeedSearchBusyStatus() == true && userQueryVo.getBusyStatus() != null) {
-//            //--if--需要查询用书在当前班次时间段内是否繁忙
-//            Date shiftStartDate = userQueryVo.getShiftStartDate();
-//            Date shiftEndDate = userQueryVo.getShiftEndDate();
-//            Map<String, Object> param = new HashMap<>();
-//            param.put("shiftStartDate", shiftStartDate);
-//            param.put("shiftEndDate", shiftEndDate);
-//            param.put("storeId", storeId);
+        Page<User> pageMps = new Page<>(page, limit);
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (userType == UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode()) {
+            //--if--如果用户是系统管理员，只查询企业管理员
+            queryWrapper.eq("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode());
+        } else if (userType == UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode()) {
+            //--if--如果用户是企业管理员，查询企业的所有用户
+            queryWrapper.eq("enterprise_id", enterpriseId)
+                    //不能查询企业管理员
+                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
+                    //不能查询系统管理员
+                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
+        } else if (userType == UserCodeEnum.TYPE_STORE_MANAGER.getCode()) {
+            //--if--如果用户是企业管理员，查询门店的所有用户
+            queryWrapper.eq("store_id", storeId)
+                    //不能查询门店管理员
+                    .ne("type", UserCodeEnum.TYPE_STORE_MANAGER.getCode())
+                    //不能查询企业管理员
+                    .ne("type", UserCodeEnum.TYPE_ENTERPRISE_MANAGER.getCode())
+                    //不能查询系统管理员
+                    .ne("type", UserCodeEnum.TYPE_SYSTEM_MANAGER.getCode());
+        }
+//        System.out.println("userQueryVo.getPositionIdArr():"+userQueryVo.getPositionIdArr());
+        if (userQueryVo.getPositionIdArr() == null) {
+
+        } else if (userQueryVo.getPositionIdArr().size() == 0) {
+            //职位为空，一个用户都不用查
+            queryWrapper.eq("id", -1);
+        } else {
+            //查出职位对应的所有用户Id
+            // TODO:
+            // List<Long> userIdList = enterpriseFeignService.listUserIdList(userQueryVo.getPositionIdArr());
+            List<Long> userIdList = new ArrayList<>();
+            if (userIdList.size() > 0) {
+                queryWrapper.in("id", userIdList);
+            } else {
+                queryWrapper.eq("id", -1);
+            }
+        }
+        if (userQueryVo.getSearchStoreId() != null) {
+            queryWrapper.in("store_id", userQueryVo.getSearchStoreId());
+        }
+        if (userQueryVo.getSearchUserType() != null) {
+            queryWrapper.in("type", userQueryVo.getSearchUserType());
+        }
+
+        queryWrapper.orderByDesc("create_time");
+
+        String keyword = userQueryVo.getKeyword();
+        if (!StringUtils.isEmpty(keyword)) {
+            queryWrapper.like("username", "%" + keyword + "%").or()
+                    .like("name", "%" + keyword + "%").or()
+                    .like("phone", "%" + keyword + "%").or()
+                    .like("mail", "%" + keyword + "%");
+        }
+
+        ///查询用户的繁忙状态
+        if (userQueryVo.getIsNeedSearchBusyStatus() != null && userQueryVo.getIsNeedSearchBusyStatus() == true && userQueryVo.getBusyStatus() != null) {
+            //--if--需要查询用书在当前班次时间段内是否繁忙
+            Date shiftStartDate = userQueryVo.getShiftStartDate();
+            Date shiftEndDate = userQueryVo.getShiftEndDate();
+            Map<String, Object> param = new HashMap<>();
+            param.put("shiftStartDate", shiftStartDate);
+            param.put("shiftEndDate", shiftEndDate);
+            param.put("storeId", storeId);
+            // TODO:
+
 //            Result r = shiftSchedulingCalculateFeignService.listUserIdIsBusy(param);
 //            if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
 //                List<Long> userIdListIsBusy = r.getData("userIdListIsBusy", new TypeReference<List<Long>>() {
@@ -145,18 +200,19 @@ public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, 
 //                    queryWrapper.in("id", userIdListIsBusy);
 //                }
 //            }
-//        }
-//
-//        ///查询日期段内有班次安排的员工
-//        if (userQueryVo.getStartDate() != null && userQueryVo.getEndDate() != null) {
-//            //查询日期段内有班次安排的员工id
-//            HashMap<String, Object> param = new HashMap<>();
-//            param.put("storeId", storeId);
-//            param.put("startDate", userQueryVo.getStartDate().toString());
-//            param.put("endDate", userQueryVo.getEndDate().toString());
-//            if (userQueryVo.getTaskId() != null) {
-//                param.put("taskId", userQueryVo.getTaskId());
-//            }
+        }
+
+        ///查询日期段内有班次安排的员工
+        if (userQueryVo.getStartDate() != null && userQueryVo.getEndDate() != null) {
+            //查询日期段内有班次安排的员工id
+            HashMap<String, Object> param = new HashMap<>();
+            param.put("storeId", storeId);
+            param.put("startDate", userQueryVo.getStartDate().toString());
+            param.put("endDate", userQueryVo.getEndDate().toString());
+            if (userQueryVo.getTaskId() != null) {
+                param.put("taskId", userQueryVo.getTaskId());
+            }
+            // TODO:
 //            Result r = shiftSchedulingCalculateFeignService.listUserIdByDateSegment(param);
 //            if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
 //                List<Long> userIdList = r.getData("userIdList", new TypeReference<List<Long>>() {
@@ -165,11 +221,10 @@ public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, 
 //                    queryWrapper.in("id", userIdList);
 //                }
 //            }
-//        }
-//
-//        baseMapper.selectPage(pageMps, queryWrapper);
-//        return new PageUtils(pageMps);
-        return new PageUtils();
+        }
+
+        baseMapper.selectPage(pageMps, queryWrapper);
+        return new PageUtils(pageMps);
     }
 
     /**
@@ -191,6 +246,7 @@ public class StoreAdmin_UserServiceImpl extends ServiceImpl<StoreAdmin_UserDao, 
 //            //2.每一个线程都共享之前的请求数据
 //            RequestContextHolder.setRequestAttributes(requestAttributes);
 //            if (user.getEnterpriseId() != null) {
+//                // TODO:
 //                Result r = enterpriseFeignService.getEnterpriseEntityById(Long.valueOf(user.getEnterpriseId()));
 //                if (r.getCode() == ResultCodeEnum.SUCCESS.getCode().intValue()) {
 ////                    Enterprise enterprise = r.getData("enterprise", new TypeReference<Enterprise>() {

@@ -2,18 +2,31 @@ package org.example.vo.enterprise;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.example.entity.Base;
 
 import java.math.BigDecimal;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class StoreVo extends Base {
 
     /**
      * 名称
      */
     private String name;
+    /**
+     * 门店id
+     */
+    private Long id;
+    /**
+     * 人数
+     */
+    private Long number;
+
     /**
      * 省
      */
