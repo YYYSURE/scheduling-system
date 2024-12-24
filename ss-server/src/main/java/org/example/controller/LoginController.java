@@ -36,7 +36,9 @@ public class LoginController {
 
         System.out.println(account);
 
-        boolean admin = account.isAdmin();
+//        boolean admin = account.isAdmin();
+        int type = account.getType();
+        System.out.println(type);
 
         Map<String, Object> map = new HashMap<>();
 

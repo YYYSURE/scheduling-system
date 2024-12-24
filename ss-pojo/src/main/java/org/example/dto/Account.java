@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class Account {
     private String email;
     private String password;
-    private boolean admin;
+//    private boolean admin;
+    private int type;
 }
