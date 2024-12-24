@@ -1,7 +1,7 @@
 package org.example.intelligent_scheduling_server.service.impl;
 
-import org.example.intelligent_scheduling_server.mapper.LeaveMapper;
 import org.example.intelligent_scheduling_server.service.LeaveService;
+import org.example.mapper.LeaveMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

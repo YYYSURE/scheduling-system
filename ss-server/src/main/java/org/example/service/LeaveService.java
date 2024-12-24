@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface LeaveService extends IService<Leave> {
 
-    List<Leave> getLeavesByEmail(String email);
-
-    List<Leave> getPendingLeaves();
-
-    Leave getLeaveById(Long id);
+//    List<Leave> getLeavesByEmail(String email);
+//
+//    List<Leave> getPendingLeaves();
+//
+//    Leave getLeaveById(Long id);
 }

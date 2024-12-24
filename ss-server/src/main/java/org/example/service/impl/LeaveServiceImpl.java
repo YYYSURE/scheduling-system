@@ -15,18 +15,18 @@ public class LeaveServiceImpl extends ServiceImpl<LeaveMapper, Leave> implements
     @Autowired
     private LeaveMapper leaveMapper;
 
-    @Override
+    /*@Override
     public List<Leave> getLeavesByEmail(String email) {
         return leaveMapper.selectByEmail(email);
-    }
+    }*/
 
-    @Override
-    public List<Leave> getPendingLeaves() {
-        return leaveMapper.selectPendingLeaves();
-    }
-
-    @Override
-    public Leave getLeaveById(Long id) {
-        return leaveMapper.selectById(id);
-    }
+//    @Override
+//    public List<Leave> getPendingLeaves() {
+//        return leaveMapper.selectPendingLeaves();
+//    }
+//
+//    @Override
+//    public Leave getLeaveById(Long id) {
+//        return leaveMapper.selectById(id);
+//    }
 }

@@ -167,9 +167,9 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
 
         //// 批量存储
         /// 先批量存储日期
-        System.out.println(dateEntityList.toString());
-        //schedulingDateService.saveBatch(dateEntityList);
-        schedulingDateService.insert(dateEntityList);
+        //System.out.println(dateEntityList.toString());
+        schedulingDateService.saveBatch(dateEntityList);
+        //schedulingDateService.insert(dateEntityList);
         /// 给班次设置dateId，存储已经分配的班次
         for (SchedulingShift schedulingShiftEntity : assignedShiftEntityList) {
             schedulingShiftEntity.setSchedulingDateId(dateEntityList.get(Integer.parseInt(schedulingShiftEntity.getSchedulingDateId().toString())).getId());

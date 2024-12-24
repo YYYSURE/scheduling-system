@@ -9,6 +9,7 @@ import org.example.utils.DateUtil;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.example.vo.scheduling_calculate_service.AvailableVo;
+import org.example.vo.scheduling_calculate_service.DayShiftVo;
 import org.example.vo.shiftScheduling.GanttShiftVo;
 import org.example.vo.shiftScheduling.GanttStatisticsVo;
 import org.example.vo.shiftScheduling.WeekViewVo;
@@ -43,7 +44,9 @@ public class SchedulingShiftController {
     @GetMapping("/day")
     public Result getByDate(@RequestParam Long storeId,
                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        return Result.ok().addData("data",schedulingShiftService.getDayShiftList(storeId,date));
+        List<DayShiftVo> data = schedulingShiftService.getDayShiftList(storeId, date);
+        System.out.println(data);
+        return Result.ok().addData("data", data);
     }
 
     /**
