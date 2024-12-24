@@ -24,7 +24,7 @@ import lombok.ToString;
 public class SchedulingShift implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.NONE)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
@@ -35,11 +35,11 @@ public class SchedulingShift implements Serializable {
     private Date updateTime;
 
     /**
-     * 班次开始时间 2023-02-27 07:00:00
+     * 班次开始时间 07:00:00
      */
     private Date startDate;
     /**
-     * 班次结束时间 2023-02-27 10:30:00
+     * 班次结束时间 10:30:00
      */
     private Date endDate;
     /**
@@ -67,5 +67,7 @@ public class SchedulingShift implements Serializable {
      * 班次类型 0：正常班 1：开店 2：收尾
      */
     private Integer shiftType;
+
+    private Long userId;
 
 }

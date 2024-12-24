@@ -22,21 +22,10 @@ public class SchedulingCalculateVo implements Serializable {
     /**
      * 以多少分钟为一段
      */
-    private int duration = 30;
+    private final int duration = 30;
     /**
      * 以多少个段为基准去排班
      */
-    private int intervalC = 2;
-    /**
-     * 第一阶段算法
-     */
-    private String stepOneAlg;
-    /**
-     * 第二阶段算法
-     */
-    private String stepTwoAlg;
-    /**
-     * 第二阶段算法参数
-     */
-    private String stepTwoAlgParam;
+    private final int intervalC = 2;
+
 }

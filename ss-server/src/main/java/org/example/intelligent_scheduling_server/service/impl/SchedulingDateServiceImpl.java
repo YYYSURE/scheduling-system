@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.entity.SchedulingDate;
 import org.example.entity.SchedulingTask;
 import org.example.intelligent_scheduling_server.dao.SchedulingDateDao;
+import org.example.intelligent_scheduling_server.mapper.SchedulingDateMapper;
 import org.example.intelligent_scheduling_server.service.SchedulingDateService;
 import org.example.intelligent_scheduling_server.service.SchedulingTaskService;
 import org.example.intelligent_scheduling_server.service.ShiftSchedulingAlgorithmService;
@@ -26,7 +27,8 @@ public class SchedulingDateServiceImpl extends ServiceImpl<SchedulingDateDao, Sc
     private ShiftSchedulingAlgorithmService shiftSchedulingAlgorithmService;
     @Autowired
     private SchedulingTaskService schedulingTaskService;
-
+    @Autowired
+    private SchedulingDateMapper schedulingDateMapper;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SchedulingDate> page = this.page(
@@ -82,5 +84,16 @@ public class SchedulingDateServiceImpl extends ServiceImpl<SchedulingDateDao, Sc
         return shiftDateEntityList;
     }
 
+    @Override
+    public Long getByStoreId(Long storeId, Date date) {
+        return schedulingDateMapper.getIdByDate(storeId,date);
+    }
+
+    @Override
+    public void insert(List<SchedulingDate> dateEntityList) {
+        for (SchedulingDate d : dateEntityList) {
+            schedulingDateMapper.insert(d);
+        }
+    }
 
 }

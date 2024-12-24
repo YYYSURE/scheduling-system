@@ -7,7 +7,6 @@ import java.util.*;
 public class PS_Util {
 
     // 判断员工是否可以和该班次匹配
-    // 判断员工是否可以和该班次匹配
     public static boolean judgeFeasible(Shift shift, Employee employee, EmployeePlan employeePlan, List<int[]> doubleShiftTimeFramesEachDay, HashSet<String>[] positionConstraintArr,
                                         List<TimeFrame[]> timeFramesEachDay, int[] weekArr, int restC, int maxWorkCEachDay, int maxWorkCEachWeek, int maxContinuousWorkC) {
         int curDayIndex = shift.getDayIndex();

@@ -3,7 +3,6 @@ package org.example.intelligent_scheduling_server.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,8 +17,6 @@ import org.example.result.Result;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -28,10 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 班次_用户中间表
- *
- * @author dam
- * @email 1782067308@qq.com
- * @date 2023-03-04 14:30:17
  */
 @RestController
 @RequestMapping("/scheduling/shiftuser")
@@ -51,7 +44,6 @@ public class ShiftUserController {
         return Result.ok().addData("page", page);
     }
 
-
     /**
      * 信息
      */
@@ -68,7 +60,6 @@ public class ShiftUserController {
     @RequestMapping("/save")
     public Result save(@RequestBody ShiftUser shiftUser) {
         shiftUserService.save(shiftUser);
-
         return Result.ok();
     }
 
@@ -78,7 +69,6 @@ public class ShiftUserController {
     @RequestMapping("/update")
     public Result update(@RequestBody ShiftUser shiftUser) {
         shiftUserService.updateById(shiftUser);
-
         return Result.ok();
     }
 
@@ -88,15 +78,11 @@ public class ShiftUserController {
     @RequestMapping("/delete")
     public Result delete(@RequestBody Long[] ids) {
         shiftUserService.removeByIds(Arrays.asList(ids));
-
         return Result.ok();
     }
 
     /**
      * 查询指定时间段繁忙的用户id
-     *
-     * @param params
-     * @return
      */
     @PostMapping("/listUserIdListIsBusy")
     public Result listUserIdIsBusy(@RequestBody Map<String, Object> params) {
@@ -120,12 +106,8 @@ public class ShiftUserController {
     /**
      * 为班次替换人员或者追加人员
      *
-     * @param params
-     * @return
      */
     @PostMapping("/replaceOrAddMembersForShift")
-    //修改班次的人员，影响班次
-    //@CacheEvict(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_SHIFT}, allEntries = true)
     public Result replaceOrAddMembersForShift(@RequestBody Map<String, Object> params, HttpServletRequest httpServletRequest) throws SSSException {
 
         Long storeId = Long.parseLong(JwtUtil.getStoreId(httpServletRequest.getHeader("token")));
@@ -169,11 +151,8 @@ public class ShiftUserController {
     /**
      * 根据工作日查询出所有需要工作的员工id
      *
-     * @param paramMap
-     * @return
      */
     @PostMapping("/listUserIdByWorkDate")
-//    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_SHIFT}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]", sync = true)
     public Result listUserIdByWorkDate(@RequestBody Map<String, Object> paramMap) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date workDate = null;
@@ -189,12 +168,8 @@ public class ShiftUserController {
 
     /**
      * 根据工作日查询出所有需要工作的员工id，及其所负责的班次
-     *
-     * @param paramMap
-     * @return
      */
     @PostMapping("/listStaffWorkDtoByWorkDate")
-//    @Cacheable(value = {RedisConstant.MODULE_SHIFT_SCHEDULING_CALCULATE_SHIFT}, key = "#root.targetClass+'-'+#root.method.name+'-'+#root.args[0]", sync = true)
     public Result listStaffWorkDtoByWorkDate(@RequestBody Map<String, Object> paramMap) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date workDate = null;
@@ -230,8 +205,6 @@ public class ShiftUserController {
     /**
      * 根据一个日期段内，所有需要工作的员工id
      *
-     * @param paramMap
-     * @return
      */
     @PostMapping("/listUserIdByDateSegment")
     public Result listUserIdByDateSegment(@RequestBody Map<String, Object> paramMap) {
@@ -258,6 +231,4 @@ public class ShiftUserController {
 
         return Result.ok().addData("userIdList", userIdList);
     }
-
-
 }

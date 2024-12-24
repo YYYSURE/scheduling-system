@@ -1,22 +1,12 @@
 package org.example.service;
 
-import org.example.dto.UserLoginDTO;
-import org.example.entity.User;
+import org.example.vo.system.UserInfoVo;
 
+import java.util.List;
 import java.util.Map;
 
 public interface UserService {
-    /**
-     * 用户登录
-     * @param userLoginDTO
-     * @return
-     */
-    User login(UserLoginDTO userLoginDTO);
-    /**
-     * 根据用户名返回用户
-     * @param name
-     * @return
-     */
-    User getByName(String name);
 
+
+    List<UserInfoVo> listUserByStoreId(Long storeId);
 }

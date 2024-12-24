@@ -115,7 +115,7 @@
         SELECT
             *
         FROM
-            `shift_user`
+            shift_user
         WHERE
                 shift_id IN (
                 SELECT

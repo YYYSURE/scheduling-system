@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.HashSet;
 import java.util.List;
 
+//存放排班算法的参数及员工信息
 @Data
 public class Instance {
     /**
@@ -40,19 +41,19 @@ public class Instance {
     /**
      * 最小班次时间的时间段数，例如：以30分钟为一段，最小班次为2小时，那么这个值就是4
      **/
-    int minC = 4;
+    int minC;
     /**
      * 最大班次时间的时间段数，例如：以30分钟为一段，最大班次为4小时，那么这个值就是8
      **/
-    int maxC = 8;
+    int maxC;
     /**
      * 以多少个段为基准去排班，例如：以30分钟为一段，如果这个值设置为2，就代表每个班次的时长必须是2*30=60分钟的整数倍
      **/
-    int intervalC = 2;
+    int intervalC;
     /**
      * 以多少分钟为一段，设置为30，就是以30分钟为一段
      **/
-    int minuteEachC = 30;
+    int minuteEachC;
     /**
      * 午餐时间范围，在timeFrames中的索引范围
      **/
@@ -64,25 +65,47 @@ public class Instance {
     /**
      * 午餐时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表午餐时间为30分钟
      **/
-    int lunchC = 1;
+    int lunchC;
     /**
      * 晚餐时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表晚餐时间为30分钟
      **/
-    int dinnerC = 1;
+    int dinnerC;
     /**
      * 休息时间占多少段，例如：以30分钟为一段，这个值如果是1，就代表休息时间为30分钟
      **/
-    int restC = 1;
+    int restC;
     /**
      * 员工每天最多工作多少段
      **/
-    int maxWorkCEachDay = 16;
+    int maxWorkCEachDay;
     /**
      * 员工每周最多工作多少段
      **/
-    int maxWorkCEachWeek = 80;
+    int maxWorkCEachWeek;
     /**
      * 员工最长连续工作时间段数
      **/
-    int maxContinuousWorkC = 8;
+    int maxContinuousWorkC;
+
+    public Instance() {
+        this.timeFramesEachDay = null;
+        this.doubleShiftTimeFramesEachDay = null;
+        this.employeesRequiredArrEachDay = null;
+        this.positionConstraintArr = null;
+        this.weekArr = null;
+        this.employees = null;
+        this.lunchFrames = null;
+        this.dinnerFrames = null;
+        this.minC = 4;
+        this.maxC = 8;
+        this.intervalC = 2;
+        this.minuteEachC = 30;
+        this.lunchC = 1;
+        this.dinnerC = 1;
+        this.restC = 1;
+        this.maxWorkCEachDay = 16;
+        this.maxWorkCEachWeek = 80;
+        this.maxContinuousWorkC = 8;
+    }
+
 }

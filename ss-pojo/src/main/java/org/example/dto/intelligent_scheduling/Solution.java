@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+//记录排班结果
 @Data
 public class Solution {
     /**
@@ -16,7 +17,7 @@ public class Solution {
      **/
     int totalAssignedMinute;
     /**
-     * 分配比率
+     * 分配比率(分配的时间占总时间的比率)
      **/
     double allocationRatio;
     /**
@@ -32,7 +33,7 @@ public class Solution {
      **/
     List<List<ShiftPlanning>> shiftPlanningListList = new ArrayList<>();
     /**
-     * 每个员工的班次安排计划的班次安排计划
+     * 每个员工的班次安排计划
      **/
     EmployeePlan[] employeePlans;
     /**

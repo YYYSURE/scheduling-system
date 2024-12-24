@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+//为某一天生成班次信息
 public class SG_GOA {
 
     /**
@@ -29,7 +30,7 @@ public class SG_GOA {
     int minC;
     int maxC;
     /**
-     * 间隔段数（呈倍数）
+     * 以多少个段为基准去排班，例如：以30分钟为一段，如果这个值设置为2，就代表每个班次的时长必须是2*30=60分钟的整数倍
      **/
     int intervalC;
     /**
@@ -68,7 +69,6 @@ public class SG_GOA {
     }
 
     // 求解主函数
-    //TODO 自定义异常
     public List<Shift> solve() throws SSSException {
         // 初始化班次列表
         shiftList = new ArrayList<>();
@@ -78,13 +78,13 @@ public class SG_GOA {
         int[] lastMealTime = null;
         // 遍历每个时间段，看看有没有没被覆盖的
         for (int i = 0; i < employeesRequiredArr.length; i++) {
-            if (employeesWorkingArr[i] < employeesRequiredArr[i]) {
+            if (employeesWorkingArr[i] < employeesRequiredArr[i]) {//安排的人数小于需要的
                 // 当前时间段还没有完全被覆盖
                 // 有两种方法覆盖它：（1）将旧的班次延长（2）新增班次
                 // 首先尝试将旧的班次延长
-                boolean b = true;
+                boolean b = true;//记录i是否要回退,false为要
                 for (int j = shiftList.size() - 1; j >= 0; j--) {
-                    // 如果旧班次本来旧覆盖了当前段，那就不能延长
+                    // 如果旧班次本来就覆盖了当前段，那就不能延长
                     if (shiftList.get(j).getHead() <= i && shiftList.get(j).getHead() + shiftList.get(j).getLen() > i) {
                         continue;
                     }

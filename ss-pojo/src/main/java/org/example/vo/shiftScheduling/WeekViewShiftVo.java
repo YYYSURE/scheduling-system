@@ -1,5 +1,6 @@
 package org.example.vo.shiftScheduling;
 
+import org.example.vo.system.UserInfoVo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;

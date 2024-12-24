@@ -1,7 +1,7 @@
 package org.example.controller.employee;
 
 import org.example.dto.EmployeeInfoDTO;
-import org.example.entity.User;
+//import org.example.entity.User;
 import org.example.enums.ResultCodeEnum;
 import org.example.result.Result;
 import org.example.service.EmployeeService;
@@ -67,7 +67,7 @@ public class EmployeeController {
         // employeeService.updateById(user);
         System.out.println(employeeInfoDTO);
 
-        User user = new User();
+        //User user = new User();
         // TODO:
         // 将 employeeInfoDTO copy 到 user
 

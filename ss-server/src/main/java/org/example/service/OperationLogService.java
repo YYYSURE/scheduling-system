@@ -1,22 +1,17 @@
 package org.example.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import org.example.entity.OperationLog;
-import org.example.utils.PageUtils;
-
-import java.util.Map;
+import java.util.List;
 
 /**
- * 操作日志表
+ * 操作日志服务接口
  *
  * @author dam
- * @email 1782067308@qq.com
- * @date 2023-03-13 16:42:08
+ * @date 2024-12-19
  */
-public interface OperationLogService extends IService<OperationLog> {
+public interface OperationLogService {
 
-    PageUtils queryPage(Map<String, Object> params, String token);
+    List<OperationLog> getAllLogs();
 
-    OperationLog getById(Long id);
+    void addLog(OperationLog operationLog);
 }
-
