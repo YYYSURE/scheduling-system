@@ -44,6 +44,7 @@ public class SchedulingShiftController {
     @GetMapping("/schedule")
     public Result getDayData(@RequestParam Long storeId,
                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        System.out.println("-------------");
         return Result.ok().addData("date",schedulingShiftService.getDayData(storeId,date));
     }
 
