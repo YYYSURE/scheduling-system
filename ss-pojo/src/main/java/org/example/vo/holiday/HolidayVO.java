@@ -13,10 +13,10 @@ public class HolidayVO {
      * 请假类型
      */
     private String type;
-    /**
-     * 时间
-     */
-    private String time;
+//    /**
+//     * 时间
+//     */
+//    private String time;
     /**
      * 开始时间
      */

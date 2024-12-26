@@ -11,7 +11,7 @@ public class EmployeeInfoVo {
     /**
      * 姓名
      */
-    private String name;
+    private String username;
     /**
      * 性别
      */
