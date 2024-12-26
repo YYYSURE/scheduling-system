@@ -21,10 +21,10 @@ import static org.example.enums.ResultCodeEnum.ACCOUNT_ERROR;
 public class LoginController {
     @Autowired
     private EmployeeService employeeService;
-//    @Autowired
-//    private EnterpriseAdminService enterpriseAdminService;
-//    @Autowired
-//    private StoreAdminService storeAdminService;
+    @Autowired
+    private EnterpriseAdminService enterpriseAdminService;
+    @Autowired
+    private StoreAdminService storeAdminService;
 
     // 用户登录
     @PostMapping("/login")
@@ -50,19 +50,19 @@ public class LoginController {
 
         } else if (type == 2) {
             // 企业管理员
-//            EnterpriseAdmin enterpriseAdmin = enterpriseService.login(account);
-//
-//            map.put("name", enterpriseAdmin.getUsername());
-//            map.put("id", enterpriseAdmin.getId());
-//            map.put("store", enterpriseAdmin.getStoreId());
+            EnterpriseAdmin enterpriseAdmin = enterpriseAdminService.login(account);
+
+            map.put("name", enterpriseAdmin.getUsername());
+            map.put("id", enterpriseAdmin.getId());
+            map.put("store", 0);
 
         } else if (type == 3) {
             // 门店管理员
-//            StoreAdmin storeAdmin  = StoreAdminService.login(account);
-//
-//            map.put("name", storeAdmin.getUsername());
-//            map.put("id", storeAdmin.getId());
-//            map.put("store", storeAdmin.getStoreId());
+            StoreAdmin storeAdmin  = StoreAdminService.login(account);
+
+            map.put("name", storeAdmin.getUsername());
+            map.put("id", storeAdmin.getId());
+            map.put("store", storeAdmin.getStoreId());
         }
 
 
