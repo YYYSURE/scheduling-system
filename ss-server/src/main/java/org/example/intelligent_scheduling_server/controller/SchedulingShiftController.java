@@ -9,6 +9,7 @@ import org.example.utils.DateUtil;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.example.vo.scheduling_calculate_service.AvailableVo;
+import org.example.vo.scheduling_calculate_service.DayShiftEmployeeVo;
 import org.example.vo.scheduling_calculate_service.DayShiftVo;
 import org.example.vo.shiftScheduling.GanttShiftVo;
 import org.example.vo.shiftScheduling.GanttStatisticsVo;
@@ -29,19 +30,29 @@ import java.util.*;
  *
  */
 @RestController
-@RequestMapping("/schedule")
+@RequestMapping
 public class SchedulingShiftController {
     //根据门店id获得排班信息,显每个时间段有多少人和是否包含就餐或休息时间
 
     @Autowired
     private SchedulingShiftService schedulingShiftService;
 
+
+    /**
+     * 首页日排班
+     */
+    @GetMapping("/schedule")
+    public Result getDayData(@RequestParam Long storeId,
+                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        return Result.ok().addData("date",schedulingShiftService.getDayData(storeId,date));
+    }
+
     /**
      * 获取日排班
      * @param date
      * @return
      */
-    @GetMapping("/day")
+    @GetMapping("/schedule/day")
     public Result getByDate(@RequestParam Long storeId,
                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         List<DayShiftVo> data = schedulingShiftService.getDayShiftList(storeId, date);
@@ -54,10 +65,27 @@ public class SchedulingShiftController {
      * @param shiftId
      * @return
      */
-    @GetMapping("/available")
+    @GetMapping("/schedule/available")
     public Result getAvailable(@RequestParam Long shiftId) {
         List<AvailableVo> list = schedulingShiftService.getAvailable(shiftId);
         return Result.ok().addData("data",list);
     }
 
+    @PostMapping("/schedule/update")
+    public Result updateEmployee(@RequestParam long shiftId,@RequestParam long employeeId){
+        schedulingShiftService.updateEmployee(shiftId,employeeId);
+        return Result.ok();
+    }
+
+    /**
+     * 员工查看自己的日排班
+     * @param  id
+     * @return
+     */
+    @GetMapping("/employee/Schedule")
+    public Result getSchedule(@RequestParam Long id,
+                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        List<List<DayShiftEmployeeVo>> list =  schedulingShiftService.getSchedule(id,date);
+        return Result.ok().addData("data",list);
+    }
 }

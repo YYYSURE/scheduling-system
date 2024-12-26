@@ -6,6 +6,8 @@ import org.example.entity.SchedulingShift;
 import org.example.exception.SSSException;
 import org.example.utils.PageUtils;
 import org.example.vo.scheduling_calculate_service.AvailableVo;
+import org.example.vo.scheduling_calculate_service.DatNameVo;
+import org.example.vo.scheduling_calculate_service.DayShiftEmployeeVo;
 import org.example.vo.scheduling_calculate_service.DayShiftVo;
 import org.example.vo.shiftScheduling.GanttShiftVo;
 import org.example.vo.shiftScheduling.GanttStatisticsVo;
@@ -26,5 +28,11 @@ public interface SchedulingShiftService extends IService<SchedulingShift> {
     public List<DayShiftVo> getDayShiftList(Long storeId,Date date);
 
     List<AvailableVo> getAvailable(Long shiftId);
+
+    void updateEmployee(long shiftId, long employeeId);
+
+    List<List<DatNameVo>> getDayData(Long storeId, Date date);
+
+    List<List<DayShiftEmployeeVo>> getSchedule(Long id, Date date);
 }
 

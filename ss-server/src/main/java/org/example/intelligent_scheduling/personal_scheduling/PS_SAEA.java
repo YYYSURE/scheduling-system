@@ -116,46 +116,159 @@ public class PS_SAEA {
         solution.setEmployeePlans(employeePlans);
     }
 
-    // 指定某一天，班次分配员工
     private boolean shiftAssignmentEmployees(int curDayIndex) {
         log.info("--------------- 为第" + (curDayIndex + 1) + "天的班次分配员工 ---------------");
+
         // 获得该天的所有班次
         List<Shift> shiftList = shiftListList.get(curDayIndex);
+
         // 找出每个班次的候选人集
-        List<List<Integer>> employeeIndexList = new ArrayList<>();
+        List<List<Integer>> employeeIndexListFirstRound = new ArrayList<>();
         for (int i = 0; i < shiftList.size(); i++) {
-            employeeIndexList.add(getCandidateList(i, curDayIndex));
+            employeeIndexListFirstRound.add(getCandidateList(shiftList.get(i), curDayIndex)); // 第一轮分配
         }
+
         // 班次排序
-        int[] sequence = shellSort(shiftList, employeeIndexList);
-        // 排序完，开始挑选
-        HashSet<Integer> set = new HashSet<>(); // 记录已经被分配的员工
-        List<Integer> removeIndexList = new ArrayList<>();//记录已经分配的班次
+        int[] sequence = shellSort(shiftList, employeeIndexListFirstRound);
+
+        // 第一轮分配
+        HashSet<Integer> set = new HashSet<>();
+        List<Integer> removeIndexList = new ArrayList<>();
         for (int i : sequence) {
-            for (int j = 0; j < employeeIndexList.get(i).size(); j++) {
-                int e = employeeIndexList.get(i).get(j);
-                if (set.add(e)) {
+            employeeIndexListFirstRound.set(i, getCandidateList(shiftList.get(i), curDayIndex));
+            for (int j = 0; j < employeeIndexListFirstRound.get(i).size(); j++) {
+                int e = employeeIndexListFirstRound.get(i).get(j);
+                // 允许员工被安排多个班次，直到达到最大工作时长限制
+                if (canAssignShiftToEmployee(e, curDayIndex, shiftList.get(i))) {
                     log.info("匹配-" + (set.size()) + ": 员工" + employees[e].getId() + " => 第" + (curDayIndex + 1) + "天的班次" + shiftList.get(i).getKey());
                     shiftPlanningListList.get(curDayIndex).add(new ShiftPlanning(e, shiftList.get(i)));
                     employeePlans[e].shiftListList.get(curDayIndex).add(shiftList.get(i));
-                    employeePlans[e].shiftListList.get(curDayIndex).sort(new Comparator<Shift>() {
-                        @Override
-                        public int compare(Shift o1, Shift o2) {
-                            return Integer.compare(o1.getHead(), o2.getHead());
-                        }
-                    });
+                    employeePlans[e].shiftListList.get(curDayIndex).sort(Comparator.comparingInt(Shift::getHead));
                     employeePlans[e].workTimeEachDay[curDayIndex] += (shiftList.get(i).getLen() - (shiftList.get(i).getMealType() == null ? 0 : shiftList.get(i).getMealLen()));
                     employeePlans[e].totalWorkMinute += shiftList.get(i).getTotalMinute();
-                    removeIndexList.add(i);
+                    removeIndexList.add(i);  // 将已分配的班次加入移除列表
                     break;
                 }
             }
         }
+
+        Collections.sort(removeIndexList);
+        // 移除已分配的班次
+        for (int i = removeIndexList.size() - 1; i >= 0; i--) {
+            shiftList.remove((int) removeIndexList.get(i)); // 从班次列表中移除已分配的班次
+        }
+        removeIndexList.clear();
+        // 第二轮分配
+        if (!shiftList.isEmpty()) {
+            List<List<Integer>> employeeIndexListSecondRound = new ArrayList<>();
+            for (int i = 0; i < shiftList.size(); i++) {
+                employeeIndexListSecondRound.add(getCandidateListForSecondRound(shiftList.get(i), curDayIndex)); // 第二轮分配
+            }
+
+            for (int i = 0;i < shiftList.size();i++) {
+                employeeIndexListSecondRound.set(i, getCandidateListForSecondRound(shiftList.get(i), curDayIndex));
+                for (int j = 0; j < employeeIndexListSecondRound.get(i).size(); j++) {
+                    int e = employeeIndexListSecondRound.get(i).get(j);
+                    if (canAssignShiftToEmployee(e, curDayIndex, shiftList.get(i))) {
+                        log.info("匹配-" + (set.size()) + ": 员工" + employees[e].getId() + " => 第" + (curDayIndex + 1) + "天的班次" + shiftList.get(i).getKey());
+                        shiftPlanningListList.get(curDayIndex).add(new ShiftPlanning(e, shiftList.get(i)));
+                        employeePlans[e].shiftListList.get(curDayIndex).add(shiftList.get(i));
+                        employeePlans[e].shiftListList.get(curDayIndex).sort(Comparator.comparingInt(Shift::getHead));
+                        employeePlans[e].workTimeEachDay[curDayIndex] += (shiftList.get(i).getLen() - (shiftList.get(i).getMealType() == null ? 0 : shiftList.get(i).getMealLen()));
+                        employeePlans[e].totalWorkMinute += shiftList.get(i).getTotalMinute();
+                        removeIndexList.add(i);  // 将已分配的班次加入移除列表
+                        break;
+                    }
+                }
+            }
+            Collections.sort(removeIndexList);
+            // 移除已分配的班次
+            for (int i = removeIndexList.size() - 1; i >= 0; i--) {
+                shiftList.remove((int) removeIndexList.get(i)); // 从班次列表中移除已分配的班次
+            }
+        }
+        removeIndexList.clear();
+        // 第三轮分配（不考虑偏好）
+        if (!shiftList.isEmpty()) {
+            List<List<Integer>> employeeIndexListThirdRound = new ArrayList<>();
+            for (int i = 0; i < shiftList.size(); i++) {
+                employeeIndexListThirdRound.add(getCandidateListForThirdRound(shiftList.get(i), curDayIndex)); // 第三轮分配
+            }
+
+            // 第三轮班次分配
+            for (int i = 0;i < shiftList.size();i++) {
+                employeeIndexListThirdRound.set(i, getCandidateListForThirdRound(shiftList.get(i), curDayIndex));
+                for (int j = 0; j < employeeIndexListThirdRound.get(i).size(); j++) {
+                    int e = employeeIndexListThirdRound.get(i).get(j);
+                    if (canAssignShiftToEmployee(e, curDayIndex, shiftList.get(i))) {
+                        log.info("匹配-" + (set.size()) + ": 员工" + employees[e].getId() + " => 第" + (curDayIndex + 1) + "天的班次" + shiftList.get(i).getKey());
+                        shiftPlanningListList.get(curDayIndex).add(new ShiftPlanning(e, shiftList.get(i)));
+                        employeePlans[e].shiftListList.get(curDayIndex).add(shiftList.get(i));
+                        employeePlans[e].shiftListList.get(curDayIndex).sort(Comparator.comparingInt(Shift::getHead));
+                        employeePlans[e].workTimeEachDay[curDayIndex] += (shiftList.get(i).getLen() - (shiftList.get(i).getMealType() == null ? 0 : shiftList.get(i).getMealLen()));
+                        employeePlans[e].totalWorkMinute += shiftList.get(i).getTotalMinute();
+                        removeIndexList.add(i);  // 将已分配的班次加入移除列表
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 最终移除已分配的班次
         Collections.sort(removeIndexList);
         for (int i = removeIndexList.size() - 1; i >= 0; i--) {
-            shiftList.remove((int) removeIndexList.get(i));
+            shiftList.remove((int) removeIndexList.get(i)); // 从班次列表中移除已分配的班次
         }
+
         return !set.isEmpty();
+    }
+    // 传入班次和该天的索引，或者该班次的候选人集
+    private List<Integer> getCandidateList(Shift shift, int curDayIndex) {
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < employees.length; i++) {
+            if (PS_Util.judgeFeasible(shift, employees[i], employeePlans[i], doubleShiftTimeFramesEachDay,
+                    positionConstraintArr, timeFramesEachDay, weekArr, restC, maxWorkCEachDay, maxWorkCEachWeek, maxContinuousWorkC)) {
+                res.add(i);
+            }
+        }
+        return res;
+    }
+
+
+    private List<Integer> getCandidateListForSecondRound(Shift shift, int curDayIndex) {
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < employees.length; i++) {
+            if (PS_Util.judgeFeasibleForSecond(shift, employees[i], employeePlans[i], doubleShiftTimeFramesEachDay,
+                    positionConstraintArr, timeFramesEachDay, weekArr, restC, maxWorkCEachDay, maxWorkCEachWeek, maxContinuousWorkC)) {
+                res.add(i);
+            }
+        }
+        return res;
+    }
+
+    private List<Integer> getCandidateListForThirdRound(Shift shift, int curDayIndex) {
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < employees.length; i++) {
+            if (PS_Util.judgeFeasibleForThrid(shift, employees[i], employeePlans[i], doubleShiftTimeFramesEachDay,
+                    positionConstraintArr, timeFramesEachDay, weekArr, restC, maxWorkCEachDay, maxWorkCEachWeek, maxContinuousWorkC)) {
+                res.add(i);
+            }
+        }
+        return res;
+    }
+
+    // 检查员工是否能继续分配班次（不超过工作时长限制）
+    private boolean canAssignShiftToEmployee(int employeeIndex, int curDayIndex, Shift shift) {
+        // 计算员工当天的总工作时间
+        int totalWorkTime = employeePlans[employeeIndex].workTimeEachDay[curDayIndex] + shift.getLen() - (shift.getMealType() == null ? 0 : shift.getMealLen());
+
+        // 判断是否超过最大工作时长限制
+        if (totalWorkTime > maxWorkCEachDay) {
+            return false;
+        }
+
+        // 如果没有超过限制，允许分配
+        return true;
     }
 
     // 班次排序
@@ -181,18 +294,4 @@ public class PS_SAEA {
         }
         return res;
     }
-
-
-    // 传入班次和该天的索引，或者该班次的候选人集
-    private List<Integer> getCandidateList(int shiftIndex, int curDayIndex) {
-        List<Integer> res = new ArrayList<>();
-        for (int i = 0; i < employees.length; i++) {
-            if (PS_Util.judgeFeasible(shiftListList.get(curDayIndex).get(shiftIndex), employees[i], employeePlans[i], doubleShiftTimeFramesEachDay,
-                    positionConstraintArr, timeFramesEachDay, weekArr, restC, maxWorkCEachDay, maxWorkCEachWeek, maxContinuousWorkC)) {
-                res.add(i);
-            }
-        }
-        return res;
-    }
-
 }
