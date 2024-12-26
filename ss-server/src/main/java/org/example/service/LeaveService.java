@@ -1,11 +1,9 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.example.entity.Leave;
+import org.example.entity.leaveRequest;
 
-import java.util.List;
-
-public interface LeaveService extends IService<Leave> {
+public interface LeaveService extends IService<leaveRequest> {
 
 //    List<Leave> getLeavesByEmail(String email);
 //

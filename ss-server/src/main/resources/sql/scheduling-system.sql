@@ -15,7 +15,9 @@ create table if not exists scheduling_system.admin
     password    varchar(255)                       not null,
     gender      tinyint  default 0                 null,
     age         int                                null,
-    type        tinyint                            not null
+    type        tinyint                            not null,
+    id_card     varchar(255)                       not null
+
 );
 
 create table if not exists scheduling_system.employee

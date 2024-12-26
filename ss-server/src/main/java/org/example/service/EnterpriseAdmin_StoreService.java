@@ -16,5 +16,7 @@ public interface EnterpriseAdmin_StoreService extends IService<Store> {
 
     PageUtils queryPage(Map<String, Object> params, QueryWrapper<Store> wrapper);
     Store getStoreById(Long id);
+    //Store getStoreByName(String name);
+    Store getStoreByUserPhone(String phone);
 }
 

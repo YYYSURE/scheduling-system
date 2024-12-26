@@ -1,4 +1,4 @@
-package org.example.controller;
+package org.example.controller.EnterpriseAdmin;
 
 import org.example.entity.OperationLog;
 import org.example.result.Result;
