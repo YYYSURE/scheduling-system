@@ -42,7 +42,7 @@ public class ManageController {
 
         // 创建分页对象
         long currentPage = Long.parseLong(val);
-        long pageSize = 10; // 每页显示10条记录
+        long pageSize = 7; // 每页显示8条记录
 
         // 创建查询条件
         QueryWrapper<Employee> wrapper = new QueryWrapper<>();
@@ -58,7 +58,7 @@ public class ManageController {
         params.put("current", currentPage);
         params.put("size", pageSize);
 
-        // 从服务层获取分页信息
+//        // 从服务层获取分页信息
 //        System.out.println("params "+params);
 //        System.out.println("wrapper "+wrapper);
         PageUtils pageUtils = userService.queryPage(params, wrapper);
@@ -73,6 +73,7 @@ public class ManageController {
     public Result getMyEmployee(@PathVariable("email") String email) {
         //userService.getMyEmployee(email);
         System.out.println("email "+email);
+        System.out.println(userService.getMyEmployee(email));
         return  Result.ok().addData("data", userService.getMyEmployee(email));
     }
 

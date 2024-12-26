@@ -6,6 +6,7 @@ import org.example.dto.StoreDTO;
 import org.example.mapper.EnterpriseAdmin_StoreMapper;
 import org.example.result.Result;
 
+import org.example.vo.enterprise.StoreVo2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,9 +69,23 @@ public class StoreController {
 
 //        List<Store> storeList = enterpriseAdminStoreService.list(new QueryWrapper<Store>().eq("status", 0));
         List<Store> storeList = enterpriseAdminStoreService.list();
+        List<StoreVo2> storeVoList = new ArrayList<>();
+        for (Store store : storeList) {
+            StoreVo2 storeVo = new StoreVo2();
+            storeVo.setId(store.getId());
+            storeVo.setName(store.getName());
+            storeVo.setSize(store.getSize());
+            storeVo.setAddress(store.getAddress());
+            storeVo.setStatus(store.getStatus());
 
-       // System.out.println(storeList);
-        return Result.ok().addData("data", storeList);
+            // 获取每个门店对应的人数
+            Integer employeeCount = enterpriseAdminStoreMapper.getEmployeeCountByStoreId(store.getId());
+            storeVo.setEmployeeCount(employeeCount);
+
+            storeVoList.add(storeVo);
+        }
+        System.out.println(storeVoList);
+        return Result.ok().addData("data", storeVoList);
     }
 
 
