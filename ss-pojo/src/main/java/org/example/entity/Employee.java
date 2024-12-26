@@ -55,6 +55,14 @@ public class Employee extends Base implements Serializable {
      */
     private Integer age;
     /**
+     * 身份证号
+     */
+    private String idCard;
+    /**
+     * 地址
+     */
+    private String address;
+    /**
      * 工作日偏好（喜欢星期几工作1|3|4喜欢星期一、三、四工作），缺省为全部
      */
     private String workDayPreference;
