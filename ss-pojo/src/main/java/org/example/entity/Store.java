@@ -19,6 +19,8 @@ import java.math.BigDecimal;
 @TableName("store")
 public class Store extends Base implements Serializable {
     private static final long serialVersionUID = 1L;
+    // 对应数据库的 id 字段
+    private Long id;
 
     /**
      * 名称

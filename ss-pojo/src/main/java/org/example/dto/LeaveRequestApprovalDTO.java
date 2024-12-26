@@ -1,12 +1,15 @@
-package org.example.entity;
+package org.example.dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
-@TableName("leave_requests")
-public class leaveRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+public class LeaveRequestApprovalDTO {
     private int id;               // 请假记录ID，唯一标识
     private int employeeId;    // 员工ID，关联员工表 (使用String类型，若是数字类型则改为Integer)
     private String employeeName;
