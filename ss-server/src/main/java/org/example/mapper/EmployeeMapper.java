@@ -48,9 +48,9 @@ public interface EmployeeMapper {
 //            "#{holiday.state})")
 //    void saveHolidayRecord(HolidayDTO holiday);
 
-    @Insert("insert into leave_requests (employee_id, leave_type, start_time, end_time, reason, status)" +
+    @Insert("insert into leave_requests (employee_id, leave_type, start_time, end_time, reason, status, employee_name)" +
             " values (#{id}, #{type}, " +
             "#{startTime}, #{endTime}, #{notes}," +
-            "#{state})")
+            "#{state}, #{username})")
     void saveHolidayRecord(HolidayDTO holiday);
 }
