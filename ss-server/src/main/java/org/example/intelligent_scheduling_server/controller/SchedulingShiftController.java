@@ -80,13 +80,12 @@ public class SchedulingShiftController {
 
     /**
      * 员工查看自己的日排班
-     * @param  id
-     * @return
      */
     @GetMapping("/employee/Schedule")
     public Result getSchedule(@RequestParam Long id,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         List<List<DayShiftEmployeeVo>> list =  schedulingShiftService.getSchedule(id,date);
+        System.out.println(list.toString());
         return Result.ok().addData("data",list);
     }
 }

@@ -206,7 +206,6 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             try {
                 Date timeStart = sdf.parse(timeSlotStart);
                 Date timeEnd = sdf.parse(timeSlotEnd);
-
                 // 如果班次与时间段有重叠
                 if (!(shiftEnd.before(timeStart) || shiftStart.after(timeEnd))) {
                     // 计算开始时间和结束时间
