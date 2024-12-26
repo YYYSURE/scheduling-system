@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.entity.Employee;
 import org.example.entity.User;
+import org.example.mapper.EnterpriseAdmin_StoreMapper;
 import org.example.result.Result;
 import org.example.service.EnterpriseAdmin_ManageService;
 import org.example.utils.PageUtils;
@@ -26,6 +27,8 @@ import java.util.Map;
 public class ManageController {
     @Autowired
     private EnterpriseAdmin_ManageService userService;
+    @Autowired
+    private EnterpriseAdmin_StoreMapper enterpriseAdminStoreMapper;
 
     /**
      * 获取员工分页列表
@@ -74,7 +77,9 @@ public class ManageController {
         //userService.getMyEmployee(email);
         System.out.println("email "+email);
         System.out.println(userService.getMyEmployee(email));
-        return  Result.ok().addData("data", userService.getMyEmployee(email));
+        Employee employee = userService.getMyEmployee(email);
+        String myStoreName=enterpriseAdminStoreMapper.selectNameById(employee.getStoreId());
+        return  Result.ok().addData("data", employee).addData("myStoreName",myStoreName);
     }
 
 
