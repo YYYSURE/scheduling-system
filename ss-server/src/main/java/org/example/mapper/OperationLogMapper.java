@@ -4,13 +4,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.example.entity.Leave;
 import org.example.entity.OperationLog;
+import org.example.entity.leaveRequest;
 
 import java.util.List;
 
 @Mapper
-public interface OperationLogMapper extends BaseMapper<Leave> {
+public interface OperationLogMapper extends BaseMapper<leaveRequest> {
 
     @Select("SELECT * FROM operation_log")
     List<OperationLog> selectAllLogs();

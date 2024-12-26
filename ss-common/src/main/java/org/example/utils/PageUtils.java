@@ -22,6 +22,16 @@ import java.util.List;
 @NoArgsConstructor
 public class PageUtils implements Serializable {
 	private static final long serialVersionUID = 1L;
+	@Override
+	public String toString() {
+		return "PageUtils{" +
+				"totalCount=" + totalCount +
+				", pageSize=" + pageSize +
+				", totalPage=" + totalPage +
+				", currPage=" + currPage +
+				", list=" + list +
+				'}';
+	}
 	/**
 	 * 总记录数
 	 */

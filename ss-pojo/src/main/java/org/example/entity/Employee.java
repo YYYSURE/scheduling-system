@@ -25,10 +25,10 @@ public class Employee extends Base implements Serializable {
      * 电话
      */
     private String phone;
-    /**
-     * 邮箱
-     */
-    private String mail;
+//    /**
+//     * 邮箱
+//     */
+//    private String mail;
     /**
      * 门店id
      */
@@ -76,7 +76,7 @@ public class Employee extends Base implements Serializable {
         return "UserEntity{" +
                 "id=" + getId() +
                 ", phone='" + phone + '\'' +
-                ", mail='" + mail + '\'' +
+
                 ", storeId=" + storeId +
                 ", position_id=" + positionId +
                 ", username='" + username + '\'' +
