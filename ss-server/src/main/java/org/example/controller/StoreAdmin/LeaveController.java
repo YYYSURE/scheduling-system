@@ -31,6 +31,7 @@ public class LeaveController {
      */
     @GetMapping("/trans/{storeId}")
     public Result getUserLeaveNotes(@PathVariable("storeId") Long storeId) {
+        System.out.println("storeId:" + storeId);
         // 创建查询条件，获取属于指定 storeId 的 employee_id
         List<Long> employeeIds = userService.list(new QueryWrapper<Employee>()
                 .select("id") // 选择 employee 的 id
@@ -41,6 +42,7 @@ public class LeaveController {
         if (employeeIds.isEmpty()) {
             return Result.ok().addData("leaveList", Collections.emptyList());
         }
+        System.out.println(employeeIds);
 
         // 创建查询条件，查询 leave_request 表
         QueryWrapper<leaveRequest> wrapper = new QueryWrapper<>();
@@ -48,6 +50,7 @@ public class LeaveController {
 
         // 查询请假记录
         List<leaveRequest> leaveList = leaveService.list(wrapper);
+        System.out.println("leaveList: " + leaveList);
         // 将 employeeName 添加到每个请假记录中
         for (leaveRequest leave : leaveList) {
             String employeeName = userService.getNameById((long) leave.getEmployeeId()); // 获取对应的 username
