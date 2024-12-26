@@ -34,6 +34,7 @@ public class EnterpriseAdmin_ManageServiceImpl extends ServiceImpl<ManageMapper,
         System.out.println("Current Page: " + page.getCurrent());
         System.out.println("Page Size: " + page.getSize());
         System.out.println("record: " +page.getRecords());
+        System.out.println(page);
 
         return new PageUtils(page);
     }
