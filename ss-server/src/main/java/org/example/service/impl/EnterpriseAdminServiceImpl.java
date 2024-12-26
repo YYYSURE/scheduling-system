@@ -16,7 +16,10 @@ public class EnterpriseAdminServiceImpl extends ServiceImpl<EnterpriseAdminMappe
     @Autowired
     private EnterpriseAdminMapper enterpriseAdminMapper;
 
-
+    @Override
+    public  EnterpriseAdmin getByIdCard(String idCard) {
+        return enterpriseAdminMapper.getByIdCard(idCard);
+    }
 
 
     @Override

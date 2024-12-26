@@ -13,7 +13,8 @@ public interface EnterpriseAdminMapper extends BaseMapper<EnterpriseAdmin> {
 
     @Select("select * from admin where phone = #{phone}")
     EnterpriseAdmin getByUserPhone(String phone);
-
+    @Select("select * from admin where id_card = #{idCard}")
+    EnterpriseAdmin getByIdCard(String idCard);
 
 
     void updatePassword(String idCard, String password);

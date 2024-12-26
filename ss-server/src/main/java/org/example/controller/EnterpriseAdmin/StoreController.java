@@ -37,9 +37,11 @@ public class StoreController {
 //        Store store1=enterpriseAdminStoreService.getStoreByUserPhone(storeId);
 //        System.out.println(store1);
         Store store1=enterpriseAdminStoreService.getStoreById(storeId);
+        int employeeCount = enterpriseAdminStoreMapper.getEmployeeCountByStoreId(storeId);
 
 
-        return Result.ok().addData("data",store1);
+
+        return Result.ok().addData("data",store1).addData("employeeCount", employeeCount);
     }
 
     //add门店
@@ -66,6 +68,7 @@ public class StoreController {
 
 //        List<Store> storeList = enterpriseAdminStoreService.list(new QueryWrapper<Store>().eq("status", 0));
         List<Store> storeList = enterpriseAdminStoreService.list();
+
        // System.out.println(storeList);
         return Result.ok().addData("data", storeList);
     }

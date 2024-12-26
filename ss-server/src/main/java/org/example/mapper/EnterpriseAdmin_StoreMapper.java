@@ -15,4 +15,7 @@ public interface EnterpriseAdmin_StoreMapper extends BaseMapper<Store> {
     @Delete("DELETE FROM store WHERE id = #{storeId}")
     Boolean removeById(Long storeId);
 
+    @Select("SELECT COUNT(*) FROM employee WHERE store_id = #{storeId}")
+    Integer getEmployeeCountByStoreId(Long storeId);
+
 }
