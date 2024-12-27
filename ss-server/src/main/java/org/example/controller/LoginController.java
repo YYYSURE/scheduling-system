@@ -97,24 +97,24 @@ public class LoginController {
         }
 
         // TODO:
-//        EnterpriseAdmin enterpriseAdmin = enterpriseAdminService.getByIdCard();
-//        if (enterpriseAdmin != null) {
-//            if (enterpriseAdmin.getIdCard() != idCard) {
-//                return Result.error(ACCOUNT_ERROR);
-//            }
-//            // update password
-//            enterpriseAdminService.updatePassword(idCard, password);
-//            return Result.ok();
-//        }
-//        StoreAdmin storeAdmin = storeService.getByIdCard();
-//        if (storeAdmin != null) {
-//            if (storeAdmin.getIdCard() != idCard) {
-//                return Result.error(ACCOUNT_ERROR);
-//            }
-//            // update password
-//            storeAdminService.updatePassword(idCard, password);
-//            return Result.ok();
-//        }
+        EnterpriseAdmin enterpriseAdmin = enterpriseAdminService.getByIdCard(idCard);
+        if (enterpriseAdmin != null) {
+            if (enterpriseAdmin.getIdCard() != idCard) {
+                return Result.error(ACCOUNT_ERROR);
+            }
+            // update password
+            enterpriseAdminService.updatePassword(idCard, password);
+            return Result.ok();
+        }
+        StoreAdmin storeAdmin = storeAdminService.getByIdCard(idCard);
+        if (storeAdmin != null) {
+            if (storeAdmin.getIdCard() != idCard) {
+                return Result.error(ACCOUNT_ERROR);
+            }
+            // update password
+            storeAdminService.updatePassword(idCard, password);
+            return Result.ok();
+        }
 
         return Result.error(ACCOUNT_ERROR);
 
