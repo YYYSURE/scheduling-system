@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.entity.Employee;
 import org.example.mapper.ManageMapper;
@@ -25,16 +26,26 @@ public class EnterpriseAdmin_ManageServiceImpl extends ServiceImpl<ManageMapper,
     }
     @Override
     public PageUtils queryPage(Map<String, Object> params, QueryWrapper<Employee> wrapper) {
-        IPage<Employee> page = this.page(
-                new Query<Employee>().getPage(params),
-                wrapper
-        );
+        //System.out.println( "params: " + params);
+        // 手动解析分页参数
+        long current = Long.parseLong(params.getOrDefault("current", "1").toString());
+        long size = Long.parseLong(params.getOrDefault("size", "10").toString());
+
+        // 创建分页对象
+        Page<Employee> pageable = new Page<>(current, size);
+
+        // 执行分页查询
+        IPage<Employee> page = this.page(pageable, wrapper);
+//        IPage<Employee> page = this.page(
+//                new Query<Employee>().getPage(params),
+//                wrapper
+//        );
 // 添加日志输出以确认总记录数
-        System.out.println("Total Count from DB: " + page.getTotal());
-        System.out.println("Current Page: " + page.getCurrent());
-        System.out.println("Page Size: " + page.getSize());
-        System.out.println("record: " +page.getRecords());
-        System.out.println(page);
+//        System.out.println("Total Count from DB: " + page.getTotal());
+//        System.out.println("Current Page: " + page.getCurrent());
+//        System.out.println("Page Size: " + page.getSize());
+//        System.out.println("record: " +page.getRecords());
+//        System.out.println(page);
 
         return new PageUtils(page);
     }

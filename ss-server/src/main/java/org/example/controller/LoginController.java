@@ -3,8 +3,12 @@ package org.example.controller;
 import org.example.dto.Account;
 import org.example.dto.ResetDTO;
 import org.example.entity.Employee;
+import org.example.entity.EnterpriseAdmin;
+import org.example.entity.StoreAdmin;
 import org.example.result.Result;
 import org.example.service.EmployeeService;
+import org.example.service.EnterpriseAdminService;
+import org.example.service.StoreAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,7 +62,7 @@ public class LoginController {
 
         } else if (type == 3) {
             // 门店管理员
-            StoreAdmin storeAdmin  = StoreAdminService.login(account);
+            StoreAdmin storeAdmin  = storeAdminService.login(account);
 
             map.put("name", storeAdmin.getUsername());
             map.put("id", storeAdmin.getId());

@@ -6,6 +6,7 @@ import org.example.dto.StoreDTO;
 import org.example.mapper.EnterpriseAdmin_StoreMapper;
 import org.example.result.Result;
 
+import org.example.vo.enterprise.StoreVo2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +38,11 @@ public class StoreController {
 //        Store store1=enterpriseAdminStoreService.getStoreByUserPhone(storeId);
 //        System.out.println(store1);
         Store store1=enterpriseAdminStoreService.getStoreById(storeId);
+        int employeeCount = enterpriseAdminStoreMapper.getEmployeeCountByStoreId(storeId);
 
 
-        return Result.ok().addData("data",store1);
+
+        return Result.ok().addData("data",store1).addData("employeeCount", employeeCount);
     }
 
     //add门店
@@ -66,8 +69,24 @@ public class StoreController {
 
 //        List<Store> storeList = enterpriseAdminStoreService.list(new QueryWrapper<Store>().eq("status", 0));
         List<Store> storeList = enterpriseAdminStoreService.list();
-       // System.out.println(storeList);
-        return Result.ok().addData("data", storeList);
+        List<StoreVo2> storeVoList = new ArrayList<>();
+        for (Store store : storeList) {
+            StoreVo2 storeVo = new StoreVo2();
+            storeVo.setId(store.getId());
+            storeVo.setName(store.getName());
+            storeVo.setSize(store.getSize());
+            storeVo.setAddress(store.getAddress());
+            storeVo.setStatus(store.getStatus());
+
+            // 获取每个门店对应的人数
+            Integer employeeCount = enterpriseAdminStoreMapper.getEmployeeCountByStoreId(store.getId());
+            storeVo.setEmployeeCount(employeeCount);
+
+            storeVoList.add(storeVo);
+        }
+        System.out.println(storeVoList);
+        int count = storeVoList.size();
+        return Result.ok().addData("data", storeVoList).addData("count", count);
     }
 
 
@@ -96,8 +115,9 @@ public class StoreController {
         if (changeStore.getCreateTime() == null) {
             changeStore.setCreateTime(new Date());
         }
-        enterpriseAdminStoreService.saveOrUpdate(changeStore);
-        return Result.ok().addData("msg", "修改成功");
+        Boolean isUpdate = enterpriseAdminStoreService.saveOrUpdate(changeStore);
+        if (isUpdate)return Result.ok().addData("msg", "修改成功");
+        else return Result.error(400, "修改失败");
     }
 
 }

@@ -23,6 +23,13 @@ public class EnterpriseAdmin_StoreServiceImpl extends ServiceImpl<EnterpriseAdmi
     private EnterpriseAdmin_StoreMapper enterpriseAdmin_StoreMapper;
     @Autowired
     private EnterpriseAdminMapper enterpriseAdminMapper;
+
+
+
+    @Override
+    public int getEmployeeCountByStoreId(Long storeId) {
+        return enterpriseAdmin_StoreMapper.getEmployeeCountByStoreId(storeId);
+    }
     @Override
     public PageUtils queryPage(Map<String, Object> params, QueryWrapper<Store> wrapper) {
         IPage<Store> page = this.page(
