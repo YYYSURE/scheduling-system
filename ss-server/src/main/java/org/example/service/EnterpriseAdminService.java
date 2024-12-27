@@ -10,5 +10,6 @@ public interface EnterpriseAdminService extends IService<EnterpriseAdmin> {
 
     EnterpriseAdmin login(Account account);
 
-
+    EnterpriseAdmin getByIdCard(String idCard);
+    int updatePasswordByIdCard(String idCard, String password);
 }

@@ -1,26 +1,19 @@
-package org.example.entity;
-
-import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
+package org.example.vo.enterprise;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * 用户表
- *
- * @author dam
- * @email 1782067308@qq.com
- * @date 2023-02-06 15:50:29
- */
+import static com.baomidou.mybatisplus.core.toolkit.IdWorker.getId;
+
 @Data
-@TableName("employee")
-public class Employee extends Base implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmployeeVo {
     private static final long serialVersionUID = 1L;
-
+    private Long id;
     /**
      * 电话
      */
@@ -41,6 +34,10 @@ public class Employee extends Base implements Serializable {
     /**
      * 用户名
      */
+    private String positionName;
+    /**
+     * 用户名
+     */
     private String username;
     /**
      * 密码
@@ -54,14 +51,8 @@ public class Employee extends Base implements Serializable {
      * 年龄
      */
     private Integer age;
-    /**
-     * 身份证号
-     */
-    private String idCard;
-    /**
-     * 地址
-     */
-    private String address;
+
+
     /**
      * 工作日偏好（喜欢星期几工作1|3|4喜欢星期一、三、四工作），缺省为全部
      */
@@ -78,25 +69,33 @@ public class Employee extends Base implements Serializable {
      * 每周班次时长偏好
      */
     private String shiftLengthPreferenceOneWeek;
-
+    /**
+     * 身份证号
+     */
+    private String idCard;
+    /**
+     * 地址
+     */
+    private String address;
     @Override
     public String toString() {
-        return "UserEntity{" +
-                "id=" + getId() +
-                ", phone='" + phone + '\'' +
-
+        return "EmployeeVo{" +
+                "id=" + id +
+                "phone='" + phone + '\'' +
                 ", storeId=" + storeId +
-                ", position_id=" + positionId +
+                ", positionId=" + positionId +
+                ", positionName='" + positionName + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", gender=" + gender +
                 ", age=" + age +
                 ", workDayPreference='" + workDayPreference + '\'' +
                 ", workTimePreference='" + workTimePreference + '\'' +
-                ", shiftLengthPreference=" + shiftLengthPreferenceOneDay +
-                ", shiftLengthPreferenceOneWeek=" + shiftLengthPreferenceOneWeek +
-                ", idCard=" + idCard +
-                ", address=" + address +
+                ", shiftLengthPreferenceOneDay='" + shiftLengthPreferenceOneDay + '\'' +
+                ", shiftLengthPreferenceOneWeek='" + shiftLengthPreferenceOneWeek + '\'' +
+                ", idCard='" + idCard + '\'' +
+                ", address='" + address + '\'' +
                 '}';
     }
+
 }

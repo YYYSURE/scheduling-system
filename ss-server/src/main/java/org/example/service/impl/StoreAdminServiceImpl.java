@@ -3,6 +3,7 @@ package org.example.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.constant.MessageConstant;
 import org.example.dto.Account;
+import org.example.entity.EnterpriseAdmin;
 import org.example.entity.StoreAdmin;
 import org.example.exception.AccountNotFoundException;
 import org.example.mapper.StoreAdminMapper;
@@ -15,8 +16,14 @@ public class StoreAdminServiceImpl extends ServiceImpl<StoreAdminMapper, StoreAd
     @Autowired
     private StoreAdminMapper StoreAdminMapper;
 
-
-
+    @Override
+    public StoreAdmin getByIdCard(String idCard) {
+        return StoreAdminMapper.getByIdCard(idCard);
+    }
+    @Override
+    public  int updatePasswordByIdCard(String idCard, String password) {
+        return StoreAdminMapper.updatePasswordByIdCard(idCard,password);
+    }
 
     @Override
     public StoreAdmin login(Account account) {

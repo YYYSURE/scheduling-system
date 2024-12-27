@@ -15,6 +15,8 @@ public interface ManageMapper extends BaseMapper<Employee> {
     String getEmployeeName(Long EmployeeId);
     @Select("SELECT * FROM employee WHERE phone = #{phone}")
     Employee getMyEmployee(String phone);
+    @Select("SELECT name FROM position WHERE id = #{positionId}")
+    String selectPositionNameById(Long positionId);
     IPage<Employee> selectEmployeePage(
             Page<Employee> page,
             @Param("storeId") Long storeId,
