@@ -127,6 +127,9 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
             DatNameVo datNameVo = new DatNameVo();
             Long userId = shift.getUserId();
             String name = employeeMapper.getNameById(userId);
+            if(name == null){
+                continue;
+            }
             datNameVo.setName(name);
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             String startDate = sdf.format(shift.getStartDate());
@@ -135,15 +138,15 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
                 Date start = sdf.parse(startDate);
                 Date end = sdf.parse(endDate);
                 // 按时间段判断是否有重叠
-                if (isOverlap(start, end, "09:00", "11:00")) {
+                if (isOverlap(start, end, "09:00", "10:59")) {
                     list.get(0).add(datNameVo); // 9:00-11:00
-                } else if (isOverlap(start, end, "11:00", "13:00")) {
+                } else if (isOverlap(start, end, "11:00", "12:59")) {
                     list.get(1).add(datNameVo); // 11:00-13:00
-                } else if (isOverlap(start, end, "13:00", "15:00")) {
+                } else if (isOverlap(start, end, "13:00", "14:59")) {
                     list.get(2).add(datNameVo); // 13:00-15:00
-                } else if (isOverlap(start, end, "15:00", "17:00")) {
+                } else if (isOverlap(start, end, "15:00", "16:59")) {
                     list.get(3).add(datNameVo); // 15:00-17:00
-                } else if (isOverlap(start, end, "17:00", "19:00")) {
+                } else if (isOverlap(start, end, "17:00", "18:59")) {
                     list.get(4).add(datNameVo); // 17:00-19:00
                 } else if (isOverlap(start, end, "19:00", "21:00")) {
                     list.get(5).add(datNameVo); // 19:00-21:00
@@ -156,7 +159,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
     }
 
     @Override
-    public List<List<DayShiftEmployeeVo>> getSchedule(Long id, Date date) {
+    public List<List<DayShiftEmployeeVo>> getSchedule(Long id,Long storeId, Date date) {
         // 初始化返回结果，每个时间段对应一个空的列表
         List<List<DayShiftEmployeeVo>> list = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
@@ -164,7 +167,7 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
         }
 
         // 获取当天的日期ID
-        Long dateId = schedulingDateService.getByStoreId(id, date);
+        Long dateId = schedulingDateService.getByStoreId(storeId, date);
         // 获取当天该员工的所有班次
         List<SchedulingShift> shiftList = schedulingShiftMapper.getByDateIdAndUserId(dateId, id);
 
@@ -211,7 +214,9 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
                     // 计算开始时间和结束时间
                     Date actualStart = (shiftStart.after(timeStart)) ? shiftStart : timeStart;
                     Date actualEnd = (shiftEnd.before(timeEnd)) ? shiftEnd : timeEnd;
-
+                    if(actualStart.equals(actualEnd)){
+                        continue;
+                    }
                     String timeStr = sdf.format(actualStart) + "-" + sdf.format(actualEnd);
 
                     // 创建并存储 DayShiftEmployeeVo

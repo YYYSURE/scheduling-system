@@ -9,6 +9,7 @@ import org.example.utils.DateUtil;
 import org.example.utils.JwtUtil;
 import org.example.utils.PageUtils;
 import org.example.vo.scheduling_calculate_service.AvailableVo;
+import org.example.vo.scheduling_calculate_service.DatNameVo;
 import org.example.vo.scheduling_calculate_service.DayShiftEmployeeVo;
 import org.example.vo.scheduling_calculate_service.DayShiftVo;
 import org.example.vo.shiftScheduling.GanttShiftVo;
@@ -44,8 +45,9 @@ public class SchedulingShiftController {
     @GetMapping("/schedule")
     public Result getDayData(@RequestParam Long storeId,
                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        System.out.println("-------------");
-        return Result.ok().addData("date",schedulingShiftService.getDayData(storeId,date));
+        List<List<DatNameVo>> data = schedulingShiftService.getDayData(storeId, date);
+        System.out.println(data);
+        return Result.ok().addData("data",data);
     }
 
     /**
@@ -83,8 +85,9 @@ public class SchedulingShiftController {
      */
     @GetMapping("/employee/Schedule")
     public Result getSchedule(@RequestParam Long id,
+                              @RequestParam Long storeId,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        List<List<DayShiftEmployeeVo>> list =  schedulingShiftService.getSchedule(id,date);
+        List<List<DayShiftEmployeeVo>> list =  schedulingShiftService.getSchedule(id,storeId,date);
         System.out.println(list.toString());
         return Result.ok().addData("data",list);
     }

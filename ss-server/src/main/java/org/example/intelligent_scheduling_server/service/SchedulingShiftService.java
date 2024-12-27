@@ -33,6 +33,6 @@ public interface SchedulingShiftService extends IService<SchedulingShift> {
 
     List<List<DatNameVo>> getDayData(Long storeId, Date date);
 
-    List<List<DayShiftEmployeeVo>> getSchedule(Long id, Date date);
+    List<List<DayShiftEmployeeVo>> getSchedule(Long id, Long storeId,Date date);
 }
 
