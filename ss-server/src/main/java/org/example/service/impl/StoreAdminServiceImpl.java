@@ -20,7 +20,10 @@ public class StoreAdminServiceImpl extends ServiceImpl<StoreAdminMapper, StoreAd
     public StoreAdmin getByIdCard(String idCard) {
         return StoreAdminMapper.getByIdCard(idCard);
     }
-
+    @Override
+    public  int updatePasswordByIdCard(String idCard, String password) {
+        return StoreAdminMapper.updatePasswordByIdCard(idCard,password);
+    }
 
     @Override
     public StoreAdmin login(Account account) {

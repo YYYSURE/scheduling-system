@@ -10,6 +10,7 @@ public interface StoreAdminService extends IService<StoreAdmin> {
 
     StoreAdmin login(Account account);
     StoreAdmin getByIdCard(String idCard);
+    int updatePasswordByIdCard(String idCard, String password);
 
 
 }
