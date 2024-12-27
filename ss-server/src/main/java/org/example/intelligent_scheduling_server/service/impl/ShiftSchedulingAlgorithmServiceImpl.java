@@ -71,14 +71,14 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      * @param isSendMessage         是否发送消息给客户端通知客户端计算完成
      */
     @Override
-    public void caculate(List<DateVo> dateVoList,Instance instance, Long storeId, Boolean isSendMessage,SchedulingTask schedulingTask) throws SSSException {
+    public Long caculate(List<DateVo> dateVoList,Instance instance, Long storeId, Boolean isSendMessage,SchedulingTask schedulingTask) throws SSSException {
         try {
             Solution solution = new IntelligentSchedulingPureAlgo().solve(instance);
-            this.saveSolutionToDatabase(dateVoList,storeId,instance, solution,schedulingTask);
+            return this.saveSolutionToDatabase(dateVoList,storeId,instance, solution,schedulingTask);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //TODO 发送消息给前端
+        return (long) 0;
     }
 
     /**
@@ -121,7 +121,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
      */
     @Override
     @Transactional
-    public void saveSolutionToDatabase(List<DateVo> dateVoList,Long storeId, Instance instance, Solution solution,SchedulingTask schedulingTask) {
+    public Long saveSolutionToDatabase(List<DateVo> dateVoList,Long storeId, Instance instance, Solution solution,SchedulingTask schedulingTask) {
 
         Employee[] employees = instance.getEmployees();
         List<String> staffIdList = new ArrayList<>();//员工编号
@@ -185,6 +185,7 @@ public class ShiftSchedulingAlgorithmServiceImpl implements ShiftSchedulingAlgor
             schedulingShiftEntity.setSchedulingDateId(dateEntityList.get(Integer.parseInt(schedulingShiftEntity.getSchedulingDateId().toString())).getId());
         }
         schedulingShiftService.saveBatch(unAssignedShiftEntityList);
+        return schedulingTask.getId();
     }
 
     /**

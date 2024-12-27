@@ -76,6 +76,8 @@ public class EnterpriseAdmin extends Base implements Serializable {
      */
     private Integer type;
 
+    private String idCard;
+
     @Override
     public String toString() {
         return "Admin{" +

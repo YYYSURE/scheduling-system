@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface ShiftSchedulingAlgorithmService {
-    public void caculate(List<DateVo> dateVoList,Instance instance, Long storeId, Boolean isSendMessage,SchedulingTask schedulingTask) throws SSSException;
+    public Long caculate(List<DateVo> dateVoList,Instance instance, Long storeId, Boolean isSendMessage,SchedulingTask schedulingTask) throws SSSException;
 
 
-    public void saveSolutionToDatabase(List<DateVo> dateVoList,Long storeId, Instance instance, Solution solution,SchedulingTask schedulingTask) throws SSSException;
+    public Long saveSolutionToDatabase(List<DateVo> dateVoList,Long storeId, Instance instance, Solution solution,SchedulingTask schedulingTask) throws SSSException;
 
     /**
      * 判断vo是否有效

@@ -103,7 +103,7 @@ public class LoginController {
                 return Result.error(ACCOUNT_ERROR);
             }
             // update password
-            enterpriseAdminService.updatePassword(idCard, password);
+            enterpriseAdminService.updatePasswordByIdCard(idCard, password);
             return Result.ok();
         }
         StoreAdmin storeAdmin = storeAdminService.getByIdCard(idCard);
@@ -112,7 +112,7 @@ public class LoginController {
                 return Result.error(ACCOUNT_ERROR);
             }
             // update password
-            storeAdminService.updatePassword(idCard, password);
+            storeAdminService.updatePasswordByIdCard(idCard, password);
             return Result.ok();
         }
 

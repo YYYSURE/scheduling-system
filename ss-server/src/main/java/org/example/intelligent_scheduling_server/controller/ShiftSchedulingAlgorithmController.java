@@ -18,7 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@RequestMapping("/scheduling/calculate")
+@RequestMapping
 @RestController
 public class ShiftSchedulingAlgorithmController {
 
@@ -37,10 +37,10 @@ public class ShiftSchedulingAlgorithmController {
     *
     * @throws SSSException
      */
-    @PostMapping("/solve")
+    @GetMapping("/generateWeeklySchedule")
     //重新计算，影响日历和班次
     public Result solve(@RequestParam Long storeId,
-                        @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") Date beginDate) throws SSSException {
+                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date beginDate) throws SSSException {
         Date endDate = dayParse(beginDate,6);
         SchedulingTask schedulingTask = new SchedulingTask();
         schedulingTask.setStoreId(storeId);
@@ -49,14 +49,15 @@ public class ShiftSchedulingAlgorithmController {
         schedulingTask.setIsPublish(0);
         List<DateVo> dateVoList = storeFlowService.getFlowByTime(storeId,beginDate,endDate);
         Instance instance = algorithmService.buildInstance(dateVoList,storeId,beginDate,endDate,schedulingTask);
-        algorithmService.caculate(dateVoList,instance, storeId, true,schedulingTask);
+        Long taskId =  algorithmService.caculate(dateVoList,instance, storeId, true,schedulingTask);
         List<List<DayShiftVo>> list = new ArrayList<>();
         for(int i = 0;i < 7;i++){
-            Date end = dayParse(endDate,i);
+            Date end = dayParse(beginDate,i);
             List<DayShiftVo> dayShiftVoList = schedulingShiftService.getDayShiftList(storeId,end);
             list.add(dayShiftVoList);
         }
-        return Result.ok().addData("data",list);
+
+        return Result.ok().addData("data",list).addData("id",taskId);
     }
 
     private Date dayParse(Date begin,int d){
