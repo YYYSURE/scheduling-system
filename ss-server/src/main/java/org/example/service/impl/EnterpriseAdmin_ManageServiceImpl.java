@@ -26,7 +26,7 @@ public class EnterpriseAdmin_ManageServiceImpl extends ServiceImpl<ManageMapper,
     }
     @Override
     public PageUtils queryPage(Map<String, Object> params, QueryWrapper<Employee> wrapper) {
-        System.out.println( "params: " + params);
+        //System.out.println( "params: " + params);
         // 手动解析分页参数
         long current = Long.parseLong(params.getOrDefault("current", "1").toString());
         long size = Long.parseLong(params.getOrDefault("size", "10").toString());
@@ -41,11 +41,11 @@ public class EnterpriseAdmin_ManageServiceImpl extends ServiceImpl<ManageMapper,
 //                wrapper
 //        );
 // 添加日志输出以确认总记录数
-        System.out.println("Total Count from DB: " + page.getTotal());
-        System.out.println("Current Page: " + page.getCurrent());
-        System.out.println("Page Size: " + page.getSize());
-        System.out.println("record: " +page.getRecords());
-        System.out.println(page);
+//        System.out.println("Total Count from DB: " + page.getTotal());
+//        System.out.println("Current Page: " + page.getCurrent());
+//        System.out.println("Page Size: " + page.getSize());
+//        System.out.println("record: " +page.getRecords());
+//        System.out.println(page);
 
         return new PageUtils(page);
     }

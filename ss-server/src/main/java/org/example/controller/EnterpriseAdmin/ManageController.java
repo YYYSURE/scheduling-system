@@ -6,18 +6,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.entity.Employee;
 import org.example.entity.User;
 import org.example.mapper.EnterpriseAdmin_StoreMapper;
+import org.example.mapper.ManageMapper;
 import org.example.result.Result;
 import org.example.service.EnterpriseAdmin_ManageService;
 import org.example.utils.PageUtils;
 import org.example.vo.employee.EmployeeInfoVo;
+import org.example.vo.enterprise.EmployeeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 人员管理控制器
@@ -27,6 +27,8 @@ import java.util.Map;
 public class ManageController {
     @Autowired
     private EnterpriseAdmin_ManageService userService;
+    @Autowired
+    private ManageMapper manageMapper;
     @Autowired
     private EnterpriseAdmin_StoreMapper enterpriseAdminStoreMapper;
 
@@ -55,23 +57,41 @@ public class ManageController {
         if (input != null && !input.isEmpty()) {
             wrapper.like("username", input); // 替换为实际的列名
         }
-
         // 创建参数 Map
         Map<String, Object> params = new HashMap<>();
         params.put("current", currentPage);
         params.put("size", pageSize);
 
-//        // 从服务层获取分页信息
-//        System.out.println("params "+params);
-//        System.out.println("wrapper "+wrapper);
         PageUtils pageUtils = userService.queryPage(params, wrapper);
-        System.out.println("pageUtils"+pageUtils.toString());
-//        pageUtils.setTotalPage(10);
-//        pageUtils.setTotalCount(80);
+        System.out.println("pageUtils: " + pageUtils);
+
+        // 获取员工列表
+        // 获取员工列表并转换为 EmployeeVo 列表
+        List<Employee> employeeList = (List<Employee>) pageUtils.getList();
+        System.out.println("employeeList: " + employeeList);
+        List<EmployeeVo> employees = new ArrayList<>();
+        for (Employee employee : employeeList) {
+            EmployeeVo employeeVo = convertToEmployeeVo(employee);
+            employees.add(employeeVo);
+        }
+
+        // 为每个员工添加 position_name
+        for (EmployeeVo employeeVo : employees) {
+            Long positionId = employeeVo.getPositionId();
+            if (positionId != null) {
+                String positionName = manageMapper.selectPositionNameById(positionId);
+                employeeVo.setPositionName(positionName);// 假设 EmployeeVo 类中有 setPositionName 方法
+            }
+        }
+        System.out.println("employees: " + employees);
+
+        // 将转换后的 EmployeeVo 列表设置回 pageUtils
+        pageUtils.setList(employees);
+
         return Result.ok().addData("data", pageUtils);
-    }/**
-     * 获取当前员工信息
-     */
+    }
+
+
     @GetMapping("/myEmployee/{email}")
     public Result getMyEmployee(@PathVariable("email") String email) {
         //userService.getMyEmployee(email);
@@ -79,7 +99,11 @@ public class ManageController {
         System.out.println(userService.getMyEmployee(email));
         Employee employee = userService.getMyEmployee(email);
         String myStoreName=enterpriseAdminStoreMapper.selectNameById(employee.getStoreId());
-        return  Result.ok().addData("data", employee).addData("myStoreName",myStoreName);
+        String positonName=manageMapper.selectPositionNameById(employee.getPositionId());
+        System.out.println("employee"+employee);
+        System.out.println("myStoreName"+myStoreName);
+
+        return  Result.ok().addData("data", employee).addData("myStoreName",myStoreName).addData("posts",positonName);
     }
 
 
@@ -93,9 +117,11 @@ public class ManageController {
         if (changeEmployee.getCreateTime() == null) {
             changeEmployee.setCreateTime(new Date());
         }
-        userService.saveOrUpdate(changeEmployee);
+        Boolean isUpdate = userService.saveOrUpdate(changeEmployee);
         System.out.println("user 123 "+changeEmployee);
-        return Result.ok();
+        System.out.println("isUpdate "+isUpdate);
+        if(isUpdate)return Result.ok().addData("msg", "修改成功");
+        else return Result.error(400, "修改失败");
     }
 
     /**
@@ -127,5 +153,28 @@ public class ManageController {
 
     }
 
+    public static EmployeeVo convertToEmployeeVo(Employee employee) {
+        EmployeeVo employeeVo = new EmployeeVo();
+        // 假设 Employee 和 EmployeeVo 的字段基本一致，这里进行一一赋值
+        employeeVo.setId(employee.getId());
+        employeeVo.setPhone(employee.getPhone());
+        employeeVo.setUsername(employee.getUsername());
+        employeeVo.setPositionId(employee.getPositionId());
+
+        // 添加其他需要设置的字段
+        employeeVo.setStoreId(employee.getStoreId());
+        employeeVo.setAddress(employee.getAddress());
+        employeeVo.setIdCard(employee.getIdCard());
+        employeeVo.setUsername(employee.getUsername());
+        employeeVo.setPassword(employee.getPassword());
+        employeeVo.setGender(employee.getGender());
+        employeeVo.setAge(employee.getAge());
+        employeeVo.setWorkDayPreference(employee.getWorkDayPreference());
+        employeeVo.setWorkTimePreference(employee.getWorkTimePreference());
+        employeeVo.setShiftLengthPreferenceOneDay(employee.getShiftLengthPreferenceOneDay());
+        employeeVo.setShiftLengthPreferenceOneWeek(employee.getShiftLengthPreferenceOneWeek());
+
+        return employeeVo;
+    }
 
 }

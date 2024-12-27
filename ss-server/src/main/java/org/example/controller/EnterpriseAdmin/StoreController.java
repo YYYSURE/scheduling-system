@@ -85,7 +85,8 @@ public class StoreController {
             storeVoList.add(storeVo);
         }
         System.out.println(storeVoList);
-        return Result.ok().addData("data", storeVoList);
+        int count = storeVoList.size();
+        return Result.ok().addData("data", storeVoList).addData("count", count);
     }
 
 
@@ -114,8 +115,9 @@ public class StoreController {
         if (changeStore.getCreateTime() == null) {
             changeStore.setCreateTime(new Date());
         }
-        enterpriseAdminStoreService.saveOrUpdate(changeStore);
-        return Result.ok().addData("msg", "修改成功");
+        Boolean isUpdate = enterpriseAdminStoreService.saveOrUpdate(changeStore);
+        if (isUpdate)return Result.ok().addData("msg", "修改成功");
+        else return Result.error(400, "修改失败");
     }
 
 }

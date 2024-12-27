@@ -95,6 +95,8 @@ public class Employee extends Base implements Serializable {
                 ", workTimePreference='" + workTimePreference + '\'' +
                 ", shiftLengthPreference=" + shiftLengthPreferenceOneDay +
                 ", shiftLengthPreferenceOneWeek=" + shiftLengthPreferenceOneWeek +
+                ", idCard=" + idCard +
+                ", address=" + address +
                 '}';
     }
 }
