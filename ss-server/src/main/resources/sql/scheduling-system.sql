@@ -1,26 +1,19 @@
-drop database scheduling_system;
-
-create database scheduling_system;
-
-create table if not exists scheduling_system.admin
+create table admin
 (
     id          int auto_increment
         primary key,
     create_time datetime default CURRENT_TIMESTAMP not null,
     update_time datetime default CURRENT_TIMESTAMP not null invisible,
-    name        varchar(50)                        not null,
     phone       varchar(11)                        not null,
     store_id    int                                null,
     username    varchar(30)                        null,
     password    varchar(255)                       not null,
     gender      tinyint  default 0                 null,
     age         int                                null,
-    type        tinyint                            not null,
-    id_card     varchar(255)                       not null
-
+    type        tinyint                            not null
 );
 
-create table if not exists scheduling_system.employee
+create table employee
 (
     id                               bigint auto_increment comment '主键'
         primary key,
@@ -37,12 +30,14 @@ create table if not exists scheduling_system.employee
     work_day_preference              varchar(20)                        null comment '工作日偏好（喜欢星期几工作1|3|4喜欢星期一、三、四工作），缺省为全部 ',
     work_time_preference             varchar(256)                       null comment '工作时间偏好（1:00~3.00|5.00~8.00|17.00~21.00），缺省为全部） ',
     shift_length_preference_one_day  varchar(20)                        null comment '每天班次时长偏好',
-    shift_length_preference_one_week varchar(20)                        null comment '每周班次时长偏好'
+    shift_length_preference_one_week varchar(20)                        null comment '每周班次时长偏好',
+    address                          varchar(20)                        null,
+    id_card                          varchar(20)                        null
 )
     comment '用户表' collate = utf8mb4_bin
                      row_format = DYNAMIC;
 
-create table if not exists scheduling_system.festival
+create table festival
 (
     id          bigint auto_increment comment '主键'
         primary key,
@@ -58,22 +53,23 @@ create table if not exists scheduling_system.festival
     comment '门店节日表' collate = utf8mb4_bin
                          row_format = DYNAMIC;
 
-create table if not exists scheduling_system.leave_requests
+create table leave_requests
 (
-    id           int auto_increment
+    id            int auto_increment
         primary key,
-    employee_id  int          not null,
-    leave_type   varchar(30)  not null comment '事假,病假,调休',
-    start_time   varchar(30)  null comment '开始时间,格式2024-06-01 09:00:00',
-    end_time     varchar(30)  null comment '结束时间,格式2024-06-01 09:00:00',
-    reason       varchar(500) null,
-    status       int          null comment '0 待审批,1已审批,2已驳回',
-    apply_time   varchar(100) null comment '申请时间',
-    approve_time varchar(100) null comment '审批时间',
-    admin_id     int          null
+    employee_id   int          not null,
+    employee_name varchar(30)  null,
+    leave_type    varchar(30)  not null comment '事假,病假,调休',
+    start_time    varchar(30)  null comment '开始时间,格式2024-06-01 09:00:00',
+    end_time      varchar(30)  null comment '结束时间,格式2024-06-01 09:00:00',
+    reason        varchar(500) null,
+    status        int          null comment '0 待审批,1已审批,2已驳回',
+    apply_time    varchar(100) null comment '申请时间',
+    approve_time  varchar(100) null comment '审批时间',
+    admin_id      int          null
 );
 
-create table if not exists scheduling_system.login_log
+create table login_log
 (
     id          bigint auto_increment comment '主键'
         primary key,
@@ -86,7 +82,7 @@ create table if not exists scheduling_system.login_log
     comment '登录日志表' charset = utf8mb3
                          row_format = DYNAMIC;
 
-create table if not exists scheduling_system.message
+create table message
 (
     id             bigint auto_increment comment '主键'
         primary key,
@@ -103,7 +99,7 @@ create table if not exists scheduling_system.message
     comment '通知表' collate = utf8mb4_bin
                      row_format = DYNAMIC;
 
-create table if not exists scheduling_system.operation_log
+create table operation_log
 (
     id            bigint auto_increment comment '主键'
         primary key,
@@ -119,7 +115,7 @@ create table if not exists scheduling_system.operation_log
     comment '操作日志表' collate = utf8mb4_bin
                          row_format = DYNAMIC;
 
-create table if not exists scheduling_system.position
+create table position
 (
     id          bigint auto_increment comment '主键'
         primary key,
@@ -132,7 +128,7 @@ create table if not exists scheduling_system.position
     comment '职位表' charset = utf8mb3
                      row_format = DYNAMIC;
 
-create table if not exists scheduling_system.scheduling_date
+create table scheduling_date
 (
     id              bigint auto_increment comment '主键ID'
         primary key,
@@ -148,7 +144,7 @@ create table if not exists scheduling_system.scheduling_date
 )
     comment '排班日期表' charset = utf8mb3;
 
-create table if not exists scheduling_system.scheduling_rule
+create table scheduling_rule
 (
     id                           bigint auto_increment comment '主键'
         primary key,
@@ -176,7 +172,7 @@ create table if not exists scheduling_system.scheduling_rule
     comment '排班规则表' charset = utf8mb3
                          row_format = DYNAMIC;
 
-create table if not exists scheduling_system.scheduling_shift
+create table scheduling_shift
 (
     id                 bigint auto_increment comment '主键'
         primary key,
@@ -196,7 +192,7 @@ create table if not exists scheduling_system.scheduling_shift
     comment '排班班次表' charset = utf8mb3
                          row_format = DYNAMIC;
 
-create table if not exists scheduling_system.scheduling_task
+create table scheduling_task
 (
     id                 bigint auto_increment comment '主键'
         primary key,
@@ -212,9 +208,9 @@ create table if not exists scheduling_system.scheduling_task
                          row_format = DYNAMIC;
 
 create index storeId
-    on scheduling_system.scheduling_task (store_id);
+    on scheduling_task (store_id);
 
-create table if not exists scheduling_system.shift_user
+create table shift_user
 (
     id          bigint auto_increment comment '主键'
         primary key,
@@ -229,12 +225,12 @@ create table if not exists scheduling_system.shift_user
                               row_format = DYNAMIC;
 
 create index shiftId
-    on scheduling_system.shift_user (shift_id);
+    on shift_user (shift_id);
 
 create index userId
-    on scheduling_system.shift_user (user_id);
+    on shift_user (user_id);
 
-create table if not exists scheduling_system.store
+create table store
 (
     id          bigint auto_increment comment '主键',
     create_time datetime default CURRENT_TIMESTAMP not null comment '创建时间',
@@ -251,20 +247,20 @@ create table if not exists scheduling_system.store
     comment '门店表' charset = utf8mb3
                      row_format = DYNAMIC;
 
-create table if not exists scheduling_system.store_flow
+create table store_flow
 (
     id          bigint auto_increment
         primary key,
-    store_id    int                                not null,
-    year        int                                not null,
-    month       int                                not null,
+    store_id    int      default 1                 not null,
+    year        int      default 2025              not null,
+    month       int      default 1                 not null,
     day         int                                not null,
-    flow        varchar(10000)                     not null,
+    flow        varchar(10000)                     null,
     create_time datetime default CURRENT_TIMESTAMP not null,
     update_time datetime default CURRENT_TIMESTAMP not null
 );
 
-create table if not exists scheduling_system.system_scheduled_notice
+create table system_scheduled_notice
 (
     id                  bigint auto_increment comment '主键'
         primary key,
@@ -279,7 +275,7 @@ create table if not exists scheduling_system.system_scheduled_notice
     comment '系统定时通知' collate = utf8mb4_bin
                            row_format = DYNAMIC;
 
-create table if not exists scheduling_system.user_message
+create table user_message
 (
     id          bigint auto_increment comment '主键'
         primary key,
@@ -292,93 +288,100 @@ create table if not exists scheduling_system.user_message
     comment '用户-消息中间表' collate = utf8mb4_bin
                               row_format = DYNAMIC;
 
+INSERT INTO scheduling_system.admin (create_time, phone, store_id, username, password, gender, age, type) VALUES ('2024-12-26 19:06:37', '4567891230', 1, '张三', '123456', 0, null, 0);
+INSERT INTO scheduling_system.admin (create_time, phone, store_id, username, password, gender, age, type) VALUES ('2024-12-26 19:28:16', '1237894560', null, '李四', '123456', 0, null, 1);
 
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '269', '郗淑', '123456', 0, 60, '1|3|4|5|6|7', '10:00~12:00|17:00~20:20', '8:30', '46:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '270', '柳之', '123456', 0, 22, '1|2|3|4|5|6|7', '09:20~12:40|16:20~19:40', '8:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '275', '夏侯之', '123456', 0, 25, '1|3|5|6|7', '09:40~11:50|14:20~17:30|17:50~20:40', '10:0', '48:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '273', '吉滢', '123456', 0, 30, '1|2|3|4|5', '12:50~15:10|16:10~18:30|18:50~22:40', '9:0', '43:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '273', '独孤杰', '123456', 0, 24, '2|4|5|6|7', '15:10~19:00|19:00~21:40', '8:30', '42:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '274', '蒙飘', '123456', 0, 44, '1|2|4|5|6', '14:50~17:10|18:50~22:40', '9:0', '46:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '274', '卫柔', '123456', 0, 58, '1|4|5|6|7', '08:30~11:50|14:50~18:20|18:50~21:20', '9:30', '47:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:59:13', 0, '12345678900', 1, '276', '白育', '123456', 0, 55, '1|2|3|4|5|6|7', '10:00~12:00|17:10~19:10', '10:0', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678908', 1, '274', '张伟', '123456', 0, 30, '1|2|3|4|5|6|7', '09:00~11:00|14:00~17:00', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678909', 1, '274', '王芳', '123456', 1, 28, '1|3|5', '08:30~11:30|16:00~18:30', '7:00', '38:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678910', 1, '274', '李明', '123456', 0, 35, '2|4|6', '10:00~12:30|17:00~20:00', '8:00', '42:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678911', 1, '274', '赵莉', '123456', 1, 26, '1|5|7', '09:30~12:00|14:00~17:00', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678912', 1, '274', '孙强', '123456', 0, 40, '2|3|4', '08:00~10:00|15:00~18:00', '8:30', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678913', 1, '274', '周艳', '123456', 1, 32, '1|2|6', '10:00~12:00|14:30~18:00', '7:00', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678914', 1, '274', '吴刚', '123456', 0, 38, '3|5|7', '08:30~11:00|13:00~15:30', '8:00', '42:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678915', 1, '274', '郑慧', '123456', 1, 27, '2|4|6', '09:30~12:30|15:30~18:00', '7:30', '39:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678916', 1, '274', '王涛', '123456', 0, 45, '1|3|5', '09:00~11:30|16:00~19:00', '8:30', '43:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678917', 1, '274', '李娜', '123456', 1, 30, '2|4|6|7', '08:30~11:30|14:00~17:00', '8:00', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678918', 1, '274', '刘丽', '123456', 0, 33, '1|3|5', '09:00~12:00|16:00~19:00', '7:30', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678919', 1, '274', '张婷', '123456', 1, 28, '3|4|7', '09:30~12:00|15:00~17:30', '8:00', '39:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678920', 1, '274', '陈敏', '123456', 0, 31, '1|5|6', '10:00~12:30|14:30~18:00', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678921', 1, '274', '杨洁', '123456', 1, 29, '2|3|5', '09:00~11:00|13:30~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678922', 1, '274', '刘翔', '123456', 0, 37, '1|4|6', '10:00~12:00|16:30~19:00', '8:30', '42:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678923', 1, '274', '蔡鑫', '123456', 1, 26, '2|3|4', '09:00~11:30|15:00~18:00', '7:00', '38:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678924', 1, '274', '高峰', '123456', 0, 43, '1|2|5', '10:30~12:00|14:00~17:30', '8:00', '44:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678925', 1, '274', '邹阳', '123456', 1, 25, '3|4|6', '09:30~11:00|14:30~17:00', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678926', 1, '274', '蒋梅', '123456', 0, 32, '1|2|4', '10:00~12:00|15:00~17:00', '8:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678927', 1, '274', '冯雪', '123456', 1, 29, '1|2|3|5', '09:00~11:30|14:00~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678928', 1, '274', '何晨', '123456', 0, 33, '2|4|6', '09:30~11:00|16:00~18:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678929', 1, '274', '高彬', '123456', 0, 36, '1|3|5|7', '08:30~11:30|14:00~17:00', '8:30', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678930', 1, '274', '李娜', '123456', 1, 34, '1|2|4', '10:00~12:30|14:00~17:30', '7:30', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678931', 1, '274', '吴芳', '123456', 1, 31, '3|5|6', '09:00~12:00|16:00~19:00', '8:00', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678932', 1, '274', '邵天', '123456', 0, 37, '2|4|7', '09:30~12:00|14:00~16:30', '8:00', '42:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678933', 1, '274', '唐雯', '123456', 1, 29, '1|3|6', '10:00~12:00|16:00~19:00', '7:30', '39:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678934', 1, '274', '周婷', '123456', 0, 35, '2|4|5', '09:30~12:00|14:30~17:30', '8:00', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678935', 1, '274', '许涛', '123456', 0, 28, '1|3|5|7', '08:00~10:30|16:00~19:00', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678936', 1, '274', '潘华', '123456', 1, 32, '2|3|4', '09:00~12:00|15:30~18:00', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678937', 1, '274', '石磊', '123456', 0, 40, '1|4|7', '09:30~12:00|14:00~17:00', '8:00', '42:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678938', 1, '274', '刘丽', '123456', 1, 27, '2|3|5', '10:00~12:30|14:30~17:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678939', 1, '274', '陈超', '123456', 0, 34, '1|2|4', '09:30~12:00|16:00~18:30', '7:30', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678940', 1, '274', '杜红', '123456', 1, 30, '3|4|6', '08:30~11:00|15:00~17:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678941', 1, '274', '蒋婷', '123456', 0, 26, '2|4|5', '09:00~11:30|14:30~17:00', '7:30', '38:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678942', 1, '274', '魏杰', '123456', 1, 28, '1|3|7', '10:00~12:30|16:00~19:00', '8:00', '39:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678943', 1, '274', '黄明', '123456', 0, 33, '1|2|5', '08:30~11:30|14:00~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678944', 1, '274', '贾丽', '123456', 1, 27, '2|4|6', '09:30~12:00|14:00~17:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678945', 1, '274', '张扬', '123456', 0, 28, '1|2|4', '09:00~11:30|15:00~17:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678946', 1, '274', '刘强', '123456', 1, 30, '3|5|7', '10:00~12:00|14:30~17:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678947', 1, '274', '王珊', '123456', 0, 32, '2|3|5', '09:30~12:00|16:00~18:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678948', 1, '274', '周宇', '123456', 1, 34, '1|2|3', '08:00~10:30|14:00~16:30', '7:30', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678949', 1, '274', '冯涛', '123456', 0, 27, '2|4|6', '09:00~11:30|16:00~18:00', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678950', 1, '274', '谢莉', '123456', 1, 29, '3|5|7', '08:00~11:30|14:30~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678951', 1, '274', '张敏', '123456', 0, 33, '1|3|5', '09:00~12:00|14:00~17:00', '8:00', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678952', 1, '274', '杨青', '123456', 1, 35, '2|4|6', '08:00~10:30|15:00~17:30', '7:30', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678953', 1, '274', '赵莉', '123456', 0, 31, '1|3|5', '09:00~12:00|14:30~17:00', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678954', 1, '274', '李磊', '123456', 1, 38, '2|4|6', '10:00~12:30|15:30~18:00', '8:00', '42:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678955', 1, '274', '邓丽', '123456', 0, 27, '1|2|4', '09:30~11:00|14:00~16:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678956', 1, '274', '王超', '123456', 1, 31, '3|5|7', '08:30~11:30|14:00~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678957', 1, '274', '陈霞', '123456', 0, 32, '1|2|3', '09:00~12:00|14:30~17:00', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678958', 1, '274', '胡静', '123456', 1, 33, '1|4|5', '10:00~12:30|14:30~17:30', '8:00', '40:30');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678959', 1, '274', '贾铭', '123456', 0, 29, '2|3|5', '08:30~11:00|14:00~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678960', 1, '274', '高虹', '123456', 1, 31, '1|3|7', '09:00~12:00|14:30~17:00', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678961', 1, '274', '唐晓', '123456', 0, 34, '2|4|6', '09:30~12:00|15:00~17:30', '8:00', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678962', 1, '274', '程雪', '123456', 1, 28, '1|3|5', '08:00~11:00|14:30~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678963', 1, '274', '宋莉', '123456', 0, 32, '2|3|5', '09:00~11:30|15:30~18:00', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678964', 1, '274', '杜悦', '123456', 0, 27, '1|3|5', '09:00~11:30|14:00~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678965', 1, '274', '何亮', '123456', 1, 30, '2|4|6', '08:30~11:00|14:00~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678966', 1, '274', '梁阳', '123456', 0, 29, '3|5|7', '09:00~12:00|14:30~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678967', 1, '274', '傅琳', '123456', 1, 28, '1|3|5', '09:00~11:30|14:30~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678968', 1, '274', '罗婷', '123456', 0, 33, '2|4|6', '08:00~11:30|14:00~16:30', '8:00', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678969', 1, '274', '毛健', '123456', 1, 31, '1|3|5', '09:00~12:00|14:30~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678970', 1, '274', '唐志', '123456', 0, 27, '3|5|7', '08:00~10:30|14:30~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678971', 1, '274', '霍洋', '123456', 1, 29, '1|4|6', '09:00~11:30|14:00~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678972', 1, '274', '蒋婷', '123456', 0, 32, '2|4|6', '08:00~11:00|14:30~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678973', 1, '274', '郑伟', '123456', 1, 34, '3|5|7', '09:00~12:00|14:00~16:30', '8:00', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678974', 1, '274', '郭雪', '123456', 0, 28, '1|2|5', '08:00~10:30|14:30~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678975', 1, '274', '杜玲', '123456', 1, 30, '3|4|5', '09:00~12:00|14:30~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678976', 1, '274', '彭嘉', '123456', 0, 29, '1|2|6', '08:00~11:00|14:00~16:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678977', 1, '274', '谢慧', '123456', 1, 33, '3|4|5', '09:00~12:00|14:00~16:30', '8:00', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678978', 1, '274', '刘芳', '123456', 0, 31, '1|2|7', '08:30~11:00|14:30~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678979', 1, '274', '王建', '123456', 1, 32, '2|3|6', '09:00~11:30|14:30~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678980', 1, '274', '李琳', '123456', 0, 30, '1|4|6', '09:30~12:00|14:00~16:30', '8:00', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678981', 1, '274', '陈丽', '123456', 1, 27, '3|4|5', '08:30~11:30|14:30~16:30', '7:30', '39:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678982', 1, '274', '邓宇', '123456', 0, 29, '1|2|6', '09:00~11:30|14:00~16:30', '8:00', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678983', 1, '274', '沈婷', '123456', 1, 30, '2|3|5', '08:00~11:00|14:30~16:30', '7:30', '40:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678984', 1, '274', '程明', '123456', 0, 32, '3|4|5', '09:00~12:00|14:30~16:30', '8:00', '41:0');
-INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week) VALUES ('2024-12-22 11:35:40', '2024-12-22 11:35:40', 0, '12345678985', 1, '274', '彭雪', '123456', 1, 31, '1|4|6', '08:00~11:30|14:30~16:30', '7:30', '40:0');
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-28 14:10:46', 0, '9876543210', 1, '5', '夏侯之', '123456', 0, 25, '1|3|5|6|7', '09:40~11:50|14:20~17:30|17:50~20:40', '8:30', '48:0', '111', null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678900', 1, '3', '吉滢', '123456', 0, 30, '1|2|3|4|5', '12:50~15:10|16:10~18:30|18:50~22:40', '9:0', '43:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-27 16:12:25', '2024-12-27 16:12:26', 0, '0123456789', 1, '3', '独孤杰', '123456', 0, 24, '2|4|5|6|7', '15:10~19:00|19:00~21:40', '8:30', '42:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678900', 1, '4', '蒙飘', '123456', 0, 44, '1|2|4|5|6', '14:50~17:10|18:50~22:40', '9:0', '46:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678900', 1, '4', '卫柔', '123456', 0, 58, '1|4|5|6|7', '08:30~11:50|14:50~18:20|18:50~21:20', '9:30', '47:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678908', 1, '4', '张伟', '123456', 0, 30, '1|2|3|4|5|6|7', '09:00~11:00|14:00~17:00', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678909', 1, '4', '王芳', '123456', 1, 28, '1|3|5', '08:30~11:30|16:00~18:30', '7:00', '38:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678910', 1, '4', '李明', '123456', 0, 35, '2|4|6', '10:00~12:30|17:00~20:00', '8:00', '42:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678911', 1, '4', '赵莉', '123456', 1, 26, '1|5|7', '09:30~12:00|14:00~17:00', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678912', 1, '4', '孙强', '123456', 0, 40, '2|3|4', '08:00~10:00|15:00~18:00', '8:30', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678913', 1, '4', '周艳', '123456', 1, 32, '1|2|6', '10:00~12:00|14:30~18:00', '7:00', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678914', 1, '4', '吴刚', '123456', 0, 38, '3|5|7', '08:30~11:00|13:00~15:30', '8:00', '42:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678915', 1, '4', '郑慧', '123456', 1, 27, '2|4|6', '09:30~12:30|15:30~18:00', '7:30', '39:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678916', 1, '4', '王涛', '123456', 0, 45, '1|3|5', '09:00~11:30|16:00~19:00', '8:30', '43:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678917', 1, '4', '李娜', '123456', 1, 30, '2|4|6|7', '08:30~11:30|14:00~17:00', '8:00', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678918', 1, '4', '刘丽', '123456', 0, 33, '1|3|5', '09:00~12:00|16:00~19:00', '7:30', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678919', 1, '4', '张婷', '123456', 1, 28, '3|4|7', '09:30~12:00|15:00~17:30', '8:00', '39:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678920', 1, '4', '陈敏', '123456', 0, 31, '1|5|6', '10:00~12:30|14:30~18:00', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678921', 1, '4', '杨洁', '123456', 1, 29, '2|3|5', '09:00~11:00|13:30~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678922', 1, '4', '刘翔', '123456', 0, 37, '1|4|6', '10:00~12:00|16:30~19:00', '8:30', '42:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678923', 1, '4', '蔡鑫', '123456', 1, 26, '2|3|4', '09:00~11:30|15:00~18:00', '7:00', '38:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678924', 1, '4', '高峰', '123456', 0, 43, '1|2|5', '10:30~12:00|14:00~17:30', '8:00', '44:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678925', 1, '4', '邹阳', '123456', 1, 25, '3|4|6', '09:30~11:00|14:30~17:00', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678926', 1, '4', '蒋梅', '123456', 0, 32, '1|2|4', '10:00~12:00|15:00~17:00', '8:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678927', 1, '4', '冯雪', '123456', 1, 29, '1|2|3|5', '09:00~11:30|14:00~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678928', 1, '4', '何晨', '123456', 0, 33, '2|4|6', '09:30~11:00|16:00~18:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678929', 1, '4', '高彬', '123456', 0, 36, '1|3|5|7', '08:30~11:30|14:00~17:00', '8:30', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678930', 1, '4', '李娜', '123456', 1, 34, '1|2|4', '10:00~12:30|14:00~17:30', '7:30', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678931', 1, '4', '吴芳', '123456', 1, 31, '3|5|6', '09:00~12:00|16:00~19:00', '8:00', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678932', 1, '4', '邵天', '123456', 0, 37, '2|4|7', '09:30~12:00|14:00~16:30', '8:00', '42:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678933', 1, '4', '唐雯', '123456', 1, 29, '1|3|6', '10:00~12:00|16:00~19:00', '7:30', '39:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678934', 1, '4', '周婷', '123456', 0, 35, '2|4|5', '09:30~12:00|14:30~17:30', '8:00', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678935', 1, '4', '许涛', '123456', 0, 28, '1|3|5|7', '08:00~10:30|16:00~19:00', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678936', 1, '4', '潘华', '123456', 1, 32, '2|3|4', '09:00~12:00|15:30~18:00', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678937', 1, '4', '石磊', '123456', 0, 40, '1|4|7', '09:30~12:00|14:00~17:00', '8:00', '42:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678938', 1, '4', '刘丽', '123456', 1, 27, '2|3|5', '10:00~12:30|14:30~17:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678939', 1, '4', '陈超', '123456', 0, 34, '1|2|4', '09:30~12:00|16:00~18:30', '7:30', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678940', 1, '4', '杜红', '123456', 1, 30, '3|4|6', '08:30~11:00|15:00~17:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678941', 1, '4', '蒋婷', '123456', 0, 26, '2|4|5', '09:00~11:30|14:30~17:00', '7:30', '38:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678942', 1, '4', '魏杰', '123456', 1, 28, '1|3|7', '10:00~12:30|16:00~19:00', '8:00', '39:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678943', 1, '4', '黄明', '123456', 0, 33, '1|2|5', '08:30~11:30|14:00~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678944', 1, '4', '贾丽', '123456', 1, 27, '2|4|6', '09:30~12:00|14:00~17:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678945', 1, '4', '张扬', '123456', 0, 28, '1|2|4', '09:00~11:30|15:00~17:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678946', 1, '4', '刘强', '123456', 1, 30, '3|5|7', '10:00~12:00|14:30~17:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678947', 1, '4', '王珊', '123456', 0, 32, '2|3|5', '09:30~12:00|16:00~18:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678948', 1, '4', '周宇', '123456', 1, 34, '1|2|3', '08:00~10:30|14:00~16:30', '7:30', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678949', 1, '4', '冯涛', '123456', 0, 27, '2|4|6', '09:00~11:30|16:00~18:00', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678950', 1, '4', '谢莉', '123456', 1, 29, '3|5|7', '08:00~11:30|14:30~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678951', 1, '4', '张敏', '123456', 0, 33, '1|3|5', '09:00~12:00|14:00~17:00', '8:00', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678952', 1, '4', '杨青', '123456', 1, 35, '2|4|6', '08:00~10:30|15:00~17:30', '7:30', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678953', 1, '4', '赵莉', '123456', 0, 31, '1|3|5', '09:00~12:00|14:30~17:00', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678954', 1, '4', '李磊', '123456', 1, 38, '2|4|6', '10:00~12:30|15:30~18:00', '8:00', '42:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678955', 1, '4', '邓丽', '123456', 0, 27, '1|2|4', '09:30~11:00|14:00~16:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678956', 1, '4', '王超', '123456', 1, 31, '3|5|7', '08:30~11:30|14:00~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678957', 1, '4', '陈霞', '123456', 0, 32, '1|2|3', '09:00~12:00|14:30~17:00', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678958', 1, '4', '胡静', '123456', 1, 33, '1|4|5', '10:00~12:30|14:30~17:30', '8:00', '40:30', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678959', 1, '4', '贾铭', '123456', 0, 29, '2|3|5', '08:30~11:00|14:00~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678960', 1, '4', '高虹', '123456', 1, 31, '1|3|7', '09:00~12:00|14:30~17:00', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678961', 1, '4', '唐晓', '123456', 0, 34, '2|4|6', '09:30~12:00|15:00~17:30', '8:00', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678962', 1, '4', '程雪', '123456', 1, 28, '1|3|5', '08:00~11:00|14:30~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678963', 1, '4', '宋莉', '123456', 0, 32, '2|3|5', '09:00~11:30|15:30~18:00', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678964', 1, '4', '杜悦', '123456', 0, 27, '1|3|5', '09:00~11:30|14:00~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678965', 1, '4', '何亮', '123456', 1, 30, '2|4|6', '08:30~11:00|14:00~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678966', 1, '4', '梁阳', '123456', 0, 29, '3|5|7', '09:00~12:00|14:30~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678967', 1, '4', '傅琳', '123456', 1, 28, '1|3|5', '09:00~11:30|14:30~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678968', 1, '4', '罗婷', '123456', 0, 33, '2|4|6', '08:00~11:30|14:00~16:30', '8:00', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678969', 1, '4', '毛健', '123456', 1, 31, '1|3|5', '09:00~12:00|14:30~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678970', 1, '4', '唐志', '123456', 0, 27, '3|5|7', '08:00~10:30|14:30~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678971', 1, '4', '霍洋', '123456', 1, 29, '1|4|6', '09:00~11:30|14:00~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678972', 1, '4', '蒋婷', '123456', 0, 32, '2|4|6', '08:00~11:00|14:30~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678973', 1, '4', '郑伟', '123456', 1, 34, '3|5|7', '09:00~12:00|14:00~16:30', '8:00', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678974', 1, '4', '郭雪', '123456', 0, 28, '1|2|5', '08:00~10:30|14:30~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678975', 1, '4', '杜玲', '123456', 1, 30, '3|4|5', '09:00~12:00|14:30~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678976', 1, '4', '彭嘉', '123456', 0, 29, '1|2|6', '08:00~11:00|14:00~16:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678977', 1, '4', '谢慧', '123456', 1, 33, '3|4|5', '09:00~12:00|14:00~16:30', '8:00', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678978', 1, '4', '刘芳', '123456', 0, 31, '1|2|7', '08:30~11:00|14:30~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678979', 1, '4', '王建', '123456', 1, 32, '2|3|6', '09:00~11:30|14:30~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678980', 1, '4', '李琳', '123456', 0, 30, '1|4|6', '09:30~12:00|14:00~16:30', '8:00', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678981', 1, '4', '陈丽', '123456', 1, 27, '3|4|5', '08:30~11:30|14:30~16:30', '7:30', '39:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678982', 1, '4', '邓宇', '123456', 0, 29, '1|2|6', '09:00~11:30|14:00~16:30', '8:00', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678983', 1, '4', '沈婷', '123456', 1, 30, '2|3|5', '08:00~11:00|14:30~16:30', '7:30', '40:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:21', 0, '12345678984', 1, '4', '程明', '123456', 0, 32, '3|4|5', '09:00~12:00|14:30~16:30', '8:00', '41:0', null, null);
+INSERT INTO scheduling_system.employee (create_time, update_time, is_deleted, phone, store_id, position_id, username, password, gender, age, work_day_preference, work_time_preference, shift_length_preference_one_day, shift_length_preference_one_week, address, id_card) VALUES ('2024-12-22 11:35:40', '2024-12-25 12:37:22', 0, '12345678985', 1, '4', '彭雪', '123456', 1, 31, '1|4|6', '08:00~11:30|14:30~16:30', '7:30', '40:0', null, null);
+
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (2, null, '调休', '2024-12-26', '2024-12-31', '', 1, null, null, null);
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (2, null, '病假', '2024-12-26', '2024-12-28', '', 2, null, null, null);
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (3, '夏侯之', '调休', '2024-12-26', '2024-12-28', '', 1, null, null, null);
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (3, '夏侯之', '调休', '2024-12-27', '2024-12-28', '', 1, null, null, null);
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (3, '夏侯之', '调休', '2024-12-27', '2024-12-28', '', 1, null, null, null);
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (3, '夏侯之', '调休', '2024-12-28', '2024-12-29', '', 1, null, null, null);
+INSERT INTO scheduling_system.leave_requests (employee_id, employee_name, leave_type, start_time, end_time, reason, status, apply_time, approve_time, admin_id) VALUES (3, '夏侯之', '调休', '2024-12-28', '2024-12-30', '', 0, null, null, null);
 
 INSERT INTO scheduling_system.position (create_time, update_time, name, description, store_id) VALUES ('2024-12-22 11:56:40', '2024-12-22 11:56:40', '门店经理', '门店经理', 1);
 INSERT INTO scheduling_system.position (create_time, update_time, name, description, store_id) VALUES ('2024-12-22 11:56:40', '2024-12-22 11:56:40', '门店副经理', '门店副经理', 1);
@@ -387,8 +390,1240 @@ INSERT INTO scheduling_system.position (create_time, update_time, name, descript
 INSERT INTO scheduling_system.position (create_time, update_time, name, description, store_id) VALUES ('2024-12-22 11:56:40', '2024-12-22 11:56:40', '库房', '库房', 1);
 INSERT INTO scheduling_system.position (create_time, update_time, name, description, store_id) VALUES ('2024-12-22 11:56:40', '2024-12-22 11:56:40', '测试', '', 1);
 
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-01 00:00:00', 1, '10:00', '22:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-02 00:00:00', 1, '10:00', '22:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-03 00:00:00', 1, '09:00', '21:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-04 00:00:00', 1, '09:00', '21:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-05 00:00:00', 1, '09:00', '21:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-06 00:00:00', 1, '09:00', '21:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 15:04:55', '2024-06-07 00:00:00', 1, '09:00', '21:00', 1, 16, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-23 00:00:00', 1, '09:00', '21:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-24 00:00:00', 1, '09:00', '21:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-25 00:00:00', 1, '09:00', '21:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-26 00:00:00', 1, '09:00', '21:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-27 00:00:00', 1, '09:00', '21:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-28 00:00:00', 1, '10:00', '22:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES (null, '2024-12-25 20:16:17', '2024-12-29 00:00:00', 1, '10:00', '22:00', 1, 18, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2024-12-30 00:00:00', 1, '09:00', '21:00', 1, 35, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2024-12-31 00:00:00', 1, '09:00', '21:00', 1, 35, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2025-01-01 00:00:00', 1, '09:00', '21:00', 1, 35, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2025-01-02 00:00:00', 1, '09:00', '21:00', 1, 35, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2025-01-03 00:00:00', 1, '09:00', '21:00', 1, 35, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2025-01-04 00:00:00', 1, '10:00', '22:00', 1, 35, 0);
+INSERT INTO scheduling_system.scheduling_date (create_time, update_time, date, is_need_work, start_work_time, end_work_time, store_id, task_id, is_have_shift) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', '2025-01-05 00:00:00', 1, '10:00', '22:00', 1, 35, 0);
 
-INSERT INTO scheduling_system.scheduling_rule (create_time, update_time, is_deleted, store_id, store_work_time_frame, most_work_hour_in_one_day, most_work_hour_in_one_week, min_shift_minute, max_shift_minute, rest_minute, maximum_continuous_work_time, open_store_rule, close_store_rule, normal_rule, no_passenger_rule, minimum_shift_num_in_one_day, normal_shift_rule, lunch_time_rule, dinner_time_rule, rule_type) VALUES ('2024-12-22 16:53:01', '2024-12-22 16:53:01', 0, 1, '{"Mon":["09:00","21:00"],"Tue":["09:00","21:00"],"Wed":["09:00","21:00"],"Thur":["09:00","21:00"],"Fri":["09:00","21:00"],"Sat":["10:00","22:00"],"Sun":["10:00","22:00"]}', 8.0000, 40.0000, 120, 240, 30, 240.0000, '{"variableParam":50,"prepareMinute":30,"positionIdArr":[270,273,274,275,276]}', '{"variableParam1":50,"variableParam2":2,"closeMinute":30,"positionIdArr":[269,270,273,274,275,276]}', '{"variableParam":3.8,"positionIdArr":[269,270,273,274,275,276]}', '{"staffNum":2}', 3, '{"variableParam":3.8,"positionIdArr":[]}', '{"timeFrame":["11:30","13:30"],"needMinute":30}', '{"timeFrame":["17:00","19:00"],"needMinute":30}', 0);
+INSERT INTO scheduling_system.scheduling_rule (create_time, update_time, is_deleted, store_id, store_work_time_frame, most_work_hour_in_one_day, most_work_hour_in_one_week, min_shift_minute, max_shift_minute, rest_minute, maximum_continuous_work_time, open_store_rule, close_store_rule, normal_rule, no_passenger_rule, minimum_shift_num_in_one_day, normal_shift_rule, lunch_time_rule, dinner_time_rule, rule_type) VALUES ('2024-12-22 16:53:01', '2024-12-25 20:16:10', 0, 1, '{"Mon":["09:00","21:00"],"Tue":["09:00","21:00"],"Wed":["09:00","21:00"],"Thur":["09:00","21:00"],"Fri":["09:00","21:00"],"Sat":["10:00","22:00"],"Sun":["10:00","22:00"]}', 8.0000, 40.0000, 120, 240, 30, 240.0000, '{"variableParam":50,"prepareMinute":30,"positionIdArr":[2,3,4,5,6]}', '{"variableParam1":50,"variableParam2":2,"closeMinute":30,"positionIdArr":[1,2,3,4,5,6]}', '{"variableParam":3.8,"positionIdArr":[1,2,3,4,5,6]}', '{"staffNum":2}', 3, '{"variableParam":3.8,"positionIdArr":[]}', '{"timeFrame":["12:00","14:00"],"needMinute":30}', '{"timeFrame":["17:30","19:30"],"needMinute":30}', 0);
+
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 14:00:00', '2024-06-01 18:00:00', 106, null, null, 2, 240, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 14:00:00', '2024-06-01 18:00:00', 106, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 12:00:00', '2024-06-01 12:30:00', 0, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:30:00', '2024-06-01 15:30:00', 106, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 11:00:00', '2024-06-01 11:30:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 12:30:00', '2024-06-01 13:00:00', 0, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 12:00:00', '2024-06-01 12:30:00', 0, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 12:00:00', '2024-06-01 16:00:00', 106, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 12:00:00', '2024-06-01 16:00:00', 106, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 14:00:00', '2024-06-01 18:00:00', 106, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 14:00:00', '2024-06-01 18:00:00', 106, null, null, 2, 240, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 12:00:00', '2024-06-01 12:30:00', 0, 210, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 12:30:00', '2024-06-01 13:00:00', 0, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 12:00:00', '2024-06-01 16:00:00', 106, null, null, 2, 240, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 12:30:00', '2024-06-01 16:30:00', 106, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:46:33', 0, '2024-06-01 09:30:00', '2024-06-01 13:30:00', 106, '2024-06-01 12:30:00', '2024-06-01 13:00:00', 0, 210, 1, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 09:30:00', '2024-06-01 13:30:00', 106, '2024-06-01 12:00:00', '2024-06-01 12:30:00', 0, 210, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 11:00:00', '2024-06-01 11:30:00', 0, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 12:30:00', '2024-06-01 13:00:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 12:00:00', '2024-06-01 12:30:00', 0, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 14:00:00', 106, '2024-06-01 11:00:00', '2024-06-01 11:30:00', 0, 210, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:30:00', '2024-06-01 14:30:00', 106, '2024-06-01 11:00:00', '2024-06-01 11:30:00', 0, 210, 0, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 13:00:00', 106, '2024-06-01 11:00:00', '2024-06-01 11:30:00', 0, 150, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 13:00:00', 106, '2024-06-01 12:30:00', '2024-06-01 13:00:00', 0, 150, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 13:00:00', 106, '2024-06-01 12:00:00', '2024-06-01 12:30:00', 0, 150, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:00:00', '2024-06-01 11:30:00', 0, 210, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:30:00', '2024-06-01 12:00:00', 0, 210, 0, '62');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 18:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:30:00', '2024-06-01 12:00:00', 0, 210, 0, '66');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:30:00', '2024-06-01 12:00:00', 0, 210, 0, '69');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:30:00', '2024-06-01 12:00:00', 0, 210, 0, '72');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:30:00', '2024-06-01 12:00:00', 0, 210, 0, '73');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 11:00:00', '2024-06-01 15:00:00', 106, '2024-06-01 11:30:00', '2024-06-01 12:00:00', 0, 210, 0, '77');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 16:30:00', '2024-06-01 17:00:00', 1, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 18:00:00', '2024-06-01 18:30:00', 1, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 17:30:00', '2024-06-01 18:00:00', 1, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 16:00:00', '2024-06-01 20:00:00', 106, '2024-06-01 16:30:00', '2024-06-01 17:00:00', 1, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 16:30:00', '2024-06-01 19:30:00', 106, '2024-06-01 17:00:00', '2024-06-01 17:30:00', 1, 150, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 18:00:00', '2024-06-01 18:30:00', 1, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 17:30:00', '2024-06-01 18:00:00', 1, 210, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 14:00:00', '2024-06-01 18:00:00', 106, null, null, 2, 240, 0, '80');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 18:00:00', '2024-06-01 18:30:00', 1, 210, 0, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 10:00:00', '2024-06-01 13:00:00', 106, '2024-06-01 12:30:00', '2024-06-01 13:00:00', 0, 150, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 17:30:00', '2024-06-01 18:00:00', 1, 210, 0, '81');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 15:00:00', '2024-06-01 19:00:00', 106, '2024-06-01 16:30:00', '2024-06-01 17:00:00', 1, 210, 0, '83');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 16:30:00', '2024-06-01 20:30:00', 106, '2024-06-01 17:00:00', '2024-06-01 17:30:00', 1, 210, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 16:30:00', '2024-06-01 20:30:00', 106, '2024-06-01 17:00:00', '2024-06-01 17:30:00', 1, 210, 0, '62');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 19:00:00', '2024-06-01 22:00:00', 106, null, null, 2, 180, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 20:30:00', '2024-06-01 22:30:00', 106, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 20:30:00', '2024-06-01 22:30:00', 106, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 20:30:00', '2024-06-01 22:30:00', 106, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-01 20:30:00', '2024-06-01 22:30:00', 106, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 09:30:00', '2024-06-02 13:30:00', 107, '2024-06-02 11:00:00', '2024-06-02 11:30:00', 0, 210, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 14:00:00', '2024-06-02 18:00:00', 107, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 14:00:00', 107, '2024-06-02 12:30:00', '2024-06-02 13:00:00', 0, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 14:00:00', 107, '2024-06-02 12:00:00', '2024-06-02 12:30:00', 0, 210, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 14:00:00', 107, '2024-06-02 11:00:00', '2024-06-02 11:30:00', 0, 210, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 17:30:00', '2024-06-02 21:30:00', 107, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 14:00:00', 107, '2024-06-02 12:00:00', '2024-06-02 12:30:00', 0, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 14:00:00', 107, '2024-06-02 12:30:00', '2024-06-02 13:00:00', 0, 210, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:30:00', '2024-06-02 14:30:00', 107, '2024-06-02 12:00:00', '2024-06-02 12:30:00', 0, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 16:30:00', '2024-06-02 17:00:00', 1, 210, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 18:00:00', '2024-06-02 18:30:00', 1, 210, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 17:30:00', '2024-06-02 18:00:00', 1, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 16:30:00', '2024-06-02 17:00:00', 1, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 18:00:00', '2024-06-02 18:30:00', 1, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 17:30:00', '2024-06-02 18:00:00', 1, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 14:00:00', 107, '2024-06-02 11:00:00', '2024-06-02 11:30:00', 0, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:30:00', '2024-06-02 15:30:00', 107, null, null, 2, 240, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 12:00:00', '2024-06-02 16:00:00', 107, null, null, 2, 240, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 12:00:00', '2024-06-02 16:00:00', 107, null, null, 2, 240, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 12:30:00', '2024-06-02 16:30:00', 107, null, null, 2, 240, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 14:00:00', '2024-06-02 18:00:00', 107, null, null, 2, 240, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 09:30:00', '2024-06-02 13:30:00', 107, '2024-06-02 12:30:00', '2024-06-02 13:00:00', 0, 210, 1, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:30:00', '2024-06-02 12:00:00', 0, 210, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:30:00', '2024-06-02 12:00:00', 0, 210, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 14:00:00', '2024-06-02 18:00:00', 107, null, null, 2, 240, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:30:00', '2024-06-02 12:00:00', 0, 210, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:30:00', '2024-06-02 12:00:00', 0, 210, 0, '79');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 17:00:00', '2024-06-02 21:00:00', 107, null, null, 2, 240, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 17:00:00', '2024-06-02 21:00:00', 107, null, null, 2, 240, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 17:00:00', '2024-06-02 17:30:00', 1, 210, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 17:00:00', '2024-06-02 17:30:00', 1, 210, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:00:00', '2024-06-02 20:00:00', 107, '2024-06-02 18:00:00', '2024-06-02 18:30:00', 1, 210, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:00:00', '2024-06-02 20:00:00', 107, '2024-06-02 17:30:00', '2024-06-02 18:00:00', 1, 210, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:30:00', '2024-06-02 18:30:00', 107, '2024-06-02 16:30:00', '2024-06-02 17:00:00', 1, 150, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:00:00', '2024-06-02 19:00:00', 107, '2024-06-02 16:30:00', '2024-06-02 17:00:00', 1, 150, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 15:30:00', '2024-06-02 18:30:00', 107, '2024-06-02 18:00:00', '2024-06-02 18:30:00', 1, 150, 0, '79');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 13:00:00', 107, '2024-06-02 12:30:00', '2024-06-02 13:00:00', 0, 150, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 13:00:00', 107, '2024-06-02 12:00:00', '2024-06-02 12:30:00', 0, 150, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 20:30:00', '2024-06-02 22:30:00', 107, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 13:00:00', 107, '2024-06-02 11:00:00', '2024-06-02 11:30:00', 0, 150, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 13:00:00', 107, '2024-06-02 12:30:00', '2024-06-02 13:00:00', 0, 150, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 13:00:00', 107, '2024-06-02 12:00:00', '2024-06-02 12:30:00', 0, 150, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 10:00:00', '2024-06-02 13:00:00', 107, '2024-06-02 11:00:00', '2024-06-02 11:30:00', 0, 150, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:00:00', '2024-06-02 11:30:00', 0, 210, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:30:00', '2024-06-02 12:00:00', 0, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:00:00', '2024-06-02 15:00:00', 107, '2024-06-02 11:30:00', '2024-06-02 12:00:00', 0, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 11:30:00', '2024-06-02 15:30:00', 107, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 16:30:00', '2024-06-02 17:00:00', 1, 210, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 17:00:00', '2024-06-02 17:30:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 17:30:00', '2024-06-02 18:00:00', 1, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 17:00:00', '2024-06-02 17:30:00', 1, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 16:30:00', '2024-06-02 20:30:00', 107, '2024-06-02 17:00:00', '2024-06-02 17:30:00', 1, 210, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 20:30:00', '2024-06-02 22:30:00', 107, null, null, 2, 120, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 20:30:00', '2024-06-02 22:30:00', 107, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 20:30:00', '2024-06-02 22:30:00', 107, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 20:30:00', '2024-06-02 22:30:00', 107, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-02 20:30:00', '2024-06-02 22:30:00', 107, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 08:30:00', '2024-06-03 12:30:00', 108, null, null, 2, 240, 1, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 08:30:00', '2024-06-03 12:30:00', 108, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 13:30:00', '2024-06-03 17:30:00', 108, null, null, 2, 240, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:00:00', '2024-06-03 13:00:00', 108, '2024-06-03 12:00:00', '2024-06-03 12:30:00', 0, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:00:00', '2024-06-03 13:00:00', 108, '2024-06-03 11:00:00', '2024-06-03 11:30:00', 0, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:30:00', '2024-06-03 15:30:00', 108, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:00:00', '2024-06-03 16:00:00', 108, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:00:00', '2024-06-03 16:00:00', 108, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:00:00', '2024-06-03 16:00:00', 108, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:00:00', '2024-06-03 16:00:00', 108, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:30:00', '2024-06-03 16:30:00', 108, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:30:00', '2024-06-03 16:30:00', 108, null, null, 2, 240, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 12:30:00', '2024-06-03 16:30:00', 108, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:00:00', '2024-06-03 13:00:00', 108, '2024-06-03 12:30:00', '2024-06-03 13:00:00', 0, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:00:00', '2024-06-03 15:00:00', 108, '2024-06-03 11:30:00', '2024-06-03 12:00:00', 0, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 13:30:00', '2024-06-03 17:30:00', 108, null, null, 2, 240, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 13:00:00', '2024-06-03 17:00:00', 108, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 13:00:00', '2024-06-03 17:00:00', 108, null, null, 2, 240, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 10:30:00', '2024-06-03 14:30:00', 108, '2024-06-03 11:00:00', '2024-06-03 11:30:00', 0, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 13:00:00', '2024-06-03 17:00:00', 108, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 10:00:00', '2024-06-03 14:00:00', 108, '2024-06-03 12:30:00', '2024-06-03 13:00:00', 0, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:00:00', '2024-06-03 15:00:00', 108, '2024-06-03 11:30:00', '2024-06-03 12:00:00', 0, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 17:00:00', '2024-06-03 17:30:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 10:00:00', '2024-06-03 14:00:00', 108, '2024-06-03 12:00:00', '2024-06-03 12:30:00', 0, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:30:00', '2024-06-03 13:30:00', 108, '2024-06-03 12:30:00', '2024-06-03 13:00:00', 0, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:00:00', '2024-06-03 15:00:00', 108, '2024-06-03 11:30:00', '2024-06-03 12:00:00', 0, 210, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 17:00:00', '2024-06-03 17:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 10:30:00', '2024-06-03 14:30:00', 108, '2024-06-03 12:00:00', '2024-06-03 12:30:00', 0, 210, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:00:00', '2024-06-03 13:00:00', 108, '2024-06-03 12:00:00', '2024-06-03 12:30:00', 0, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:00:00', '2024-06-03 13:00:00', 108, '2024-06-03 11:00:00', '2024-06-03 11:30:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:30:00', '2024-06-03 13:30:00', 108, '2024-06-03 11:00:00', '2024-06-03 11:30:00', 0, 210, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 17:00:00', '2024-06-03 21:00:00', 108, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:00:00', '2024-06-03 15:00:00', 108, '2024-06-03 11:30:00', '2024-06-03 12:00:00', 0, 210, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 09:00:00', '2024-06-03 13:00:00', 108, '2024-06-03 12:30:00', '2024-06-03 13:00:00', 0, 210, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 15:00:00', '2024-06-03 18:00:00', 108, null, null, 2, 180, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:00:00', '2024-06-03 20:00:00', 108, '2024-06-03 17:30:00', '2024-06-03 18:00:00', 1, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 18:00:00', '2024-06-03 18:30:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 17:30:00', '2024-06-03 18:00:00', 1, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 16:30:00', '2024-06-03 17:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:00:00', '2024-06-03 20:00:00', 108, '2024-06-03 16:30:00', '2024-06-03 17:00:00', 1, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 13:30:00', '2024-06-03 17:30:00', 108, null, null, 2, 240, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 17:00:00', '2024-06-03 17:30:00', 1, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 15:30:00', '2024-06-03 18:30:00', 108, '2024-06-03 18:00:00', '2024-06-03 18:30:00', 1, 150, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 15:30:00', '2024-06-03 18:30:00', 108, '2024-06-03 17:30:00', '2024-06-03 18:00:00', 1, 150, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:00:00', '2024-06-03 14:00:00', 108, '2024-06-03 11:00:00', '2024-06-03 11:30:00', 0, 150, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 11:00:00', '2024-06-03 14:00:00', 108, '2024-06-03 11:30:00', '2024-06-03 12:00:00', 0, 150, 0, '56');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:30:00', '2024-06-03 20:30:00', 108, '2024-06-03 16:30:00', '2024-06-03 17:00:00', 1, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 17:30:00', '2024-06-03 20:30:00', 108, null, null, 2, 180, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 16:00:00', '2024-06-03 18:00:00', 108, null, null, 2, 120, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-03 19:30:00', '2024-06-03 21:30:00', 108, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 08:30:00', '2024-06-04 12:30:00', 109, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 08:30:00', '2024-06-04 12:30:00', 109, null, null, 2, 240, 1, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 13:30:00', '2024-06-04 17:30:00', 109, null, null, 2, 240, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:00:00', '2024-06-04 13:00:00', 109, '2024-06-04 12:00:00', '2024-06-04 12:30:00', 0, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:00:00', '2024-06-04 13:00:00', 109, '2024-06-04 11:00:00', '2024-06-04 11:30:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:30:00', '2024-06-04 15:30:00', 109, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:00:00', '2024-06-04 13:00:00', 109, '2024-06-04 12:30:00', '2024-06-04 13:00:00', 0, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:00:00', '2024-06-04 16:00:00', 109, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:00:00', '2024-06-04 16:00:00', 109, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:30:00', '2024-06-04 16:30:00', 109, null, null, 2, 240, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 13:00:00', '2024-06-04 17:00:00', 109, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:00:00', '2024-06-04 16:00:00', 109, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:30:00', '2024-06-04 16:30:00', 109, null, null, 2, 240, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:30:00', '2024-06-04 16:30:00', 109, null, null, 2, 240, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:00:00', '2024-06-04 15:00:00', 109, '2024-06-04 11:30:00', '2024-06-04 12:00:00', 0, 210, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 13:30:00', '2024-06-04 17:30:00', 109, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 13:00:00', '2024-06-04 17:00:00', 109, null, null, 2, 240, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 13:00:00', '2024-06-04 17:00:00', 109, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 10:30:00', '2024-06-04 14:30:00', 109, '2024-06-04 11:00:00', '2024-06-04 11:30:00', 0, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 12:00:00', '2024-06-04 16:00:00', 109, null, null, 2, 240, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 10:00:00', '2024-06-04 14:00:00', 109, '2024-06-04 12:30:00', '2024-06-04 13:00:00', 0, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:00:00', '2024-06-04 15:00:00', 109, '2024-06-04 11:30:00', '2024-06-04 12:00:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 17:00:00', '2024-06-04 17:30:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 10:00:00', '2024-06-04 14:00:00', 109, '2024-06-04 12:00:00', '2024-06-04 12:30:00', 0, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:30:00', '2024-06-04 13:30:00', 109, '2024-06-04 12:30:00', '2024-06-04 13:00:00', 0, 210, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:00:00', '2024-06-04 15:00:00', 109, '2024-06-04 11:30:00', '2024-06-04 12:00:00', 0, 210, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 17:00:00', '2024-06-04 17:30:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 10:30:00', '2024-06-04 14:30:00', 109, '2024-06-04 12:00:00', '2024-06-04 12:30:00', 0, 210, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:00:00', '2024-06-04 13:00:00', 109, '2024-06-04 12:00:00', '2024-06-04 12:30:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:00:00', '2024-06-04 13:00:00', 109, '2024-06-04 11:00:00', '2024-06-04 11:30:00', 0, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:30:00', '2024-06-04 13:30:00', 109, '2024-06-04 11:00:00', '2024-06-04 11:30:00', 0, 210, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 17:00:00', '2024-06-04 21:00:00', 109, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:00:00', '2024-06-04 15:00:00', 109, '2024-06-04 11:30:00', '2024-06-04 12:00:00', 0, 210, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 09:00:00', '2024-06-04 13:00:00', 109, '2024-06-04 12:30:00', '2024-06-04 13:00:00', 0, 210, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 15:00:00', '2024-06-04 18:00:00', 109, null, null, 2, 180, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:00:00', '2024-06-04 20:00:00', 109, '2024-06-04 17:30:00', '2024-06-04 18:00:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 18:00:00', '2024-06-04 18:30:00', 1, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 17:30:00', '2024-06-04 18:00:00', 1, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 16:30:00', '2024-06-04 17:00:00', 1, 210, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:00:00', '2024-06-04 20:00:00', 109, '2024-06-04 16:30:00', '2024-06-04 17:00:00', 1, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 13:30:00', '2024-06-04 17:30:00', 109, null, null, 2, 240, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 17:00:00', '2024-06-04 17:30:00', 1, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 15:30:00', '2024-06-04 18:30:00', 109, '2024-06-04 18:00:00', '2024-06-04 18:30:00', 1, 150, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 15:30:00', '2024-06-04 18:30:00', 109, '2024-06-04 17:30:00', '2024-06-04 18:00:00', 1, 150, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:00:00', '2024-06-04 14:00:00', 109, '2024-06-04 11:00:00', '2024-06-04 11:30:00', 0, 150, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 11:00:00', '2024-06-04 14:00:00', 109, '2024-06-04 11:30:00', '2024-06-04 12:00:00', 0, 150, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:30:00', '2024-06-04 20:30:00', 109, '2024-06-04 16:30:00', '2024-06-04 17:00:00', 1, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 17:30:00', '2024-06-04 20:30:00', 109, null, null, 2, 180, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 16:00:00', '2024-06-04 18:00:00', 109, null, null, 2, 120, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-04 19:30:00', '2024-06-04 21:30:00', 109, null, null, 2, 120, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 08:30:00', '2024-06-05 12:30:00', 110, null, null, 2, 240, 1, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 12:30:00', '2024-06-05 16:30:00', 110, null, null, 2, 240, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 10:30:00', '2024-06-05 14:30:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 12:30:00', '2024-06-05 16:30:00', 110, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:30:00', '2024-06-05 13:00:00', 0, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 210, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 12:30:00', '2024-06-05 13:00:00', 0, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 12:00:00', '2024-06-05 16:00:00', 110, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 12:30:00', '2024-06-05 16:30:00', 110, null, null, 2, 240, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 210, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 210, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:30:00', '2024-06-05 15:30:00', 110, null, null, 2, 240, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:30:00', '2024-06-05 15:30:00', 110, null, null, 2, 240, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:30:00', '2024-06-05 12:00:00', 0, 210, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 16:30:00', '2024-06-05 20:30:00', 110, '2024-06-05 17:30:00', '2024-06-05 18:00:00', 1, 210, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 16:30:00', '2024-06-05 20:30:00', 110, '2024-06-05 17:00:00', '2024-06-05 17:30:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 10:30:00', '2024-06-05 14:30:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 08:30:00', '2024-06-05 12:30:00', 110, null, null, 2, 240, 1, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 10:30:00', '2024-06-05 14:30:00', 110, '2024-06-05 12:30:00', '2024-06-05 13:00:00', 0, 210, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:30:00', '2024-06-05 13:30:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 210, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 16:30:00', '2024-06-05 20:30:00', 110, '2024-06-05 16:30:00', '2024-06-05 17:00:00', 1, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:30:00', '2024-06-05 13:00:00', 0, 210, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 210, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:30:00', '2024-06-05 13:00:00', 0, 210, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 11:00:00', '2024-06-05 15:00:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 16:30:00', '2024-06-05 20:30:00', 110, '2024-06-05 17:00:00', '2024-06-05 17:30:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 10:00:00', '2024-06-05 13:00:00', 110, '2024-06-05 12:00:00', '2024-06-05 12:30:00', 0, 150, 0, '58');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 19:00:00', 110, '2024-06-05 18:00:00', '2024-06-05 18:30:00', 1, 210, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:00:00', '2024-06-05 21:00:00', 110, null, null, 2, 120, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:30:00', '2024-06-05 13:30:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '60');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 10:00:00', '2024-06-05 14:00:00', 110, '2024-06-05 11:00:00', '2024-06-05 11:30:00', 0, 210, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 16:30:00', '2024-06-05 20:30:00', 110, '2024-06-05 17:00:00', '2024-06-05 17:30:00', 1, 210, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 18:00:00', 110, null, null, 2, 180, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:00:00', '2024-06-05 21:00:00', 110, null, null, 2, 120, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 09:30:00', '2024-06-05 13:30:00', 110, '2024-06-05 12:30:00', '2024-06-05 13:00:00', 0, 210, 0, '63');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 19:00:00', 110, '2024-06-05 16:30:00', '2024-06-05 17:00:00', 1, 210, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 19:00:00', 110, '2024-06-05 16:30:00', '2024-06-05 17:00:00', 1, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 19:00:00', 110, '2024-06-05 18:00:00', '2024-06-05 18:30:00', 1, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 19:00:00', 110, '2024-06-05 17:30:00', '2024-06-05 18:00:00', 1, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:00:00', '2024-06-05 21:00:00', 110, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:00:00', '2024-06-05 21:00:00', 110, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 17:00:00', 110, null, null, 2, 120, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 15:00:00', '2024-06-05 17:00:00', 110, null, null, 2, 120, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:00:00', '2024-06-05 21:00:00', 110, null, null, 2, 120, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:00:00', '2024-06-05 21:00:00', 110, null, null, 2, 120, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-05 19:30:00', '2024-06-05 21:30:00', 110, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 08:30:00', '2024-06-06 12:30:00', 111, null, null, 2, 240, 1, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 08:30:00', '2024-06-06 12:30:00', 111, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 10:30:00', '2024-06-06 14:30:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 12:30:00', '2024-06-06 16:30:00', 111, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:30:00', '2024-06-06 13:00:00', 0, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:30:00', '2024-06-06 13:00:00', 0, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 12:00:00', '2024-06-06 16:00:00', 111, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 12:30:00', '2024-06-06 16:30:00', 111, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:30:00', '2024-06-06 13:30:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:30:00', '2024-06-06 13:30:00', 111, '2024-06-06 12:30:00', '2024-06-06 13:00:00', 0, 210, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:30:00', '2024-06-06 15:30:00', 111, null, null, 2, 240, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:30:00', '2024-06-06 13:30:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:30:00', '2024-06-06 13:00:00', 0, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:30:00', '2024-06-06 15:30:00', 111, null, null, 2, 240, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 16:30:00', '2024-06-06 20:30:00', 111, '2024-06-06 17:30:00', '2024-06-06 18:00:00', 1, 210, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 10:00:00', '2024-06-06 14:00:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 10:30:00', '2024-06-06 14:30:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 210, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 12:30:00', '2024-06-06 16:30:00', 111, null, null, 2, 240, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 10:30:00', '2024-06-06 14:30:00', 111, '2024-06-06 12:30:00', '2024-06-06 13:00:00', 0, 210, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 12:30:00', '2024-06-06 13:00:00', 0, 210, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '56');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 09:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 11:00:00', '2024-06-06 11:30:00', 0, 210, 0, '59');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 11:00:00', '2024-06-06 15:00:00', 111, '2024-06-06 11:30:00', '2024-06-06 12:00:00', 0, 210, 0, '62');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 19:00:00', 111, '2024-06-06 16:30:00', '2024-06-06 17:00:00', 1, 210, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 19:00:00', 111, '2024-06-06 18:00:00', '2024-06-06 18:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 16:30:00', '2024-06-06 20:30:00', 111, '2024-06-06 17:00:00', '2024-06-06 17:30:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 16:30:00', '2024-06-06 20:30:00', 111, '2024-06-06 16:30:00', '2024-06-06 17:00:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 19:00:00', 111, '2024-06-06 18:00:00', '2024-06-06 18:30:00', 1, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 19:00:00', 111, '2024-06-06 17:30:00', '2024-06-06 18:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 19:00:00', 111, '2024-06-06 16:30:00', '2024-06-06 17:00:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:00:00', '2024-06-06 21:00:00', 111, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:00:00', '2024-06-06 21:00:00', 111, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 18:00:00', 111, null, null, 2, 180, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 10:00:00', '2024-06-06 13:00:00', 111, '2024-06-06 12:00:00', '2024-06-06 12:30:00', 0, 150, 0, '66');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 16:30:00', '2024-06-06 20:30:00', 111, '2024-06-06 17:00:00', '2024-06-06 17:30:00', 1, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 16:30:00', '2024-06-06 20:30:00', 111, '2024-06-06 17:00:00', '2024-06-06 17:30:00', 1, 210, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 17:00:00', 111, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 15:00:00', '2024-06-06 17:00:00', 111, null, null, 2, 120, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:00:00', '2024-06-06 21:00:00', 111, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:00:00', '2024-06-06 21:00:00', 111, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:00:00', '2024-06-06 21:00:00', 111, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:00:00', '2024-06-06 21:00:00', 111, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-06 19:30:00', '2024-06-06 21:30:00', 111, null, null, 2, 120, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 15:00:00', 112, null, null, 2, 180, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:30:00', '2024-06-07 16:30:00', 112, null, null, 2, 240, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 11:00:00', 112, null, null, 2, 120, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 11:00:00', 112, null, null, 2, 120, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 08:30:00', '2024-06-07 10:30:00', 112, null, null, 2, 120, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 08:30:00', '2024-06-07 10:30:00', 112, null, null, 2, 120, 1, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 11:00:00', 112, null, null, 2, 120, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 11:00:00', 112, null, null, 2, 120, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 11:00:00', 112, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 13:00:00', 112, '2024-06-07 12:00:00', '2024-06-07 12:30:00', 0, 210, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 13:00:00', 112, '2024-06-07 11:30:00', '2024-06-07 12:00:00', 0, 210, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 20:00:00', 112, '2024-06-07 16:30:00', '2024-06-07 17:00:00', 1, 210, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 14:00:00', 112, null, null, 2, 120, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 14:00:00', 112, null, null, 2, 120, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 14:00:00', 112, null, null, 2, 120, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 15:00:00', 112, null, null, 2, 180, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 15:00:00', 112, null, null, 2, 180, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 16:00:00', 112, null, null, 2, 240, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 09:00:00', '2024-06-07 13:00:00', 112, '2024-06-07 11:00:00', '2024-06-07 11:30:00', 0, 210, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:30:00', '2024-06-07 20:30:00', 112, '2024-06-07 17:00:00', '2024-06-07 17:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 12:00:00', '2024-06-07 15:00:00', 112, null, null, 2, 180, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:00:00', '2024-06-07 21:00:00', 112, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 16:00:00', '2024-06-07 18:00:00', 112, null, null, 2, 120, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:30:00', '2024-06-07 21:30:00', 112, null, null, 2, 120, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:30:00', '2024-06-07 21:30:00', 112, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:30:00', '2024-06-07 21:30:00', 112, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 15:04:55', 0, '2024-06-07 19:30:00', '2024-06-07 21:30:00', 112, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 08:30:00', '2024-12-23 12:30:00', 120, null, null, 2, 240, 1, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 08:30:00', '2024-12-23 12:30:00', 120, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 09:00:00', '2024-12-23 13:00:00', 120, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 09:00:00', '2024-12-23 13:00:00', 120, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 09:00:00', '2024-12-23 13:00:00', 120, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 09:00:00', '2024-12-23 13:00:00', 120, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 09:30:00', '2024-12-23 13:30:00', 120, '2024-12-23 11:30:00', '2024-12-23 12:00:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 12:00:00', '2024-12-23 16:00:00', 120, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 12:00:00', '2024-12-23 16:00:00', 120, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 12:00:00', '2024-12-23 16:00:00', 120, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 12:30:00', '2024-12-23 16:30:00', 120, null, null, 2, 240, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 12:30:00', '2024-12-23 16:30:00', 120, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:00:00', '2024-12-23 15:00:00', 120, '2024-12-23 12:30:00', '2024-12-23 13:00:00', 0, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:00:00', '2024-12-23 15:00:00', 120, '2024-12-23 13:00:00', '2024-12-23 13:30:00', 0, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 12:30:00', '2024-12-23 16:30:00', 120, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 21:00:00', 120, '2024-12-23 17:00:00', '2024-12-23 17:30:00', 1, 210, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 13:00:00', '2024-12-23 17:00:00', 120, null, null, 2, 240, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 21:00:00', 120, '2024-12-23 17:30:00', '2024-12-23 18:00:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:30:00', '2024-12-23 15:30:00', 120, '2024-12-23 12:00:00', '2024-12-23 12:30:00', 0, 210, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 10:00:00', '2024-12-23 14:00:00', 120, '2024-12-23 13:00:00', '2024-12-23 13:30:00', 0, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 13:00:00', '2024-12-23 17:00:00', 120, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 13:00:00', '2024-12-23 17:00:00', 120, null, null, 2, 240, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 10:00:00', '2024-12-23 14:00:00', 120, '2024-12-23 12:30:00', '2024-12-23 13:00:00', 0, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:00:00', '2024-12-23 14:00:00', 120, '2024-12-23 11:30:00', '2024-12-23 12:00:00', 0, 150, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 10:30:00', '2024-12-23 13:30:00', 120, '2024-12-23 12:30:00', '2024-12-23 13:00:00', 0, 150, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:30:00', '2024-12-23 15:30:00', 120, '2024-12-23 12:00:00', '2024-12-23 12:30:00', 0, 210, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 09:30:00', '2024-12-23 13:30:00', 120, '2024-12-23 13:00:00', '2024-12-23 13:30:00', 0, 210, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 10:00:00', '2024-12-23 14:00:00', 120, '2024-12-23 11:30:00', '2024-12-23 12:00:00', 0, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 21:00:00', 120, '2024-12-23 17:30:00', '2024-12-23 18:00:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 13:00:00', '2024-12-23 17:00:00', 120, null, null, 2, 240, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 13:00:00', '2024-12-23 17:00:00', 120, null, null, 2, 240, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:30:00', '2024-12-23 20:30:00', 120, null, null, 2, 180, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 18:00:00', '2024-12-23 21:00:00', 120, null, null, 2, 180, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 18:00:00', '2024-12-23 21:00:00', 120, null, null, 2, 180, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 15:30:00', '2024-12-23 18:30:00', 120, null, null, 2, 180, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 16:30:00', '2024-12-23 19:30:00', 120, '2024-12-23 17:00:00', '2024-12-23 17:30:00', 1, 150, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 16:30:00', '2024-12-23 19:30:00', 120, '2024-12-23 18:30:00', '2024-12-23 19:00:00', 1, 150, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 20:00:00', 120, '2024-12-23 18:30:00', '2024-12-23 19:00:00', 1, 150, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 19:00:00', 120, '2024-12-23 18:00:00', '2024-12-23 18:30:00', 1, 90, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:30:00', '2024-12-23 14:30:00', 120, '2024-12-23 11:30:00', '2024-12-23 12:00:00', 0, 150, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:30:00', '2024-12-23 15:30:00', 120, '2024-12-23 12:00:00', '2024-12-23 12:30:00', 0, 210, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 11:30:00', '2024-12-23 15:30:00', 120, '2024-12-23 12:00:00', '2024-12-23 12:30:00', 0, 210, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 15:30:00', '2024-12-23 18:30:00', 120, null, null, 2, 180, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 15:30:00', '2024-12-23 18:30:00', 120, null, null, 2, 180, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 18:00:00', '2024-12-23 21:00:00', 120, null, null, 2, 180, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 16:00:00', '2024-12-23 19:00:00', 120, '2024-12-23 18:00:00', '2024-12-23 18:30:00', 1, 150, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 19:00:00', 120, '2024-12-23 17:00:00', '2024-12-23 17:30:00', 1, 90, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 17:00:00', '2024-12-23 19:00:00', 120, '2024-12-23 17:30:00', '2024-12-23 18:00:00', 1, 90, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 19:30:00', '2024-12-23 21:30:00', 120, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 19:30:00', '2024-12-23 21:30:00', 120, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 19:30:00', '2024-12-23 21:30:00', 120, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-23 19:30:00', '2024-12-23 21:30:00', 120, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 08:30:00', '2024-12-24 12:30:00', 121, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 08:30:00', '2024-12-24 12:30:00', 121, null, null, 2, 240, 1, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 09:00:00', '2024-12-24 13:00:00', 121, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 09:00:00', '2024-12-24 13:00:00', 121, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 09:00:00', '2024-12-24 13:00:00', 121, null, null, 2, 240, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 09:00:00', '2024-12-24 13:00:00', 121, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 12:00:00', '2024-12-24 16:00:00', 121, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 12:00:00', '2024-12-24 16:00:00', 121, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 12:00:00', '2024-12-24 16:00:00', 121, null, null, 2, 240, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 12:30:00', '2024-12-24 16:30:00', 121, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 12:30:00', '2024-12-24 16:30:00', 121, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 20:00:00', 121, '2024-12-24 17:30:00', '2024-12-24 18:00:00', 1, 150, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 13:00:00', '2024-12-24 17:00:00', 121, null, null, 2, 240, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 13:00:00', '2024-12-24 17:00:00', 121, null, null, 2, 240, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 10:30:00', '2024-12-24 13:30:00', 121, '2024-12-24 12:30:00', '2024-12-24 13:00:00', 0, 150, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 21:00:00', 121, '2024-12-24 18:30:00', '2024-12-24 19:00:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 21:00:00', 121, '2024-12-24 18:00:00', '2024-12-24 18:30:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 11:00:00', '2024-12-24 14:00:00', 121, '2024-12-24 13:00:00', '2024-12-24 13:30:00', 0, 150, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 13:00:00', '2024-12-24 17:00:00', 121, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 11:00:00', '2024-12-24 15:00:00', 121, '2024-12-24 12:30:00', '2024-12-24 13:00:00', 0, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 12:30:00', '2024-12-24 16:30:00', 121, null, null, 2, 240, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 10:00:00', '2024-12-24 14:00:00', 121, '2024-12-24 12:30:00', '2024-12-24 13:00:00', 0, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 10:00:00', '2024-12-24 14:00:00', 121, '2024-12-24 11:30:00', '2024-12-24 12:00:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 21:00:00', 121, '2024-12-24 17:00:00', '2024-12-24 17:30:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 09:30:00', '2024-12-24 13:30:00', 121, '2024-12-24 11:30:00', '2024-12-24 12:00:00', 0, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 09:30:00', '2024-12-24 13:30:00', 121, '2024-12-24 13:00:00', '2024-12-24 13:30:00', 0, 210, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 10:00:00', '2024-12-24 14:00:00', 121, '2024-12-24 13:00:00', '2024-12-24 13:30:00', 0, 210, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 15:30:00', '2024-12-24 18:30:00', 121, null, null, 2, 180, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 11:30:00', '2024-12-24 14:30:00', 121, '2024-12-24 12:00:00', '2024-12-24 12:30:00', 0, 150, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 21:00:00', 121, '2024-12-24 17:30:00', '2024-12-24 18:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 11:30:00', '2024-12-24 15:30:00', 121, '2024-12-24 12:00:00', '2024-12-24 12:30:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 21:00:00', 121, '2024-12-24 17:30:00', '2024-12-24 18:00:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 11:30:00', '2024-12-24 15:30:00', 121, '2024-12-24 12:00:00', '2024-12-24 12:30:00', 0, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:30:00', '2024-12-24 20:30:00', 121, null, null, 2, 180, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:00:00', '2024-12-24 18:00:00', 121, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:00:00', '2024-12-24 18:00:00', 121, null, null, 2, 120, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:30:00', '2024-12-24 18:30:00', 121, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:30:00', '2024-12-24 19:30:00', 121, '2024-12-24 17:00:00', '2024-12-24 17:30:00', 1, 150, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 15:30:00', '2024-12-24 18:30:00', 121, null, null, 2, 180, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:30:00', '2024-12-24 19:30:00', 121, '2024-12-24 18:00:00', '2024-12-24 18:30:00', 1, 150, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:30:00', '2024-12-24 19:30:00', 121, '2024-12-24 18:30:00', '2024-12-24 19:00:00', 1, 150, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 11:30:00', '2024-12-24 14:30:00', 121, '2024-12-24 11:30:00', '2024-12-24 12:00:00', 0, 150, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:00:00', '2024-12-24 19:00:00', 121, '2024-12-24 18:30:00', '2024-12-24 19:00:00', 1, 150, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:00:00', '2024-12-24 19:00:00', 121, '2024-12-24 18:00:00', '2024-12-24 18:30:00', 1, 150, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 21:00:00', 121, '2024-12-24 17:30:00', '2024-12-24 18:00:00', 1, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 16:30:00', '2024-12-24 19:30:00', 121, '2024-12-24 17:00:00', '2024-12-24 17:30:00', 1, 150, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 17:00:00', '2024-12-24 19:00:00', 121, '2024-12-24 17:00:00', '2024-12-24 17:30:00', 1, 90, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 19:30:00', '2024-12-24 21:30:00', 121, null, null, 2, 120, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 19:30:00', '2024-12-24 21:30:00', 121, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 19:30:00', '2024-12-24 21:30:00', 121, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-24 19:30:00', '2024-12-24 21:30:00', 121, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 08:30:00', '2024-12-25 12:30:00', 122, null, null, 2, 240, 1, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 08:30:00', '2024-12-25 12:30:00', 122, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 13:00:00', '2024-12-25 17:00:00', 122, null, null, 2, 240, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 09:00:00', '2024-12-25 13:00:00', 122, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 09:00:00', '2024-12-25 13:00:00', 122, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 09:00:00', '2024-12-25 13:00:00', 122, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:00:00', '2024-12-25 16:00:00', 122, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:00:00', '2024-12-25 16:00:00', 122, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:30:00', '2024-12-25 20:30:00', 122, '2024-12-25 18:30:00', '2024-12-25 19:00:00', 1, 210, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:30:00', '2024-12-25 16:30:00', 122, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:30:00', '2024-12-25 16:30:00', 122, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:30:00', '2024-12-25 16:30:00', 122, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 13:00:00', '2024-12-25 17:00:00', 122, null, null, 2, 240, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 13:00:00', '2024-12-25 17:00:00', 122, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:30:00', '2024-12-25 20:30:00', 122, '2024-12-25 18:30:00', '2024-12-25 19:00:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 17:00:00', '2024-12-25 21:00:00', 122, '2024-12-25 17:30:00', '2024-12-25 18:00:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 17:00:00', '2024-12-25 21:00:00', 122, '2024-12-25 17:30:00', '2024-12-25 18:00:00', 1, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 17:00:00', '2024-12-25 21:00:00', 122, '2024-12-25 17:30:00', '2024-12-25 18:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:30:00', '2024-12-25 20:30:00', 122, '2024-12-25 18:00:00', '2024-12-25 18:30:00', 1, 210, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 17:00:00', '2024-12-25 21:00:00', 122, '2024-12-25 17:00:00', '2024-12-25 17:30:00', 1, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:30:00', '2024-12-25 20:30:00', 122, '2024-12-25 18:00:00', '2024-12-25 18:30:00', 1, 210, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:00:00', '2024-12-25 16:00:00', 122, null, null, 2, 240, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 10:30:00', '2024-12-25 14:30:00', 122, '2024-12-25 13:00:00', '2024-12-25 13:30:00', 0, 210, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 12:00:00', '2024-12-25 16:00:00', 122, null, null, 2, 240, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 09:30:00', '2024-12-25 13:30:00', 122, '2024-12-25 11:30:00', '2024-12-25 12:00:00', 0, 210, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:00:00', '2024-12-25 20:00:00', 122, '2024-12-25 17:00:00', '2024-12-25 17:30:00', 1, 210, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 13:00:00', '2024-12-25 17:00:00', 122, null, null, 2, 240, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 09:00:00', '2024-12-25 13:00:00', 122, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 13:30:00', '2024-12-25 17:30:00', 122, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 11:30:00', '2024-12-25 15:30:00', 122, '2024-12-25 12:00:00', '2024-12-25 12:30:00', 0, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 11:00:00', '2024-12-25 14:00:00', 122, '2024-12-25 12:30:00', '2024-12-25 13:00:00', 0, 150, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 11:30:00', '2024-12-25 14:30:00', 122, '2024-12-25 11:30:00', '2024-12-25 12:00:00', 0, 150, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 10:00:00', '2024-12-25 14:00:00', 122, '2024-12-25 12:30:00', '2024-12-25 13:00:00', 0, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 10:00:00', '2024-12-25 14:00:00', 122, '2024-12-25 11:30:00', '2024-12-25 12:00:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 10:00:00', '2024-12-25 14:00:00', 122, '2024-12-25 13:00:00', '2024-12-25 13:30:00', 0, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 15:30:00', '2024-12-25 18:30:00', 122, null, null, 2, 180, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 15:30:00', '2024-12-25 18:30:00', 122, null, null, 2, 180, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 11:30:00', '2024-12-25 14:30:00', 122, '2024-12-25 12:00:00', '2024-12-25 12:30:00', 0, 150, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 11:30:00', '2024-12-25 15:30:00', 122, '2024-12-25 12:30:00', '2024-12-25 13:00:00', 0, 210, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 11:30:00', '2024-12-25 15:30:00', 122, '2024-12-25 12:00:00', '2024-12-25 12:30:00', 0, 210, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:30:00', '2024-12-25 20:30:00', 122, '2024-12-25 17:00:00', '2024-12-25 17:30:00', 1, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 16:00:00', '2024-12-25 18:00:00', 122, null, null, 2, 120, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-25 19:30:00', '2024-12-25 21:30:00', 122, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-26 19:10:32', 0, '2024-12-26 08:30:00', '2024-12-26 12:30:00', 123, null, null, 2, 240, 1, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 08:30:00', '2024-12-26 12:30:00', 123, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-26 19:08:17', 0, '2024-12-26 09:00:00', '2024-12-26 13:00:00', 123, null, null, 2, 240, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 09:00:00', '2024-12-26 13:00:00', 123, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 09:00:00', '2024-12-26 13:00:00', 123, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-26 19:08:46', 0, '2024-12-26 09:00:00', '2024-12-26 13:00:00', 123, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:00:00', '2024-12-26 16:00:00', 123, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:00:00', '2024-12-26 16:00:00', 123, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:00:00', '2024-12-26 16:00:00', 123, null, null, 2, 240, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:30:00', '2024-12-26 16:30:00', 123, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:30:00', '2024-12-26 16:30:00', 123, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:30:00', '2024-12-26 16:30:00', 123, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 13:00:00', '2024-12-26 17:00:00', 123, null, null, 2, 240, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 13:00:00', '2024-12-26 17:00:00', 123, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:30:00', '2024-12-26 20:30:00', 123, '2024-12-26 18:30:00', '2024-12-26 19:00:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 17:00:00', '2024-12-26 21:00:00', 123, '2024-12-26 17:30:00', '2024-12-26 18:00:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 13:00:00', '2024-12-26 17:00:00', 123, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 17:00:00', '2024-12-26 21:00:00', 123, '2024-12-26 17:30:00', '2024-12-26 18:00:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:30:00', '2024-12-26 20:30:00', 123, '2024-12-26 18:00:00', '2024-12-26 18:30:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 17:00:00', '2024-12-26 21:00:00', 123, '2024-12-26 17:00:00', '2024-12-26 17:30:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 10:00:00', '2024-12-26 14:00:00', 123, '2024-12-26 13:00:00', '2024-12-26 13:30:00', 0, 210, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 12:00:00', '2024-12-26 16:00:00', 123, null, null, 2, 240, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 10:30:00', '2024-12-26 14:30:00', 123, '2024-12-26 13:00:00', '2024-12-26 13:30:00', 0, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 10:00:00', '2024-12-26 14:00:00', 123, '2024-12-26 11:30:00', '2024-12-26 12:00:00', 0, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 09:30:00', '2024-12-26 13:30:00', 123, '2024-12-26 11:30:00', '2024-12-26 12:00:00', 0, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 10:00:00', '2024-12-26 14:00:00', 123, '2024-12-26 12:30:00', '2024-12-26 13:00:00', 0, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 17:00:00', '2024-12-26 21:00:00', 123, '2024-12-26 17:30:00', '2024-12-26 18:00:00', 1, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 13:00:00', '2024-12-26 17:00:00', 123, null, null, 2, 240, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 13:30:00', '2024-12-26 17:30:00', 123, null, null, 2, 240, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 11:30:00', '2024-12-26 15:30:00', 123, '2024-12-26 12:00:00', '2024-12-26 12:30:00', 0, 210, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 11:00:00', '2024-12-26 14:00:00', 123, '2024-12-26 12:30:00', '2024-12-26 13:00:00', 0, 150, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 11:30:00', '2024-12-26 14:30:00', 123, '2024-12-26 11:30:00', '2024-12-26 12:00:00', 0, 150, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:00:00', '2024-12-26 20:00:00', 123, '2024-12-26 17:00:00', '2024-12-26 17:30:00', 1, 210, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:30:00', '2024-12-26 20:30:00', 123, '2024-12-26 18:30:00', '2024-12-26 19:00:00', 1, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:30:00', '2024-12-26 20:30:00', 123, '2024-12-26 18:00:00', '2024-12-26 18:30:00', 1, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 15:30:00', '2024-12-26 18:30:00', 123, null, null, 2, 180, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 15:30:00', '2024-12-26 18:30:00', 123, null, null, 2, 180, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 11:30:00', '2024-12-26 14:30:00', 123, '2024-12-26 12:00:00', '2024-12-26 12:30:00', 0, 150, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 11:30:00', '2024-12-26 15:30:00', 123, '2024-12-26 12:30:00', '2024-12-26 13:00:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 11:30:00', '2024-12-26 15:30:00', 123, '2024-12-26 12:00:00', '2024-12-26 12:30:00', 0, 210, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:30:00', '2024-12-26 20:30:00', 123, '2024-12-26 17:00:00', '2024-12-26 17:30:00', 1, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 16:00:00', '2024-12-26 18:00:00', 123, null, null, 2, 120, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-26 19:30:00', '2024-12-26 21:30:00', 123, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 08:30:00', '2024-12-27 12:30:00', 124, null, null, 2, 240, 1, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 08:30:00', '2024-12-27 12:30:00', 124, null, null, 2, 240, 1, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:00:00', '2024-12-27 13:00:00', 124, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:00:00', '2024-12-27 13:00:00', 124, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:00:00', '2024-12-27 13:00:00', 124, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:00:00', '2024-12-27 13:00:00', 124, null, null, 2, 240, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:00:00', '2024-12-27 13:00:00', 124, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:00:00', '2024-12-27 13:00:00', 124, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:30:00', '2024-12-27 13:30:00', 124, '2024-12-27 12:30:00', '2024-12-27 13:00:00', 0, 210, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:30:00', '2024-12-27 13:30:00', 124, '2024-12-27 11:30:00', '2024-12-27 12:00:00', 0, 210, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 09:30:00', '2024-12-27 13:30:00', 124, '2024-12-27 13:00:00', '2024-12-27 13:30:00', 0, 210, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 10:00:00', '2024-12-27 14:00:00', 124, '2024-12-27 12:30:00', '2024-12-27 13:00:00', 0, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 10:00:00', '2024-12-27 14:00:00', 124, '2024-12-27 11:30:00', '2024-12-27 12:00:00', 0, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 17:00:00', '2024-12-27 21:00:00', 124, '2024-12-27 17:30:00', '2024-12-27 18:00:00', 1, 210, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 17:00:00', '2024-12-27 21:00:00', 124, '2024-12-27 17:30:00', '2024-12-27 18:00:00', 1, 210, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:00:00', '2024-12-27 15:00:00', 124, '2024-12-27 11:30:00', '2024-12-27 12:00:00', 0, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 12:30:00', '2024-12-27 16:30:00', 124, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:00:00', '2024-12-27 15:00:00', 124, '2024-12-27 13:00:00', '2024-12-27 13:30:00', 0, 210, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 12:00:00', '2024-12-27 16:00:00', 124, null, null, 2, 240, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 12:00:00', '2024-12-27 12:30:00', 0, 210, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 13:00:00', '2024-12-27 17:00:00', 124, null, null, 2, 240, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 12:30:00', '2024-12-27 13:00:00', 0, 210, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 13:00:00', '2024-12-27 13:30:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 12:00:00', '2024-12-27 12:30:00', 0, 210, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 12:30:00', '2024-12-27 16:30:00', 124, null, null, 2, 240, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 12:00:00', '2024-12-27 12:30:00', 0, 210, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 10:00:00', '2024-12-27 14:00:00', 124, '2024-12-27 13:00:00', '2024-12-27 13:30:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:00:00', '2024-12-27 14:00:00', 124, '2024-12-27 12:30:00', '2024-12-27 13:00:00', 0, 150, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 10:30:00', '2024-12-27 13:30:00', 124, '2024-12-27 11:30:00', '2024-12-27 12:00:00', 0, 150, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 12:30:00', '2024-12-27 16:30:00', 124, null, null, 2, 240, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 12:00:00', '2024-12-27 12:30:00', 0, 210, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 14:30:00', 124, '2024-12-27 11:30:00', '2024-12-27 12:00:00', 0, 150, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 11:30:00', '2024-12-27 15:30:00', 124, '2024-12-27 12:00:00', '2024-12-27 12:30:00', 0, 210, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 15:30:00', '2024-12-27 19:30:00', 124, '2024-12-27 18:00:00', '2024-12-27 18:30:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 16:30:00', '2024-12-27 20:30:00', 124, '2024-12-27 17:00:00', '2024-12-27 17:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 15:30:00', '2024-12-27 19:30:00', 124, '2024-12-27 18:30:00', '2024-12-27 19:00:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 15:30:00', '2024-12-27 19:30:00', 124, '2024-12-27 18:30:00', '2024-12-27 19:00:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 15:30:00', '2024-12-27 19:30:00', 124, '2024-12-27 17:00:00', '2024-12-27 17:30:00', 1, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 15:30:00', '2024-12-27 19:30:00', 124, '2024-12-27 18:00:00', '2024-12-27 18:30:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 10:30:00', '2024-12-27 13:30:00', 124, '2024-12-27 12:30:00', '2024-12-27 13:00:00', 0, 150, 0, '59');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 18:30:00', '2024-12-27 20:30:00', 124, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-27 19:30:00', '2024-12-27 21:30:00', 124, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 12:00:00', '2024-12-28 16:00:00', 125, null, null, 2, 240, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 12:30:00', '2024-12-28 16:30:00', 125, null, null, 2, 240, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 13:00:00', '2024-12-28 13:30:00', 0, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 12:30:00', '2024-12-28 13:00:00', 0, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 12:30:00', '2024-12-28 13:00:00', 0, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 13:00:00', '2024-12-28 13:30:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 11:30:00', '2024-12-28 12:00:00', 0, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 12:30:00', '2024-12-28 13:00:00', 0, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 14:00:00', 125, '2024-12-28 11:30:00', '2024-12-28 12:00:00', 0, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:00:00', '2024-12-28 15:00:00', 125, '2024-12-28 11:30:00', '2024-12-28 12:00:00', 0, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:00:00', '2024-12-28 15:00:00', 125, '2024-12-28 13:00:00', '2024-12-28 13:30:00', 0, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:00:00', '2024-12-28 15:00:00', 125, '2024-12-28 12:30:00', '2024-12-28 13:00:00', 0, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 11:30:00', '2024-12-28 12:00:00', 0, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:00:00', '2024-12-28 12:30:00', 0, 210, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:30:00', '2024-12-28 14:30:00', 125, '2024-12-28 11:30:00', '2024-12-28 12:00:00', 0, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 18:00:00', '2024-12-28 18:30:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 18:30:00', '2024-12-28 19:00:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 09:30:00', '2024-12-28 13:30:00', 125, '2024-12-28 11:30:00', '2024-12-28 12:00:00', 0, 210, 1, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 17:30:00', '2024-12-28 18:00:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 17:00:00', '2024-12-28 17:30:00', 1, 210, 0, '8');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 18:30:00', '2024-12-28 19:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:30:00', '2024-12-28 13:00:00', 0, 210, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 13:00:00', '2024-12-28 13:30:00', 0, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:00:00', '2024-12-28 12:30:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:00:00', '2024-12-28 12:30:00', 0, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:00:00', '2024-12-28 12:30:00', 0, 210, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 09:30:00', '2024-12-28 13:30:00', 125, '2024-12-28 13:00:00', '2024-12-28 13:30:00', 0, 210, 1, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:30:00', '2024-12-28 13:30:00', 125, '2024-12-28 12:30:00', '2024-12-28 13:00:00', 0, 150, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:00:00', '2024-12-28 12:30:00', 0, 210, 0, '62');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 11:30:00', '2024-12-28 15:30:00', 125, '2024-12-28 12:00:00', '2024-12-28 12:30:00', 0, 210, 0, '66');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 13:00:00', 125, null, null, 2, 180, 0, '69');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 13:00:00', 125, null, null, 2, 180, 0, '72');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 13:00:00', 125, null, null, 2, 180, 0, '73');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 13:00:00', 125, null, null, 2, 180, 0, '77');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 10:00:00', '2024-12-28 13:00:00', 125, null, null, 2, 180, 0, '80');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 18:00:00', '2024-12-28 18:30:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 17:30:00', '2024-12-28 18:00:00', 1, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 15:30:00', '2024-12-28 19:30:00', 125, '2024-12-28 17:00:00', '2024-12-28 17:30:00', 1, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 18:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 180, 0, '1');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '2');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 19:30:00', '2024-12-28 21:30:00', 125, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:00:00', '2024-12-28 22:00:00', 125, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-28 20:30:00', '2024-12-28 22:30:00', 125, null, null, 2, 120, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 09:30:00', '2024-12-29 13:30:00', 126, '2024-12-29 12:30:00', '2024-12-29 13:00:00', 0, 210, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 09:30:00', '2024-12-29 13:30:00', 126, '2024-12-29 11:30:00', '2024-12-29 12:00:00', 0, 210, 1, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:30:00', '2024-12-29 16:30:00', 126, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:30:00', '2024-12-29 16:30:00', 126, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 16:00:00', 126, null, null, 2, 240, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 11:30:00', '2024-12-29 15:30:00', 126, '2024-12-29 12:00:00', '2024-12-29 12:30:00', 0, 210, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 14:00:00', 126, null, null, 2, 120, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 14:00:00', 126, null, null, 2, 120, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 14:00:00', 126, null, null, 2, 120, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 15:00:00', 126, null, null, 2, 180, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 20:00:00', 126, '2024-12-29 17:30:00', '2024-12-29 18:00:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 20:00:00', 126, '2024-12-29 17:00:00', '2024-12-29 17:30:00', 1, 210, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 15:00:00', 126, null, null, 2, 180, 0, '79');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:30:00', '2024-12-29 22:30:00', 126, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 180, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 180, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 180, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '79');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 14:00:00', 126, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 15:00:00', 126, null, null, 2, 180, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 12:00:00', '2024-12-29 15:00:00', 126, null, null, 2, 180, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 16:00:00', '2024-12-29 18:00:00', 126, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:00:00', '2024-12-29 21:00:00', 126, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:00:00', '2024-12-29 21:00:00', 126, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 180, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:30:00', '2024-12-29 21:30:00', 126, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 19:30:00', '2024-12-29 21:30:00', 126, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:00:00', '2024-12-29 22:00:00', 126, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:30:00', '2024-12-29 22:30:00', 126, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:30:00', '2024-12-29 22:30:00', 126, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES (null, '2024-12-25 20:16:17', 0, '2024-12-29 20:30:00', '2024-12-29 22:30:00', 126, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 08:30:00', '2024-12-30 12:30:00', 239, null, null, 2, 240, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 08:30:00', '2024-12-30 12:30:00', 239, null, null, 2, 240, 1, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:00:00', '2024-12-30 13:00:00', 239, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:00:00', '2024-12-30 13:00:00', 239, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:00:00', '2024-12-30 13:00:00', 239, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:00:00', '2024-12-30 13:00:00', 239, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:00:00', '2024-12-30 13:00:00', 239, null, null, 2, 240, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:00:00', '2024-12-30 13:00:00', 239, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:30:00', '2024-12-30 13:30:00', 239, '2024-12-30 12:30:00', '2024-12-30 13:00:00', 0, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 12:00:00', '2024-12-30 16:00:00', 239, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 12:00:00', '2024-12-30 16:00:00', 239, null, null, 2, 240, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 12:00:00', '2024-12-30 16:00:00', 239, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 12:30:00', '2024-12-30 16:30:00', 239, null, null, 2, 240, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 12:30:00', '2024-12-30 16:30:00', 239, null, null, 2, 240, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 12:30:00', '2024-12-30 16:30:00', 239, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 13:00:00', '2024-12-30 17:00:00', 239, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 13:00:00', '2024-12-30 17:00:00', 239, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:30:00', '2024-12-30 13:30:00', 239, '2024-12-30 13:00:00', '2024-12-30 13:30:00', 0, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 10:00:00', '2024-12-30 14:00:00', 239, '2024-12-30 12:30:00', '2024-12-30 13:00:00', 0, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 10:00:00', '2024-12-30 14:00:00', 239, '2024-12-30 11:30:00', '2024-12-30 12:00:00', 0, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 10:00:00', '2024-12-30 14:00:00', 239, '2024-12-30 13:00:00', '2024-12-30 13:30:00', 0, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 10:30:00', '2024-12-30 13:30:00', 239, '2024-12-30 12:30:00', '2024-12-30 13:00:00', 0, 150, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:00:00', '2024-12-30 15:00:00', 239, '2024-12-30 12:30:00', '2024-12-30 13:00:00', 0, 210, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 09:30:00', '2024-12-30 13:30:00', 239, '2024-12-30 11:30:00', '2024-12-30 12:00:00', 0, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 21:00:00', 239, '2024-12-30 18:30:00', '2024-12-30 19:00:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 21:00:00', 239, '2024-12-30 17:00:00', '2024-12-30 17:30:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 21:00:00', 239, '2024-12-30 17:30:00', '2024-12-30 18:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 21:00:00', 239, '2024-12-30 17:30:00', '2024-12-30 18:00:00', 1, 210, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 21:00:00', 239, '2024-12-30 17:30:00', '2024-12-30 18:00:00', 1, 210, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:30:00', '2024-12-30 15:30:00', 239, '2024-12-30 12:00:00', '2024-12-30 12:30:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 21:00:00', 239, '2024-12-30 18:00:00', '2024-12-30 18:30:00', 1, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 13:00:00', '2024-12-30 17:00:00', 239, null, null, 2, 240, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 13:00:00', '2024-12-30 17:00:00', 239, null, null, 2, 240, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 13:00:00', '2024-12-30 17:00:00', 239, null, null, 2, 240, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 13:00:00', '2024-12-30 17:00:00', 239, null, null, 2, 240, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:30:00', '2024-12-30 15:30:00', 239, '2024-12-30 12:00:00', '2024-12-30 12:30:00', 0, 210, 0, '56');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:30:00', '2024-12-30 15:30:00', 239, '2024-12-30 12:00:00', '2024-12-30 12:30:00', 0, 210, 0, '58');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 15:30:00', '2024-12-30 19:30:00', 239, '2024-12-30 17:00:00', '2024-12-30 17:30:00', 1, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:30:00', '2024-12-30 20:30:00', 239, null, null, 2, 180, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 18:00:00', '2024-12-30 21:00:00', 239, null, null, 2, 180, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 18:00:00', '2024-12-30 21:00:00', 239, null, null, 2, 180, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:30:00', '2024-12-30 15:30:00', 239, '2024-12-30 11:30:00', '2024-12-30 12:00:00', 0, 210, 0, '59');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:00:00', '2024-12-30 15:00:00', 239, '2024-12-30 11:30:00', '2024-12-30 12:00:00', 0, 210, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:00:00', '2024-12-30 15:00:00', 239, '2024-12-30 13:00:00', '2024-12-30 13:30:00', 0, 210, 0, '63');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 16:30:00', '2024-12-30 19:30:00', 239, '2024-12-30 18:00:00', '2024-12-30 18:30:00', 1, 150, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 20:00:00', 239, '2024-12-30 17:30:00', '2024-12-30 18:00:00', 1, 150, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 16:30:00', '2024-12-30 19:30:00', 239, '2024-12-30 18:30:00', '2024-12-30 19:00:00', 1, 150, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 11:30:00', '2024-12-30 15:30:00', 239, '2024-12-30 12:00:00', '2024-12-30 12:30:00', 0, 210, 0, '65');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 15:00:00', '2024-12-30 19:00:00', 239, '2024-12-30 17:00:00', '2024-12-30 17:30:00', 1, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 15:30:00', '2024-12-30 18:30:00', 239, null, null, 2, 180, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 15:30:00', '2024-12-30 18:30:00', 239, null, null, 2, 180, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:30:00', '2024-12-30 20:30:00', 239, null, null, 2, 180, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 16:00:00', '2024-12-30 19:00:00', 239, '2024-12-30 18:30:00', '2024-12-30 19:00:00', 1, 150, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 16:00:00', '2024-12-30 19:00:00', 239, '2024-12-30 18:00:00', '2024-12-30 18:30:00', 1, 150, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 17:00:00', '2024-12-30 19:00:00', 239, '2024-12-30 17:00:00', '2024-12-30 17:30:00', 1, 90, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 19:30:00', '2024-12-30 21:30:00', 239, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 19:30:00', '2024-12-30 21:30:00', 239, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 19:30:00', '2024-12-30 21:30:00', 239, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-30 19:30:00', '2024-12-30 21:30:00', 239, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 08:30:00', '2024-12-31 12:30:00', 240, null, null, 2, 240, 1, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 08:30:00', '2024-12-31 12:30:00', 240, null, null, 2, 240, 1, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:00:00', '2024-12-31 13:00:00', 240, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:00:00', '2024-12-31 13:00:00', 240, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:00:00', '2024-12-31 13:00:00', 240, null, null, 2, 240, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:00:00', '2024-12-31 13:00:00', 240, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:00:00', '2024-12-31 13:00:00', 240, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:00:00', '2024-12-31 13:00:00', 240, null, null, 2, 240, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 12:00:00', '2024-12-31 16:00:00', 240, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 12:00:00', '2024-12-31 16:00:00', 240, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 12:30:00', '2024-12-31 16:30:00', 240, null, null, 2, 240, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 12:30:00', '2024-12-31 16:30:00', 240, null, null, 2, 240, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 12:30:00', '2024-12-31 16:30:00', 240, null, null, 2, 240, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 12:30:00', '2024-12-31 16:30:00', 240, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 13:00:00', '2024-12-31 17:00:00', 240, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 13:00:00', '2024-12-31 17:00:00', 240, null, null, 2, 240, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:30:00', '2024-12-31 13:30:00', 240, '2024-12-31 13:00:00', '2024-12-31 13:30:00', 0, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:30:00', '2024-12-31 13:30:00', 240, '2024-12-31 11:30:00', '2024-12-31 12:00:00', 0, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 10:00:00', '2024-12-31 14:00:00', 240, '2024-12-31 11:30:00', '2024-12-31 12:00:00', 0, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 10:00:00', '2024-12-31 14:00:00', 240, '2024-12-31 13:00:00', '2024-12-31 13:30:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 10:00:00', '2024-12-31 14:00:00', 240, '2024-12-31 12:30:00', '2024-12-31 13:00:00', 0, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 13:00:00', '2024-12-31 17:00:00', 240, null, null, 2, 240, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 10:30:00', '2024-12-31 13:30:00', 240, '2024-12-31 13:00:00', '2024-12-31 13:30:00', 0, 150, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 09:30:00', '2024-12-31 13:30:00', 240, '2024-12-31 12:30:00', '2024-12-31 13:00:00', 0, 210, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 18:00:00', '2024-12-31 18:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 18:30:00', '2024-12-31 19:00:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 17:00:00', '2024-12-31 17:30:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 17:30:00', '2024-12-31 18:00:00', 1, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 18:00:00', '2024-12-31 18:30:00', 1, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:00:00', '2024-12-31 15:00:00', 240, '2024-12-31 11:30:00', '2024-12-31 12:00:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 17:30:00', '2024-12-31 18:00:00', 1, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:30:00', '2024-12-31 14:30:00', 240, '2024-12-31 11:30:00', '2024-12-31 12:00:00', 0, 150, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:30:00', '2024-12-31 15:30:00', 240, '2024-12-31 12:00:00', '2024-12-31 12:30:00', 0, 210, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:30:00', '2024-12-31 15:30:00', 240, '2024-12-31 12:30:00', '2024-12-31 13:00:00', 0, 210, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:30:00', '2024-12-31 15:30:00', 240, '2024-12-31 12:00:00', '2024-12-31 12:30:00', 0, 210, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:30:00', '2024-12-31 15:30:00', 240, '2024-12-31 12:00:00', '2024-12-31 12:30:00', 0, 210, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 11:30:00', '2024-12-31 15:30:00', 240, '2024-12-31 12:00:00', '2024-12-31 12:30:00', 0, 210, 0, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 17:30:00', '2024-12-31 18:00:00', 1, 210, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 17:30:00', '2024-12-31 18:00:00', 1, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 21:00:00', 240, '2024-12-31 17:30:00', '2024-12-31 18:00:00', 1, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:30:00', '2024-12-31 20:30:00', 240, null, null, 2, 180, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 15:30:00', '2024-12-31 18:30:00', 240, null, null, 2, 180, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 15:30:00', '2024-12-31 18:30:00', 240, null, null, 2, 180, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 15:30:00', '2024-12-31 18:30:00', 240, null, null, 2, 180, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:30:00', '2024-12-31 19:30:00', 240, '2024-12-31 17:00:00', '2024-12-31 17:30:00', 1, 150, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:00:00', '2024-12-31 19:00:00', 240, '2024-12-31 18:30:00', '2024-12-31 19:00:00', 1, 150, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:30:00', '2024-12-31 19:30:00', 240, '2024-12-31 18:30:00', '2024-12-31 19:00:00', 1, 150, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:30:00', '2024-12-31 19:30:00', 240, '2024-12-31 18:00:00', '2024-12-31 18:30:00', 1, 150, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 15:30:00', '2024-12-31 18:30:00', 240, null, null, 2, 180, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 15:30:00', '2024-12-31 18:30:00', 240, null, null, 2, 180, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:00:00', '2024-12-31 19:00:00', 240, '2024-12-31 17:00:00', '2024-12-31 17:30:00', 1, 150, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 17:00:00', '2024-12-31 20:00:00', 240, '2024-12-31 17:00:00', '2024-12-31 17:30:00', 1, 150, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:00:00', '2024-12-31 19:00:00', 240, '2024-12-31 18:00:00', '2024-12-31 18:30:00', 1, 150, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:30:00', '2024-12-31 19:30:00', 240, '2024-12-31 17:00:00', '2024-12-31 17:30:00', 1, 150, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 16:30:00', '2024-12-31 19:30:00', 240, '2024-12-31 18:30:00', '2024-12-31 19:00:00', 1, 150, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 19:30:00', '2024-12-31 21:30:00', 240, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 19:30:00', '2024-12-31 21:30:00', 240, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 19:30:00', '2024-12-31 21:30:00', 240, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2024-12-31 19:30:00', '2024-12-31 21:30:00', 240, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 08:30:00', '2025-01-01 12:30:00', 241, null, null, 2, 240, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 08:30:00', '2025-01-01 12:30:00', 241, null, null, 2, 240, 1, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:00:00', '2025-01-01 13:00:00', 241, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:00:00', '2025-01-01 13:00:00', 241, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:00:00', '2025-01-01 13:00:00', 241, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:00:00', '2025-01-01 13:00:00', 241, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:00:00', '2025-01-01 13:00:00', 241, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:00:00', '2025-01-01 13:00:00', 241, null, null, 2, 240, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:00:00', '2025-01-01 16:00:00', 241, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:30:00', '2025-01-01 16:30:00', 241, null, null, 2, 240, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:00:00', '2025-01-01 17:00:00', 241, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:30:00', '2025-01-01 16:30:00', 241, null, null, 2, 240, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:30:00', '2025-01-01 16:30:00', 241, null, null, 2, 240, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:30:00', '2025-01-01 16:30:00', 241, null, null, 2, 240, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:00:00', '2025-01-01 16:00:00', 241, null, null, 2, 240, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:00:00', '2025-01-01 16:00:00', 241, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 12:00:00', '2025-01-01 16:00:00', 241, null, null, 2, 240, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:30:00', '2025-01-01 20:30:00', 241, '2025-01-01 17:00:00', '2025-01-01 17:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:30:00', '2025-01-01 13:30:00', 241, '2025-01-01 11:30:00', '2025-01-01 12:00:00', 0, 210, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:30:00', '2025-01-01 20:30:00', 241, '2025-01-01 18:30:00', '2025-01-01 19:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:00:00', '2025-01-01 17:00:00', 241, null, null, 2, 240, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:00:00', '2025-01-01 17:00:00', 241, null, null, 2, 240, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 09:30:00', '2025-01-01 13:30:00', 241, '2025-01-01 12:30:00', '2025-01-01 13:00:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 18:00:00', '2025-01-01 18:30:00', 1, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 18:30:00', '2025-01-01 19:00:00', 1, 210, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 17:00:00', '2025-01-01 17:30:00', 1, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 10:30:00', '2025-01-01 14:30:00', 241, '2025-01-01 13:00:00', '2025-01-01 13:30:00', 0, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 10:30:00', '2025-01-01 14:30:00', 241, '2025-01-01 12:30:00', '2025-01-01 13:00:00', 0, 210, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 17:00:00', '2025-01-01 17:30:00', 1, 210, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 17:30:00', '2025-01-01 18:00:00', 1, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:00:00', '2025-01-01 17:00:00', 241, null, null, 2, 240, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:00:00', '2025-01-01 17:00:00', 241, null, null, 2, 240, 0, '49');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:00:00', '2025-01-01 17:00:00', 241, null, null, 2, 240, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 13:30:00', '2025-01-01 17:30:00', 241, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 10:00:00', '2025-01-01 14:00:00', 241, '2025-01-01 12:30:00', '2025-01-01 13:00:00', 0, 210, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 17:30:00', '2025-01-01 18:00:00', 1, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 17:30:00', '2025-01-01 18:00:00', 1, 210, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 10:00:00', '2025-01-01 14:00:00', 241, '2025-01-01 11:30:00', '2025-01-01 12:00:00', 0, 210, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 11:00:00', '2025-01-01 14:00:00', 241, '2025-01-01 13:00:00', '2025-01-01 13:30:00', 0, 150, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:00:00', '2025-01-01 19:00:00', 241, '2025-01-01 18:00:00', '2025-01-01 18:30:00', 1, 150, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 11:30:00', '2025-01-01 14:30:00', 241, '2025-01-01 11:30:00', '2025-01-01 12:00:00', 0, 150, 0, '58');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 17:00:00', '2025-01-01 21:00:00', 241, '2025-01-01 17:30:00', '2025-01-01 18:00:00', 1, 210, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 11:30:00', '2025-01-01 15:30:00', 241, '2025-01-01 12:00:00', '2025-01-01 12:30:00', 0, 210, 0, '60');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 15:30:00', '2025-01-01 17:30:00', 241, null, null, 2, 120, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:00:00', '2025-01-01 18:00:00', 241, null, null, 2, 120, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 11:30:00', '2025-01-01 15:30:00', 241, '2025-01-01 12:00:00', '2025-01-01 12:30:00', 0, 210, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 11:30:00', '2025-01-01 15:30:00', 241, '2025-01-01 12:00:00', '2025-01-01 12:30:00', 0, 210, 0, '63');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:30:00', '2025-01-01 20:30:00', 241, '2025-01-01 18:00:00', '2025-01-01 18:30:00', 1, 210, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:30:00', '2025-01-01 20:30:00', 241, '2025-01-01 17:00:00', '2025-01-01 17:30:00', 1, 210, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:00:00', '2025-01-01 19:00:00', 241, '2025-01-01 18:30:00', '2025-01-01 19:00:00', 1, 150, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 16:30:00', '2025-01-01 18:30:00', 241, null, null, 2, 120, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-01 19:30:00', '2025-01-01 21:30:00', 241, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 08:30:00', '2025-01-02 12:30:00', 242, null, null, 2, 240, 1, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 08:30:00', '2025-01-02 12:30:00', 242, null, null, 2, 240, 1, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:00:00', '2025-01-02 13:00:00', 242, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:00:00', '2025-01-02 13:00:00', 242, null, null, 2, 240, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:00:00', '2025-01-02 13:00:00', 242, null, null, 2, 240, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:00:00', '2025-01-02 13:00:00', 242, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:00:00', '2025-01-02 13:00:00', 242, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:00:00', '2025-01-02 13:00:00', 242, null, null, 2, 240, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:00:00', '2025-01-02 16:00:00', 242, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:30:00', '2025-01-02 16:30:00', 242, null, null, 2, 240, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:00:00', '2025-01-02 17:00:00', 242, null, null, 2, 240, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:30:00', '2025-01-02 16:30:00', 242, null, null, 2, 240, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:30:00', '2025-01-02 16:30:00', 242, null, null, 2, 240, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:30:00', '2025-01-02 16:30:00', 242, null, null, 2, 240, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:00:00', '2025-01-02 16:00:00', 242, null, null, 2, 240, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:00:00', '2025-01-02 16:00:00', 242, null, null, 2, 240, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 12:00:00', '2025-01-02 16:00:00', 242, null, null, 2, 240, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 10:00:00', '2025-01-02 14:00:00', 242, '2025-01-02 12:30:00', '2025-01-02 13:00:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:30:00', '2025-01-02 13:30:00', 242, '2025-01-02 11:30:00', '2025-01-02 12:00:00', 0, 210, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 10:00:00', '2025-01-02 14:00:00', 242, '2025-01-02 11:30:00', '2025-01-02 12:00:00', 0, 210, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:00:00', '2025-01-02 17:00:00', 242, null, null, 2, 240, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:00:00', '2025-01-02 17:00:00', 242, null, null, 2, 240, 0, '40');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 09:30:00', '2025-01-02 13:30:00', 242, '2025-01-02 12:30:00', '2025-01-02 13:00:00', 0, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 18:00:00', '2025-01-02 18:30:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 18:30:00', '2025-01-02 19:00:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 17:00:00', '2025-01-02 17:30:00', 1, 210, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 10:30:00', '2025-01-02 14:30:00', 242, '2025-01-02 13:00:00', '2025-01-02 13:30:00', 0, 210, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 10:30:00', '2025-01-02 14:30:00', 242, '2025-01-02 12:30:00', '2025-01-02 13:00:00', 0, 210, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 17:00:00', '2025-01-02 17:30:00', 1, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 17:30:00', '2025-01-02 18:00:00', 1, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:00:00', '2025-01-02 17:00:00', 242, null, null, 2, 240, 0, '46');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:00:00', '2025-01-02 17:00:00', 242, null, null, 2, 240, 0, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:00:00', '2025-01-02 17:00:00', 242, null, null, 2, 240, 0, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 13:30:00', '2025-01-02 17:30:00', 242, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 17:30:00', '2025-01-02 18:00:00', 1, 210, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 17:30:00', '2025-01-02 18:00:00', 1, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:30:00', '2025-01-02 20:30:00', 242, '2025-01-02 17:00:00', '2025-01-02 17:30:00', 1, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:30:00', '2025-01-02 20:30:00', 242, '2025-01-02 18:30:00', '2025-01-02 19:00:00', 1, 210, 0, '31');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 11:00:00', '2025-01-02 14:00:00', 242, '2025-01-02 13:00:00', '2025-01-02 13:30:00', 0, 150, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:00:00', '2025-01-02 19:00:00', 242, '2025-01-02 18:00:00', '2025-01-02 18:30:00', 1, 150, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 11:30:00', '2025-01-02 14:30:00', 242, '2025-01-02 11:30:00', '2025-01-02 12:00:00', 0, 150, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 17:00:00', '2025-01-02 21:00:00', 242, '2025-01-02 17:30:00', '2025-01-02 18:00:00', 1, 210, 0, '27');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 11:30:00', '2025-01-02 15:30:00', 242, '2025-01-02 12:00:00', '2025-01-02 12:30:00', 0, 210, 0, '56');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 15:30:00', '2025-01-02 17:30:00', 242, null, null, 2, 120, 0, '37');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:00:00', '2025-01-02 18:00:00', 242, null, null, 2, 120, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 11:30:00', '2025-01-02 15:30:00', 242, '2025-01-02 12:00:00', '2025-01-02 12:30:00', 0, 210, 0, '59');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 11:30:00', '2025-01-02 15:30:00', 242, '2025-01-02 12:00:00', '2025-01-02 12:30:00', 0, 210, 0, '62');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:30:00', '2025-01-02 20:30:00', 242, '2025-01-02 18:00:00', '2025-01-02 18:30:00', 1, 210, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:30:00', '2025-01-02 20:30:00', 242, '2025-01-02 17:00:00', '2025-01-02 17:30:00', 1, 210, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:00:00', '2025-01-02 19:00:00', 242, '2025-01-02 18:30:00', '2025-01-02 19:00:00', 1, 150, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 16:30:00', '2025-01-02 18:30:00', 242, null, null, 2, 120, 0, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-02 19:30:00', '2025-01-02 21:30:00', 242, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 08:30:00', '2025-01-03 12:30:00', 243, null, null, 2, 240, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 08:30:00', '2025-01-03 12:30:00', 243, null, null, 2, 240, 1, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:00:00', '2025-01-03 13:00:00', 243, null, null, 2, 240, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:30:00', '2025-01-03 13:30:00', 243, '2025-01-03 12:30:00', '2025-01-03 13:00:00', 0, 210, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:30:00', '2025-01-03 13:30:00', 243, '2025-01-03 11:30:00', '2025-01-03 12:00:00', 0, 210, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 09:30:00', '2025-01-03 13:30:00', 243, '2025-01-03 13:00:00', '2025-01-03 13:30:00', 0, 210, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 12:00:00', '2025-01-03 16:00:00', 243, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 17:00:00', '2025-01-03 21:00:00', 243, '2025-01-03 17:30:00', '2025-01-03 18:00:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 17:00:00', '2025-01-03 21:00:00', 243, '2025-01-03 18:00:00', '2025-01-03 18:30:00', 1, 210, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 17:00:00', '2025-01-03 21:00:00', 243, '2025-01-03 17:30:00', '2025-01-03 18:00:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:00:00', '2025-01-03 15:00:00', 243, '2025-01-03 11:30:00', '2025-01-03 12:00:00', 0, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 12:30:00', '2025-01-03 16:30:00', 243, null, null, 2, 240, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:00:00', '2025-01-03 15:00:00', 243, '2025-01-03 13:00:00', '2025-01-03 13:30:00', 0, 210, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 12:30:00', '2025-01-03 16:30:00', 243, null, null, 2, 240, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 17:00:00', '2025-01-03 21:00:00', 243, '2025-01-03 17:00:00', '2025-01-03 17:30:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 12:30:00', '2025-01-03 16:30:00', 243, null, null, 2, 240, 0, '39');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 12:30:00', '2025-01-03 16:30:00', 243, null, null, 2, 240, 0, '42');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 15:30:00', 243, '2025-01-03 12:00:00', '2025-01-03 12:30:00', 0, 210, 0, '44');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 14:30:00', 243, '2025-01-03 11:30:00', '2025-01-03 12:00:00', 0, 150, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 15:30:00', 243, '2025-01-03 12:00:00', '2025-01-03 12:30:00', 0, 210, 0, '48');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 15:30:00', 243, '2025-01-03 12:00:00', '2025-01-03 12:30:00', 0, 210, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 15:30:00', 243, '2025-01-03 12:00:00', '2025-01-03 12:30:00', 0, 210, 0, '52');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 14:30:00', 243, '2025-01-03 12:00:00', '2025-01-03 12:30:00', 0, 150, 0, '54');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:30:00', '2025-01-03 15:30:00', 243, '2025-01-03 12:30:00', '2025-01-03 13:00:00', 0, 210, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 17:00:00', '2025-01-03 21:00:00', 243, '2025-01-03 17:30:00', '2025-01-03 18:00:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 11:00:00', '2025-01-03 14:00:00', 243, '2025-01-03 12:30:00', '2025-01-03 13:00:00', 0, 150, 0, '59');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 13:00:00', '2025-01-03 17:00:00', 243, null, null, 2, 240, 0, '60');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 13:00:00', '2025-01-03 17:00:00', 243, null, null, 2, 240, 0, '63');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 13:00:00', '2025-01-03 17:00:00', 243, null, null, 2, 240, 0, '64');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 13:00:00', '2025-01-03 17:00:00', 243, null, null, 2, 240, 0, '65');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 16:30:00', '2025-01-03 20:30:00', 243, '2025-01-03 18:00:00', '2025-01-03 18:30:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 15:30:00', '2025-01-03 19:30:00', 243, '2025-01-03 17:00:00', '2025-01-03 17:30:00', 1, 210, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 10:00:00', '2025-01-03 14:00:00', 243, '2025-01-03 13:00:00', '2025-01-03 13:30:00', 0, 210, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 15:30:00', '2025-01-03 19:30:00', 243, '2025-01-03 18:30:00', '2025-01-03 19:00:00', 1, 210, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 15:30:00', '2025-01-03 19:30:00', 243, '2025-01-03 18:00:00', '2025-01-03 18:30:00', 1, 210, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 10:30:00', '2025-01-03 13:30:00', 243, '2025-01-03 12:30:00', '2025-01-03 13:00:00', 0, 150, 0, '68');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 10:00:00', '2025-01-03 14:00:00', 243, '2025-01-03 11:30:00', '2025-01-03 12:00:00', 0, 210, 0, '70');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 16:30:00', '2025-01-03 20:30:00', 243, '2025-01-03 17:00:00', '2025-01-03 17:30:00', 1, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 16:30:00', '2025-01-03 20:30:00', 243, '2025-01-03 18:30:00', '2025-01-03 19:00:00', 1, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 10:30:00', '2025-01-03 13:30:00', 243, '2025-01-03 11:30:00', '2025-01-03 12:00:00', 0, 150, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 10:30:00', '2025-01-03 13:30:00', 243, '2025-01-03 13:00:00', '2025-01-03 13:30:00', 0, 150, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 18:30:00', '2025-01-03 20:30:00', 243, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '13');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '24');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-03 19:30:00', '2025-01-03 21:30:00', 243, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 12:30:00', '2025-01-04 16:30:00', 244, null, null, 2, 240, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 14:30:00', '2025-01-04 18:30:00', 244, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 13:00:00', '2025-01-04 13:30:00', 0, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 12:30:00', '2025-01-04 13:00:00', 0, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 17:00:00', '2025-01-04 21:00:00', 244, '2025-01-04 17:30:00', '2025-01-04 18:00:00', 1, 210, 0, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 12:30:00', '2025-01-04 13:00:00', 0, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 13:00:00', '2025-01-04 13:30:00', 0, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:00:00', '2025-01-04 19:00:00', 244, '2025-01-04 18:30:00', '2025-01-04 19:00:00', 1, 210, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:00:00', '2025-01-04 15:00:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:00:00', '2025-01-04 15:00:00', 244, '2025-01-04 13:00:00', '2025-01-04 13:30:00', 0, 210, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:00:00', '2025-01-04 15:00:00', 244, '2025-01-04 12:30:00', '2025-01-04 13:00:00', 0, 210, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 12:00:00', '2025-01-04 16:00:00', 244, null, null, 2, 240, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 12:30:00', '2025-01-04 16:30:00', 244, null, null, 2, 240, 0, '41');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 09:30:00', '2025-01-04 13:30:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 1, '45');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 09:30:00', '2025-01-04 13:30:00', 244, '2025-01-04 13:00:00', '2025-01-04 13:30:00', 0, 210, 1, '50');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 17:00:00', '2025-01-04 17:30:00', 1, 210, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 18:30:00', '2025-01-04 19:00:00', 1, 210, 0, '9');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 18:00:00', '2025-01-04 18:30:00', 1, 210, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 17:30:00', '2025-01-04 18:00:00', 1, 210, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 12:30:00', '2025-01-04 13:00:00', 0, 210, 0, '53');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:30:00', '2025-01-04 14:30:00', 244, '2025-01-04 12:30:00', '2025-01-04 13:00:00', 0, 210, 0, '55');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:30:00', '2025-01-04 14:30:00', 244, '2025-01-04 11:30:00', '2025-01-04 12:00:00', 0, 210, 0, '62');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '66');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '69');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:30:00', '2025-01-04 13:00:00', 0, 210, 0, '72');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '73');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '77');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '80');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '81');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 11:30:00', '2025-01-04 15:30:00', 244, '2025-01-04 12:00:00', '2025-01-04 12:30:00', 0, 210, 0, '83');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:30:00', '2025-01-04 14:30:00', 244, '2025-01-04 13:00:00', '2025-01-04 13:30:00', 0, 210, 0, '86');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 17:00:00', '2025-01-04 17:30:00', 1, 210, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 18:00:00', '2025-01-04 18:30:00', 1, 210, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 16:30:00', '2025-01-04 20:30:00', 244, '2025-01-04 17:00:00', '2025-01-04 17:30:00', 1, 210, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 15:30:00', '2025-01-04 19:30:00', 244, '2025-01-04 17:30:00', '2025-01-04 18:00:00', 1, 210, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 18:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 180, 0, '29');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 18:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 180, 0, '32');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 13:00:00', 244, null, null, 2, 180, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 13:00:00', 244, null, null, 2, 180, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 13:00:00', 244, null, null, 2, 180, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 13:00:00', 244, null, null, 2, 180, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 13:00:00', 244, null, null, 2, 180, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 10:00:00', '2025-01-04 14:00:00', 244, '2025-01-04 13:00:00', '2025-01-04 13:30:00', 0, 210, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '4');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 19:30:00', '2025-01-04 21:30:00', 244, null, null, 2, 120, 0, '22');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:00:00', '2025-01-04 22:00:00', 244, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:00:00', '2025-01-04 22:00:00', 244, null, null, 2, 120, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '28');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '34');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '35');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-04 20:30:00', '2025-01-04 22:30:00', 244, null, null, 2, 120, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-05 09:30:00', '2025-01-05 13:30:00', 245, '2025-01-05 12:30:00', '2025-01-05 13:00:00', 0, 210, 1, '3');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-05 09:30:00', '2025-01-05 13:30:00', 245, '2025-01-05 11:30:00', '2025-01-05 12:00:00', 0, 210, 1, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-05 12:30:00', '2025-01-05 16:30:00', 245, null, null, 2, 240, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-05 12:30:00', '2025-01-05 16:30:00', 245, null, null, 2, 240, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:22', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '30');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '33');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '38');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '47');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '51');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '57');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 16:00:00', 245, null, null, 2, 240, 0, '61');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 11:30:00', '2025-01-05 15:30:00', 245, '2025-01-05 12:00:00', '2025-01-05 12:30:00', 0, 210, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 14:00:00', 245, null, null, 2, 120, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 15:00:00', 245, null, null, 2, 180, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 15:00:00', 245, null, null, 2, 180, 0, '79');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 20:00:00', 245, '2025-01-05 17:00:00', '2025-01-05 17:30:00', 1, 210, 0, '67');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:30:00', '2025-01-05 20:30:00', 245, '2025-01-05 17:30:00', '2025-01-05 18:00:00', 1, 210, 0, '5');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:30:00', '2025-01-05 22:30:00', 245, null, null, 2, 120, 0, '7');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '71');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '74');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '79');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '36');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '43');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 14:00:00', 245, null, null, 2, 120, 0, '6');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 14:00:00', 245, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 14:00:00', 245, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 14:00:00', 245, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 15:00:00', 245, null, null, 2, 180, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 12:00:00', '2025-01-05 15:00:00', 245, null, null, 2, 180, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 16:00:00', '2025-01-05 18:00:00', 245, null, null, 2, 120, 0, '26');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 21:00:00', 245, null, null, 2, 120, 0, '10');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 21:00:00', 245, null, null, 2, 120, 0, '11');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '12');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '14');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '15');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '17');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 180, 0, '18');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 19:30:00', '2025-01-05 21:30:00', 245, null, null, 2, 120, 0, '16');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 120, 0, '19');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 120, 0, '20');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:00:00', '2025-01-05 22:00:00', 245, null, null, 2, 120, 0, '21');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:30:00', '2025-01-05 22:30:00', 245, null, null, 2, 120, 0, '23');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:30:00', '2025-01-05 22:30:00', 245, null, null, 2, 120, 0, '25');
+INSERT INTO scheduling_system.scheduling_shift (create_time, update_time, is_deleted, start_date, end_date, scheduling_date_id, meal_start_date, meal_end_date, meal_type, total_minute, shift_type, user_id) VALUES ('2024-12-28 14:34:23', '2024-12-28 14:34:23', 0, '2025-01-05 20:30:00', '2025-01-05 22:30:00', 245, null, null, 2, 120, 0, '26');
+
+INSERT INTO scheduling_system.scheduling_task (create_time, update_time, scheduling_rule_id, store_id, start_date, end_date, is_publish) VALUES ('2024-12-25 15:04:55', '2024-12-25 15:04:55', 1, 1, 'Sat Jun 01 00:00:00 CST 2024', 'Fri Jun 07 00:00:00 CST 2024', 0);
+INSERT INTO scheduling_system.scheduling_task (create_time, update_time, scheduling_rule_id, store_id, start_date, end_date, is_publish) VALUES ('2024-12-25 20:16:17', '2024-12-25 20:16:17', 1, 1, 'Mon Dec 23 00:00:00 CST 2024', 'Sun Dec 29 00:00:00 CST 2024', 0);
+INSERT INTO scheduling_system.scheduling_task (create_time, update_time, scheduling_rule_id, store_id, start_date, end_date, is_publish) VALUES ('2024-12-28 14:34:22', '2024-12-28 14:34:22', 1, 1, 'Mon Dec 30 00:00:00 CST 2024', 'Sun Jan 05 00:00:00 CST 2025', 0);
 
 INSERT INTO scheduling_system.store (create_time, update_time, name, province, city, region, address, size, status) VALUES ('2024-12-22 11:47:58', '2024-12-22 11:47:58', '智能排班系统官方店——城阳分店', '浙江省', '杭州市', '西湖区', '人才广场', 100.0000, 0);
 INSERT INTO scheduling_system.store (create_time, update_time, name, province, city, region, address, size, status) VALUES ('2024-12-22 11:47:58', '2024-12-22 11:47:58', '智能排班系统官方店——电白分店', '浙江省', '杭州市', '西湖区', '水东镇', 58.0000, 0);
@@ -396,2030 +1631,3297 @@ INSERT INTO scheduling_system.store (create_time, update_time, name, province, c
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 1, '[
     {
         "date": "2024/06/01",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 152.80627740778223
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 154.24658035578085
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 162.87356539401924
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 109.94683865660637
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 134.31916919019392
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 163.68153844134864
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 132.55287503529925
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 175.8813471663057
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 125.5682353819579
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 158.9180491444815
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 128.37190229513234
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 144.72907396998767
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 164.94377490799081
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 139.31199725271253
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 176.2549976385908
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 122.84303531786354
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 153.9217933891846
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 106.89997453641271
-    },
-    {
-        "date": "2024/06/01",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 119.9384769413346
+        "passengerFlow": 30.0
     },
     {
         "date": "2024/06/01",
         "startTime": "9:30",
         "endTime": "10:0",
-        "passengerFlow": 143.7791334415699
+        "passengerFlow": 40.0
     },
     {
         "date": "2024/06/01",
         "startTime": "10:0",
         "endTime": "10:30",
-        "passengerFlow": 149.13832520722337
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/01",
         "startTime": "10:30",
         "endTime": "11:0",
-        "passengerFlow": 117.95371585862944
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/01",
         "startTime": "11:0",
         "endTime": "11:30",
-        "passengerFlow": 170.40771926414038
+        "passengerFlow": 65.0
     },
     {
         "date": "2024/06/01",
         "startTime": "11:30",
         "endTime": "12:0",
-        "passengerFlow": 110.44963039551934
+        "passengerFlow": 70.0
     },
     {
         "date": "2024/06/01",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 133.86517269504012
+        "passengerFlow": 80.0
     },
     {
         "date": "2024/06/01",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 123.69296261083154
+        "passengerFlow": 85.0
     },
     {
         "date": "2024/06/01",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 156.9565953620082
+        "passengerFlow": 90.0
     },
     {
         "date": "2024/06/01",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 123.14565960328656
+        "passengerFlow": 85.0
     },
     {
         "date": "2024/06/01",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 114.46177454330262
+        "passengerFlow": 75.0
     },
     {
         "date": "2024/06/01",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 129.9835308692234
+        "passengerFlow": 70.0
     },
     {
         "date": "2024/06/01",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 123.41129525220084
+        "passengerFlow": 65.0
     },
     {
         "date": "2024/06/01",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 146.3307203845901
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/01",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 111.94080498131976
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/01",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 141.1508618340661
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/01",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 134.12981770798456
+        "passengerFlow": 45.0
     },
     {
         "date": "2024/06/01",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 169.1669219375252
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/01",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 133.26052499116616
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/01",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 166.75537438340058
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/01",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 147.97001806196735
+        "passengerFlow": 45.0
     },
     {
         "date": "2024/06/01",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 112.60794249813735
+        "passengerFlow": 40.0
     },
     {
         "date": "2024/06/01",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 174.94475441142407
+        "passengerFlow": 35.0
     },
     {
         "date": "2024/06/01",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 147.1044089474655
+        "passengerFlow": 30.0
     },
     {
         "date": "2024/06/01",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 114.91320218481695
+        "passengerFlow": 30.0
     },
     {
         "date": "2024/06/01",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 163.5774809056897
+        "passengerFlow": 25.0
     },
     {
         "date": "2024/06/01",
         "startTime": "22:0",
         "endTime": "22:30",
-        "passengerFlow": 157.93176647706275
+        "passengerFlow": 20.0
     },
     {
         "date": "2024/06/01",
         "startTime": "22:30",
         "endTime": "23:0",
-        "passengerFlow": 117.41662035630311
+        "passengerFlow": 25.0
     },
     {
         "date": "2024/06/01",
         "startTime": "23:0",
         "endTime": "23:30",
-        "passengerFlow": 155.8369664221193
-    },
-    {
-        "date": "2024/06/01",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 106.64922432669754
+        "passengerFlow": 30.0
     }
 ]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 2, '[
     {
         "date": "2024/06/02",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 125.16625426926547
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 157.90815282014395
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 163.8500666436945
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 133.75413132917856
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 140.77396000884045
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 145.63596680048218
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 176.83377382627577
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 108.36307899048244
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 156.09639688881157
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 113.3121944891048
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 122.97829210677267
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 157.52770218263296
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 175.41351383125362
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 156.8944296278306
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 158.55948772961324
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 107.10953095827865
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 150.44505489021546
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 123.1603346231911
-    },
-    {
-        "date": "2024/06/02",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 109.17025606757933
+        "passengerFlow": 30.0
     },
     {
         "date": "2024/06/02",
         "startTime": "9:30",
         "endTime": "10:0",
-        "passengerFlow": 114.88724897797452
+        "passengerFlow": 40.0
     },
     {
         "date": "2024/06/02",
         "startTime": "10:0",
         "endTime": "10:30",
-        "passengerFlow": 131.296712191577
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/02",
         "startTime": "10:30",
         "endTime": "11:0",
-        "passengerFlow": 139.8910242030647
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/02",
         "startTime": "11:0",
         "endTime": "11:30",
-        "passengerFlow": 174.10258579163448
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/02",
         "startTime": "11:30",
         "endTime": "12:0",
-        "passengerFlow": 139.80423258098995
+        "passengerFlow": 65.0
     },
     {
         "date": "2024/06/02",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 125.20510039721005
+        "passengerFlow": 75.0
     },
     {
         "date": "2024/06/02",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 167.91615555592597
+        "passengerFlow": 80.0
     },
     {
         "date": "2024/06/02",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 119.77042881079021
+        "passengerFlow": 75.0
     },
     {
         "date": "2024/06/02",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 163.00322687661028
+        "passengerFlow": 70.0
     },
     {
         "date": "2024/06/02",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 111.23597670960561
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/02",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 138.9146624131945
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/02",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 141.9701872887675
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/02",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 134.2923295415131
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/02",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 118.20296279913839
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/02",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 142.71864336621883
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/02",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 125.19473483456207
+        "passengerFlow": 65.0
     },
     {
         "date": "2024/06/02",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 138.2961938958515
+        "passengerFlow": 70.0
     },
     {
         "date": "2024/06/02",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 176.89950684980064
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/02",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 118.53385873130922
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/02",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 162.5485550543443
+        "passengerFlow": 45.0
     },
     {
         "date": "2024/06/02",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 106.96863685139425
+        "passengerFlow": 40.0
     },
     {
         "date": "2024/06/02",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 164.67461441484386
+        "passengerFlow": 35.0
     },
     {
         "date": "2024/06/02",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 161.16886607447748
+        "passengerFlow": 30.0
     },
     {
         "date": "2024/06/02",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 133.2557015421949
+        "passengerFlow": 25.0
     },
     {
         "date": "2024/06/02",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 142.5776022793615
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "22:0",
-        "endTime": "22:30",
-        "passengerFlow": 141.23336208212376
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "22:30",
-        "endTime": "23:0",
-        "passengerFlow": 141.25579470666185
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "23:0",
-        "endTime": "23:30",
-        "passengerFlow": 115.1089255421376
-    },
-    {
-        "date": "2024/06/02",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 148.52069467347943
+        "passengerFlow": 20.0
     }
 ]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 3, '[
     {
         "date": "2024/06/03",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 109.7060219842872
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 132.34930974059475
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 152.47748620878804
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 127.58925746524221
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 173.7050591318763
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 163.706306346819
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 150.67274074345946
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 144.97126085349657
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 152.87714859760445
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 120.27740910389237
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 140.96483134721979
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 133.1679874240418
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 149.95773371755837
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 119.78235384638153
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 122.9503411815452
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 119.29680785727916
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 136.34855295499096
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 109.89485397894806
-    },
-    {
-        "date": "2024/06/03",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 115.89001152155751
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/03",
         "startTime": "9:30",
         "endTime": "10:0",
-        "passengerFlow": 161.562095997782
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/03",
         "startTime": "10:0",
         "endTime": "10:30",
-        "passengerFlow": 155.56394914458292
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/03",
         "startTime": "10:30",
         "endTime": "11:0",
-        "passengerFlow": 127.32854920556437
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/03",
         "startTime": "11:0",
         "endTime": "11:30",
-        "passengerFlow": 123.66718580071081
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/03",
         "startTime": "11:30",
         "endTime": "12:0",
-        "passengerFlow": 114.19857413905468
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/03",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 136.52965632459612
+        "passengerFlow": 75
     },
     {
         "date": "2024/06/03",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 157.79420962989144
+        "passengerFlow": 80
     },
     {
         "date": "2024/06/03",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 120.76183702975904
+        "passengerFlow": 85
     },
     {
         "date": "2024/06/03",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 174.92617202484755
+        "passengerFlow": 90
     },
     {
         "date": "2024/06/03",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 110.86818163631874
+        "passengerFlow": 75
     },
     {
         "date": "2024/06/03",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 176.9892742905854
+        "passengerFlow": 65
     },
     {
         "date": "2024/06/03",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 129.09165428149865
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/03",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 111.90275293503987
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/03",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 122.76772989432617
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/03",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 153.58444974463148
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/03",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 119.34077908627611
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/03",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 154.32078831925327
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/03",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 112.40708534284099
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/03",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 166.38799600171657
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/03",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 109.87850234680964
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/03",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 150.5663648152583
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/03",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 145.7966829072604
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/03",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 134.69692493406902
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/03",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 115.16426346388245
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/03",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 176.24367864166638
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "22:0",
-        "endTime": "22:30",
-        "passengerFlow": 130.49656005134858
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "22:30",
-        "endTime": "23:0",
-        "passengerFlow": 169.28529896842198
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "23:0",
-        "endTime": "23:30",
-        "passengerFlow": 133.24203139274965
-    },
-    {
-        "date": "2024/06/03",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 106.56537641527912
+        "passengerFlow": 45
     }
 ]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 4, '[
     {
         "date": "2024/06/04",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 129.18469636406184
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 132.73335746524037
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 176.1462272928991
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 126.41895679826187
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 127.47471873611464
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 139.06722186489304
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 145.77302243664423
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 116.44163963835106
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 124.71976949456023
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 175.5574110009999
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 132.21496223959082
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 175.0709074521658
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 121.18978377444219
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 175.21545838299
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 134.1135215635041
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 151.9852005621031
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 140.37225490445283
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 166.63140442764208
-    },
-    {
-        "date": "2024/06/04",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 147.6533392894068
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/04",
         "startTime": "9:30",
         "endTime": "10:0",
-        "passengerFlow": 111.20895867616089
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/04",
         "startTime": "10:0",
         "endTime": "10:30",
-        "passengerFlow": 160.82201687900715
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/04",
         "startTime": "10:30",
         "endTime": "11:0",
-        "passengerFlow": 162.71097150332238
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/04",
         "startTime": "11:0",
         "endTime": "11:30",
-        "passengerFlow": 174.80351051086132
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/04",
         "startTime": "11:30",
         "endTime": "12:0",
-        "passengerFlow": 111.62855814279791
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/04",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 153.97342058674104
+        "passengerFlow": 75
     },
     {
         "date": "2024/06/04",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 159.59973067559625
+        "passengerFlow": 80
     },
     {
         "date": "2024/06/04",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 130.7054547093742
+        "passengerFlow": 85
     },
     {
         "date": "2024/06/04",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 111.55035580888807
+        "passengerFlow": 90
     },
     {
         "date": "2024/06/04",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 129.02868994551588
+        "passengerFlow": 75
     },
     {
         "date": "2024/06/04",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 160.8226047840243
+        "passengerFlow": 65
     },
     {
         "date": "2024/06/04",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 114.71354693575277
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/04",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 109.82940665377714
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/04",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 164.64912261636454
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/04",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 147.8205406470761
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/04",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 137.91377606278292
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/04",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 156.60712501567315
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/04",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 151.70121294358233
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/04",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 174.23222928543663
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/04",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 127.97742963131626
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/04",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 168.21845830361934
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/04",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 151.74763885017586
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/04",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 134.64725051831164
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/04",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 125.15084103799785
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/04",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 138.5638898988037
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "22:0",
-        "endTime": "22:30",
-        "passengerFlow": 148.7234540073111
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "22:30",
-        "endTime": "23:0",
-        "passengerFlow": 151.94801248775752
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "23:0",
-        "endTime": "23:30",
-        "passengerFlow": 156.2389516092305
-    },
-    {
-        "date": "2024/06/04",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 158.38887944314857
+        "passengerFlow": 45
     }
 ]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 5, '[
     {
         "date": "2024/06/05",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 111.90073531819277
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 135.16145204778599
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 176.20957055700148
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 174.47307311576753
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 121.2203029708548
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 156.75734940237635
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 150.72679156795454
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 155.90392256428416
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 150.1570172107737
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 131.75876886057318
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 162.71627371805357
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 160.39409224287357
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 168.88558155307504
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 170.07103537643852
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 149.57163251055218
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 108.39931018241734
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 123.22663245514607
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 165.28923464769164
-    },
-    {
-        "date": "2024/06/05",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 143.23038546552837
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/05",
         "startTime": "9:30",
         "endTime": "10:0",
-        "passengerFlow": 168.60307393025005
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/05",
         "startTime": "10:0",
         "endTime": "10:30",
-        "passengerFlow": 169.078312928995
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/05",
         "startTime": "10:30",
         "endTime": "11:0",
-        "passengerFlow": 147.51023925389435
+        "passengerFlow": 70
     },
     {
         "date": "2024/06/05",
         "startTime": "11:0",
         "endTime": "11:30",
-        "passengerFlow": 161.87954167952188
+        "passengerFlow": 80
     },
     {
         "date": "2024/06/05",
         "startTime": "11:30",
         "endTime": "12:0",
-        "passengerFlow": 145.55692062773815
+        "passengerFlow": 90
     },
     {
         "date": "2024/06/05",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 120.57639719347
+        "passengerFlow": 95
     },
     {
         "date": "2024/06/05",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 123.95374099807889
+        "passengerFlow": 100
     },
     {
         "date": "2024/06/05",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 136.69500873880472
+        "passengerFlow": 85
     },
     {
         "date": "2024/06/05",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 121.69966340807387
+        "passengerFlow": 75
     },
     {
         "date": "2024/06/05",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 129.07645441967304
+        "passengerFlow": 65
     },
     {
         "date": "2024/06/05",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 108.68782843502176
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/05",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 130.97570320992418
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/05",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 115.22636717977207
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/05",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 113.2143884733185
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/05",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 155.05813871461964
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/05",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 117.90233733584196
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/05",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 168.73749506261254
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/05",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 116.57712872073422
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/05",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 133.13562612522063
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/05",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 125.33252870070802
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/05",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 133.67100421801558
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/05",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 162.10308770528727
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/05",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 164.4265355843222
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/05",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 109.13799379073966
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/05",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 161.8048826793944
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "22:0",
-        "endTime": "22:30",
-        "passengerFlow": 107.23243577364276
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "22:30",
-        "endTime": "23:0",
-        "passengerFlow": 152.02914123754505
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "23:0",
-        "endTime": "23:30",
-        "passengerFlow": 144.59625029305516
-    },
-    {
-        "date": "2024/06/05",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 132.41493019538478
+        "passengerFlow": 40
     }
 ]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 6, '[
     {
         "date": "2024/06/06",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 117.84011650610742
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 142.77536337655192
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 118.2683759084506
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 118.38228821457423
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 176.50988966747127
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 151.0613644272999
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 149.42602620315478
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 154.26757121997116
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 168.1456458444685
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 173.24977339195166
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 116.0350425634362
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 174.10313982433505
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 135.66655159772708
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 143.11715859064225
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 162.75963323066384
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 124.40237337923175
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 138.19552802044169
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 124.82392542344118
-    },
-    {
-        "date": "2024/06/06",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 121.42023398793867
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/06",
         "startTime": "9:30",
         "endTime": "10:0",
-        "passengerFlow": 176.6445511558789
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/06",
         "startTime": "10:0",
         "endTime": "10:30",
-        "passengerFlow": 136.52593439255648
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/06",
         "startTime": "10:30",
         "endTime": "11:0",
-        "passengerFlow": 136.69982200798123
+        "passengerFlow": 70
     },
     {
         "date": "2024/06/06",
         "startTime": "11:0",
         "endTime": "11:30",
-        "passengerFlow": 166.21981891785532
+        "passengerFlow": 80
     },
     {
         "date": "2024/06/06",
         "startTime": "11:30",
         "endTime": "12:0",
-        "passengerFlow": 176.4661933946193
+        "passengerFlow": 90
     },
     {
         "date": "2024/06/06",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 139.3392213181875
+        "passengerFlow": 95
     },
     {
         "date": "2024/06/06",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 115.96672259441044
+        "passengerFlow": 100
     },
     {
         "date": "2024/06/06",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 127.6475576841588
+        "passengerFlow": 85
     },
     {
         "date": "2024/06/06",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 151.17452265236884
+        "passengerFlow": 75
     },
     {
         "date": "2024/06/06",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 176.64671429031287
+        "passengerFlow": 65
     },
     {
         "date": "2024/06/06",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 131.36140996173805
+        "passengerFlow": 60
     },
     {
         "date": "2024/06/06",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 170.27535148313328
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/06",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 153.39593525832112
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/06",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 152.64156477535457
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/06",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 160.27458067304917
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/06",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 114.6819314935068
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/06",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 124.28215419282671
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/06",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 135.7723281163153
+        "passengerFlow": 30
     },
     {
         "date": "2024/06/06",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 118.28831652159982
+        "passengerFlow": 35
     },
     {
         "date": "2024/06/06",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 146.47085339144442
+        "passengerFlow": 40
     },
     {
         "date": "2024/06/06",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 106.31900081256677
+        "passengerFlow": 45
     },
     {
         "date": "2024/06/06",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 116.18746710634107
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/06",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 113.87275320536233
+        "passengerFlow": 55
     },
     {
         "date": "2024/06/06",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 128.59281970472486
+        "passengerFlow": 50
     },
     {
         "date": "2024/06/06",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 147.41747461190133
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "22:0",
-        "endTime": "22:30",
-        "passengerFlow": 151.35052688535762
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "22:30",
-        "endTime": "23:0",
-        "passengerFlow": 152.6937503294286
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "23:0",
-        "endTime": "23:30",
-        "passengerFlow": 164.93947198279778
-    },
-    {
-        "date": "2024/06/06",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 163.41412355071822
+        "passengerFlow": 40
     }
-]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
+]
+', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
 INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 6, 7, '[
     {
         "date": "2024/06/07",
-        "startTime": "0:0",
-        "endTime": "0:30",
-        "passengerFlow": 120.38857830034955
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "0:30",
-        "endTime": "1:0",
-        "passengerFlow": 141.68681847334986
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "1:0",
-        "endTime": "1:30",
-        "passengerFlow": 142.64484898653845
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "1:30",
-        "endTime": "2:0",
-        "passengerFlow": 174.96741583800855
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "2:0",
-        "endTime": "2:30",
-        "passengerFlow": 167.41192863522076
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "2:30",
-        "endTime": "3:0",
-        "passengerFlow": 157.56861926448738
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "3:0",
-        "endTime": "3:30",
-        "passengerFlow": 106.91244611886484
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "3:30",
-        "endTime": "4:0",
-        "passengerFlow": 140.70912880805122
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "4:0",
-        "endTime": "4:30",
-        "passengerFlow": 120.83099896388688
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "4:30",
-        "endTime": "5:0",
-        "passengerFlow": 167.3858596434221
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "5:0",
-        "endTime": "5:30",
-        "passengerFlow": 140.6798447741458
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "5:30",
-        "endTime": "6:0",
-        "passengerFlow": 106.99450607219181
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "6:0",
-        "endTime": "6:30",
-        "passengerFlow": 128.3966441552532
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "6:30",
-        "endTime": "7:0",
-        "passengerFlow": 127.24239399351075
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "7:0",
-        "endTime": "7:30",
-        "passengerFlow": 109.63963123639157
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "7:30",
-        "endTime": "8:0",
-        "passengerFlow": 134.0922059739755
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "8:0",
-        "endTime": "8:30",
-        "passengerFlow": 153.50308801612425
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "8:30",
-        "endTime": "9:0",
-        "passengerFlow": 117.09891087895899
-    },
-    {
-        "date": "2024/06/07",
         "startTime": "9:0",
         "endTime": "9:30",
-        "passengerFlow": 173.05436381767854
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "9:30",
-        "endTime": "10:0",
-        "passengerFlow": 111.9648545837995
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "10:0",
-        "endTime": "10:30",
-        "passengerFlow": 112.41803898781603
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "10:30",
-        "endTime": "11:0",
-        "passengerFlow": 142.5055322789225
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "11:0",
-        "endTime": "11:30",
-        "passengerFlow": 157.63506022993272
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "11:30",
-        "endTime": "12:0",
-        "passengerFlow": 163.51323642110358
+        "passengerFlow": 35.0
     },
     {
         "date": "2024/06/07",
         "startTime": "12:0",
         "endTime": "12:30",
-        "passengerFlow": 143.34244015930312
+        "passengerFlow": 85.0
     },
     {
         "date": "2024/06/07",
         "startTime": "12:30",
         "endTime": "13:0",
-        "passengerFlow": 165.1062413996698
+        "passengerFlow": 92.0
     },
     {
         "date": "2024/06/07",
         "startTime": "13:0",
         "endTime": "13:30",
-        "passengerFlow": 153.09678936949751
+        "passengerFlow": 82.0
     },
     {
         "date": "2024/06/07",
         "startTime": "13:30",
         "endTime": "14:0",
-        "passengerFlow": 158.89197142276203
+        "passengerFlow": 75.0
     },
     {
         "date": "2024/06/07",
         "startTime": "14:0",
         "endTime": "14:30",
-        "passengerFlow": 140.95269112412785
+        "passengerFlow": 72.0
     },
     {
         "date": "2024/06/07",
         "startTime": "14:30",
         "endTime": "15:0",
-        "passengerFlow": 122.34500503716647
+        "passengerFlow": 62.0
     },
     {
         "date": "2024/06/07",
         "startTime": "15:0",
         "endTime": "15:30",
-        "passengerFlow": 154.66157987009228
+        "passengerFlow": 56.0
     },
     {
         "date": "2024/06/07",
         "startTime": "15:30",
         "endTime": "16:0",
-        "passengerFlow": 144.05175065039072
+        "passengerFlow": 53.0
     },
     {
         "date": "2024/06/07",
         "startTime": "16:0",
         "endTime": "16:30",
-        "passengerFlow": 113.9410900400937
+        "passengerFlow": 60.0
     },
     {
         "date": "2024/06/07",
         "startTime": "16:30",
         "endTime": "17:0",
-        "passengerFlow": 136.60702124910068
+        "passengerFlow": 55.0
     },
     {
         "date": "2024/06/07",
         "startTime": "17:0",
         "endTime": "17:30",
-        "passengerFlow": 170.94803570589622
+        "passengerFlow": 0
     },
     {
         "date": "2024/06/07",
         "startTime": "17:30",
         "endTime": "18:0",
-        "passengerFlow": 113.22299937207474
+        "passengerFlow": 0
     },
     {
         "date": "2024/06/07",
         "startTime": "18:0",
         "endTime": "18:30",
-        "passengerFlow": 127.64560407979718
+        "passengerFlow": 0
     },
     {
         "date": "2024/06/07",
         "startTime": "18:30",
         "endTime": "19:0",
-        "passengerFlow": 175.4445023279458
+        "passengerFlow": 0
     },
     {
         "date": "2024/06/07",
         "startTime": "19:0",
         "endTime": "19:30",
-        "passengerFlow": 129.3686428172864
+        "passengerFlow": 40.0
     },
     {
         "date": "2024/06/07",
         "startTime": "19:30",
         "endTime": "20:0",
-        "passengerFlow": 131.02807681029404
+        "passengerFlow": 45.0
     },
     {
         "date": "2024/06/07",
         "startTime": "20:0",
         "endTime": "20:30",
-        "passengerFlow": 137.14800555657396
+        "passengerFlow": 50.0
     },
     {
         "date": "2024/06/07",
         "startTime": "20:30",
         "endTime": "21:0",
-        "passengerFlow": 143.1649486654633
+        "passengerFlow": 45.0
     },
     {
         "date": "2024/06/07",
         "startTime": "21:0",
         "endTime": "21:30",
-        "passengerFlow": 136.94993637259176
+        "passengerFlow": 40.0
     },
     {
         "date": "2024/06/07",
         "startTime": "21:30",
         "endTime": "22:0",
-        "passengerFlow": 140.09391357279566
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "22:0",
-        "endTime": "22:30",
-        "passengerFlow": 163.4197479591063
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "22:30",
-        "endTime": "23:0",
-        "passengerFlow": 166.70086501384657
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "23:0",
-        "endTime": "23:30",
-        "passengerFlow": 174.39730706973768
-    },
-    {
-        "date": "2024/06/07",
-        "startTime": "23:30",
-        "endTime": "24:0",
-        "passengerFlow": 166.83423035162377
+        "passengerFlow": 35.0
     }
 ]', '2024-12-22 14:06:27', '2024-12-22 14:06:27');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 23, '[
+    {
+        "date": "2024/12/23",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 20.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 70.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 80.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 25.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 20.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 20.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 15.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "22:0",
+        "endTime": "22:30",
+        "passengerFlow": 10.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "22:30",
+        "endTime": "23:0",
+        "passengerFlow": 15.0
+    },
+    {
+        "date": "2024/12/23",
+        "startTime": "23:0",
+        "endTime": "23:30",
+        "passengerFlow": 20.0
+    }
+]
+', '2024-12-25 20:01:47', '2024-12-25 20:01:47');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 24, '[
+    {
+        "date": "2024/12/24",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 20.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 70.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 25.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 20.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 15.0
+    },
+    {
+        "date": "2024/12/24",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 10.0
+    }
+]
+', '2024-12-25 20:10:55', '2024-12-25 20:10:55');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 25, '[
+    {
+        "date": "2024/12/25",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 70
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/25",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 35
+    }
+]
+', '2024-12-25 20:12:34', '2024-12-25 20:12:34');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 26, '[
+    {
+        "date": "2024/12/26",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 70
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/26",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 35
+    }
+]
+', '2024-12-25 20:12:34', '2024-12-25 20:12:34');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 27, '[
+    {
+        "date": "2024/12/27",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 70
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 85
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 90
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/27",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 30
+    }
+]
+', '2024-12-25 20:12:34', '2024-12-25 20:12:34');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 28, '[
+    {
+        "date": "2024/12/28",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 70
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 85
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 90
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 20
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 25
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2024/12/28",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 30
+    }
+]
+', '2024-12-25 20:12:34', '2024-12-25 20:12:34');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 29, '[
+    {
+        "date": "2024/12/29",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 25.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 82.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 72.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 62.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 52.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 46.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 43.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/29",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 25.0
+    }
+]
+', '2024-12-25 20:12:34', '2024-12-25 20:12:34');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 30, '[
+    {
+        "date": "2024/12/30",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 70.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 80.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 85.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 90.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 85.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 70.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 25.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "22:0",
+        "endTime": "22:30",
+        "passengerFlow": 20.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "22:30",
+        "endTime": "23:0",
+        "passengerFlow": 25.0
+    },
+    {
+        "date": "2024/12/30",
+        "startTime": "23:0",
+        "endTime": "23:30",
+        "passengerFlow": 30.0
+    }
+]
+', '2024-12-25 20:20:41', '2024-12-25 20:20:41');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2024, 12, 31, '[
+    {
+        "date": "2024/12/31",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 80.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 70.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 65.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 70.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 30.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 25.0
+    },
+    {
+        "date": "2024/12/31",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 20.0
+    }
+]
+', '2024-12-25 20:20:41', '2024-12-25 20:20:41');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2025, 1, 1, '[
+    {
+        "date": "2025/01/01",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 85
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 90
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/01",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 45
+    }
+]
+', '2024-12-25 20:23:41', '2024-12-25 20:23:41');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2025, 1, 2, '[
+    {
+        "date": "2025/01/02",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 85
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 90
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/02",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 45
+    }
+]
+', '2024-12-25 20:23:41', '2024-12-25 20:23:41');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2025, 1, 3, '[
+    {
+        "date": "2025/01/03",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 70
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 90
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 95
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 100
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 85
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/03",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 40
+    }
+]
+', '2024-12-25 20:23:41', '2024-12-25 20:23:41');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2025, 1, 4, '[
+    {
+        "date": "2025/01/04",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "9:30",
+        "endTime": "10:0",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "10:0",
+        "endTime": "10:30",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "10:30",
+        "endTime": "11:0",
+        "passengerFlow": 70
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "11:0",
+        "endTime": "11:30",
+        "passengerFlow": 80
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "11:30",
+        "endTime": "12:0",
+        "passengerFlow": 90
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 95
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 100
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 85
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 75
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 65
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 60
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 30
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 35
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 40
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 45
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 55
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 50
+    },
+    {
+        "date": "2025/01/04",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 40
+    }
+]
+', '2024-12-25 20:23:41', '2024-12-25 20:23:41');
+INSERT INTO scheduling_system.store_flow (store_id, year, month, day, flow, create_time, update_time) VALUES (1, 2025, 1, 5, '[
+    {
+        "date": "2025/01/05",
+        "startTime": "9:0",
+        "endTime": "9:30",
+        "passengerFlow": 35.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "12:0",
+        "endTime": "12:30",
+        "passengerFlow": 85.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "12:30",
+        "endTime": "13:0",
+        "passengerFlow": 92.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "13:0",
+        "endTime": "13:30",
+        "passengerFlow": 82.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "13:30",
+        "endTime": "14:0",
+        "passengerFlow": 75.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "14:0",
+        "endTime": "14:30",
+        "passengerFlow": 72.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "14:30",
+        "endTime": "15:0",
+        "passengerFlow": 62.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "15:0",
+        "endTime": "15:30",
+        "passengerFlow": 56.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "15:30",
+        "endTime": "16:0",
+        "passengerFlow": 53.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "16:0",
+        "endTime": "16:30",
+        "passengerFlow": 60.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "16:30",
+        "endTime": "17:0",
+        "passengerFlow": 55.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "17:0",
+        "endTime": "17:30",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "17:30",
+        "endTime": "18:0",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "18:0",
+        "endTime": "18:30",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "18:30",
+        "endTime": "19:0",
+        "passengerFlow": 0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "19:0",
+        "endTime": "19:30",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "19:30",
+        "endTime": "20:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "20:0",
+        "endTime": "20:30",
+        "passengerFlow": 50.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "20:30",
+        "endTime": "21:0",
+        "passengerFlow": 45.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "21:0",
+        "endTime": "21:30",
+        "passengerFlow": 40.0
+    },
+    {
+        "date": "2025/01/05",
+        "startTime": "21:30",
+        "endTime": "22:0",
+        "passengerFlow": 35.0
+    }
+]', '2024-12-25 20:23:41', '2024-12-25 20:23:41');
+

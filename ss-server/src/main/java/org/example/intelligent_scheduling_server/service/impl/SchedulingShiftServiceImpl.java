@@ -140,15 +140,20 @@ public class SchedulingShiftServiceImpl extends ServiceImpl<SchedulingShiftDao, 
                 // 按时间段判断是否有重叠
                 if (isOverlap(start, end, "09:00", "10:59")) {
                     list.get(0).add(datNameVo); // 9:00-11:00
-                } else if (isOverlap(start, end, "11:00", "12:59")) {
+                }
+                if (isOverlap(start, end, "11:00", "12:59")) {
                     list.get(1).add(datNameVo); // 11:00-13:00
-                } else if (isOverlap(start, end, "13:00", "14:59")) {
+                }
+                if (isOverlap(start, end, "13:00", "14:59")) {
                     list.get(2).add(datNameVo); // 13:00-15:00
-                } else if (isOverlap(start, end, "15:00", "16:59")) {
+                }
+                if (isOverlap(start, end, "15:00", "16:59")) {
                     list.get(3).add(datNameVo); // 15:00-17:00
-                } else if (isOverlap(start, end, "17:00", "18:59")) {
+                }
+                if (isOverlap(start, end, "17:00", "18:59")) {
                     list.get(4).add(datNameVo); // 17:00-19:00
-                } else if (isOverlap(start, end, "19:00", "21:00")) {
+                }
+                if (isOverlap(start, end, "19:00", "21:00")) {
                     list.get(5).add(datNameVo); // 19:00-21:00
                 }
             } catch (ParseException e) {
