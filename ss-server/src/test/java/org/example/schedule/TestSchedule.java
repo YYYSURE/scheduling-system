@@ -1,33 +1,49 @@
-package org.example.controller.schedule;
+package org.example.schedule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.dto.ScheduleRuleDTO;
 import org.example.dto.TimeData;
 import org.example.entity.SchedulingRule;
 import org.example.intelligent_scheduling_server.mapper.SchedulingRuleMapper;
-import org.example.result.Result;
 import org.example.vo.ScheduleRuleVO;
-import org.example.vo.employee.EmployeeInfoVo;
-import org.springframework.beans.BeanUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-
-@RestController
-@RequestMapping("/ScheduleRule")
-public class ScheduleController {
+@SpringBootTest
+public class TestSchedule {
     @Autowired
     private SchedulingRuleMapper schedulingRuleMapper;
 
-    // 获取排班规则
-    @GetMapping
-    public Result getScheduleRule(@RequestParam int storeId) {
-        SchedulingRule scheduleRule = schedulingRuleMapper.getScheduleRule(storeId);
+    @Test
+    public void TestGetSchduleWorkTime() {
+        SchedulingRule scheduleRule = schedulingRuleMapper.getScheduleRule(1);
+
+        String workTime = scheduleRule.getStoreWorkTimeFrame();
+        System.out.println(workTime);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // 解析 JSON 数据到 Map 对象
+            Map<String, List<String>> schedule = objectMapper.readValue(workTime, Map.class);
+
+            // 打印解析后的数据
+            for (Map.Entry<String, List<String>> entry : schedule.entrySet()) {
+                System.out.println(entry.getKey() + ": " + String.join(", ", entry.getValue()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    @Test
+    public void TestGetSchduleRule() {
+
+        SchedulingRule scheduleRule = schedulingRuleMapper.getScheduleRule(1);
         ScheduleRuleVO scheduleRuleVO = new ScheduleRuleVO();
 
         scheduleRuleVO.setDayTime(scheduleRule.getMostWorkHourInOneDay());
@@ -81,13 +97,12 @@ public class ScheduleController {
 
         System.out.println(scheduleRuleVO);
 
-
-        return Result.ok().addData("data", scheduleRuleVO);
     }
 
-    // 修改排班规则
-    @PutMapping("/modify")
-    public Result modifyScheduleRule(@RequestBody ScheduleRuleDTO scheduleRuleDTO, @RequestParam int storeId) {
+    @Test
+    public void TestModifyScheduleRule() {
+        ScheduleRuleDTO scheduleRuleDTO = new ScheduleRuleDTO(4, 30, "11:30", "13:30", "17:00", "19:00", 2, 4, null, "09:00-21:00", "10:00-22:00");
+
         SchedulingRule schedulingRule = new SchedulingRule();
         schedulingRule.setStoreId(1L);
 
@@ -135,10 +150,9 @@ public class ScheduleController {
 
         schedulingRule.setRuleType(0);
 
-        schedulingRuleMapper.update(schedulingRule, storeId);
+        schedulingRuleMapper.update(schedulingRule, 1);
 
 
 
-        return Result.ok();
     }
 }
